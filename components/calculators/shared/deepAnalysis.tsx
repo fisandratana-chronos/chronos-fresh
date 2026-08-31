@@ -212,7 +212,7 @@ function buildGrowthSchedule(principal, monthlyRate, monthlyContrib, totalMonths
   return schedule;
 }
 
-function GrowthDeepAnalysis({ principal, monthlyRate, monthlyContrib, totalMonths, periodLabel="month" }) {
+export function GrowthDeepAnalysis({ principal, monthlyRate, monthlyContrib, totalMonths, periodLabel="month" }) {
   const { T } = useTheme();
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
