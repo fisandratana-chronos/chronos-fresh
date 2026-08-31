@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import { useTheme } from './contexts'
 import { Inp, Row } from './ui'
 
-function buildAmortization(principal, monthlyRate, monthlyPayment, numPayments, extraPayment=0) {
+export function buildAmortization(principal, monthlyRate, monthlyPayment, numPayments, extraPayment=0) {
   let balance = principal;
   const schedule = [];
   let cumPrincipal=0, cumInterest=0;
@@ -23,7 +23,7 @@ function buildAmortization(principal, monthlyRate, monthlyPayment, numPayments, 
   return schedule;
 }
 
-function sampleSchedule(schedule, maxPoints=60) {
+export function sampleSchedule(schedule, maxPoints=60) {
   if(schedule.length <= maxPoints) return schedule;
   const step = Math.ceil(schedule.length / maxPoints);
   const sampled = schedule.filter((_,i)=>i%step===0);
@@ -31,7 +31,7 @@ function sampleSchedule(schedule, maxPoints=60) {
   return sampled;
 }
 
-function LoanDeepAnalysis({ principal, monthlyRate, monthlyPayment, numPayments, periodLabel="month" }) {
+export function LoanDeepAnalysis({ principal, monthlyRate, monthlyPayment, numPayments, periodLabel="month" }) {
   const { T } = useTheme();
   const [open, setOpen] = useState(false);
   const [year, setYear] = useState(0); // 0-indexed period block
@@ -199,7 +199,7 @@ function LoanDeepAnalysis({ principal, monthlyRate, monthlyPayment, numPayments,
   );
 }
 
-function buildGrowthSchedule(principal, monthlyRate, monthlyContrib, totalMonths) {
+export function buildGrowthSchedule(principal, monthlyRate, monthlyContrib, totalMonths) {
   let bal = principal;
   const schedule = [];
   let cumContrib=0, cumInterest=0;
