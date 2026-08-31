@@ -1,0 +1,4725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ImageKit — Free Online Image Tools: Compress, Convert, Resize, Remove Background</title>
+
+<!-- ─── SEO META ─────────────────────────────────────────── -->
+<meta name="description" content="Free browser-based image tools — compress, convert, resize, AI upscale, and remove background from images instantly. No uploads, no account, 100% private.">
+<meta name="keywords" content="image compressor, background remover, image converter, resize image, AI upscaler, free image tools, online image editor, remove background free, compress jpg png webp">
+<meta name="robots" content="index, follow">
+<meta name="author" content="ImageKit">
+<link rel="canonical" href="https://imagekit.app/">
+
+<!-- ─── FAVICON (inline SVG — no extra file needed) ─── -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f59e0b'/><text y='24' x='4' font-size='22'>🖼</text></svg>">
+<meta name="theme-color" content="#f59e0b">
+
+<!-- ─── OPEN GRAPH ─── -->
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="ImageKit — Free Online Image Tools">
+<meta property="og:description" content="Compress, convert, resize, AI upscale, and remove background from images — all free, all in your browser. No uploads, no account.">
+<meta property="og:image"       content="https://imagekit.app/og-image.png">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt"   content="ImageKit — Free Online Image Tools">
+<meta property="og:url"         content="https://imagekit.app/">
+<meta property="og:site_name"   content="ImageKit">
+<meta property="og:locale"      content="en_US">
+
+<!-- ─── TWITTER CARD ─── -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="ImageKit — Free Online Image Tools">
+<meta name="twitter:description" content="Compress, convert, resize, AI upscale, and remove background from images — all free, all in your browser.">
+<meta name="twitter:image"       content="https://imagekit.app/og-image.png">
+<meta name="twitter:image:alt"  content="ImageKit — Free Online Image Tools">
+
+<!-- ─── STRUCTURED DATA (WebApplication) ─── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "ImageKit",
+  "description": "Free browser-based image tools: compress, convert, resize, AI upscale, and remove background from images instantly. No account needed.",
+  "url": "https://imagekit.app/",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Any (Web Browser)",
+  "browserRequirements": "Requires a modern browser with JavaScript enabled",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "featureList": [
+    "Image compression with quality control",
+    "Format conversion — JPG, PNG, WEBP, AVIF",
+    "Social media resizer with presets",
+    "AI upscaler powered by Real-ESRGAN",
+    "AI background remover — 100% in-browser"
+  ],
+  "screenshot": "https://imagekit.app/og-image.png"
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="dns-prefetch" href="https://staticimgly.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Shepherd CSS, browser-image-compression, JSZip, Shepherd JS
+     are lazy-loaded on demand — see CDN + loadScript() in JS. -->
+<style>
+  :root {
+    --bg: #0e0e0f;
+    --surface: #181819;
+    --surface2: #222224;
+    --border: #2e2e32;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --text: #f0ede8;
+    --muted: #7a7a82;
+    --success: #34d399;
+    --danger: #f87171;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  /* ─── LIGHT MODE ─── */
+  [data-theme="light"] {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #ebebeb;
+    --border: #d4d2cc;
+    --text: #1a1a1b;
+    --muted: #7a7a82;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    padding: 0 0 110px; /* extra space for sticky footer ad */
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 200% at 0% 50%, rgba(245,158,11,.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: grid; place-items: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.5px; }
+  .logo-sub { font-size: .78rem; color: var(--muted); margin-top: 1px; }
+  header .badge {
+    margin-left: auto;
+    background: rgba(245,158,11,.12);
+    border: 1px solid rgba(245,158,11,.3);
+    color: var(--accent);
+    font-size: .72rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: .3px;
+  }
+
+  /* ─── TABS ─── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 20px 32px 0;
+    border-bottom: 1px solid var(--border);
+    /* Scrollable on narrow screens — no wrapping */
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: none; /* Firefox */
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: none; border: none; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    color: var(--muted);
+    position: relative;
+    transition: color .2s;
+    flex-shrink: 0;           /* never compress */
+    scroll-snap-align: start;
+    /* Desktop: horizontal label */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px 14px;
+    font-size: .88rem;
+    letter-spacing: -.2px;
+    white-space: nowrap;
+  }
+  .tab-btn.active { color: var(--text); }
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px 2px 0 0;
+  }
+  .tab-btn:hover { color: var(--text); }
+  /* Tab icon — hidden on desktop, shown on mobile */
+  .tab-icon { font-size: 1rem; display: none; }
+  /* Tab label — always shown on desktop */
+  .tab-label { display: inline; }
+  .tab-number {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px;
+    background: var(--surface2);
+    border-radius: 5px;
+    font-size: .7rem;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .tab-btn.active .tab-number {
+    background: rgba(245,158,11,.18);
+    color: var(--accent);
+  }
+
+  /* ── Mobile tabs: icon + short label, scrollable ── */
+  @media (max-width: 520px) {
+    .tabs { padding: 12px 8px 0; gap: 0; }
+    .tab-btn { padding: 8px 12px 11px; font-size: .76rem; gap: 4px; }
+    .tab-icon { display: inline; }
+  }
+  @media (max-width: 360px) {
+    /* Very narrow: icon only, label hidden */
+    .tab-label { display: none; }
+    .tab-icon  { display: inline; font-size: 1.15rem; }
+    .tab-btn   { padding: 8px 14px 11px; }
+  }
+
+  /* ─── PANELS ─── */
+  .panel { display: none; padding: 32px; max-width: 860px; }
+  .panel.active { display: block; }
+
+  /* ─── DROPZONE ─── */
+  /* ─── COMPRESS PREVIEW GRID ─── */
+  .compress-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .cpg-item {
+    position: relative;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--surface2);
+    aspect-ratio: 1;
+    border: 1px solid var(--border);
+  }
+  .cpg-thumb {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .cpg-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.65) 0%, transparent 55%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 5px 6px;
+    pointer-events: none;
+  }
+  .cpg-name {
+    font-size: .62rem;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+  .cpg-size {
+    font-size: .58rem;
+    color: rgba(255,255,255,.7);
+    margin-top: 1px;
+  }
+  .cpg-remove {
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 18px; height: 18px;
+    background: rgba(0,0,0,.55);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: .65rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+    pointer-events: all;
+    transition: background .15s;
+  }
+  .cpg-remove:hover { background: var(--danger); }
+  .cpg-more {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    aspect-ratio: 1;
+    font-size: .75rem;
+    color: var(--muted);
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .cpg-more:hover { border-color: var(--accent); color: var(--accent); }
+  .compress-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .compress-preview-count {
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .compress-add-more {
+    font-size: .75rem;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
+  }
+  .compress-add-more:hover { text-decoration: underline; }
+
+  /* Mobile drop hint — shown only on touch devices */
+  .dropzone-mobile-hint {
+    display: none;
+    font-size: .75rem;
+    color: var(--accent);
+    margin-top: 6px;
+  }
+  @media (hover: none) and (pointer: coarse) {
+    /* Touch device: show mobile hint, hide desktop drag copy */
+    .dropzone-mobile-hint { display: block; }
+    .dropzone h3::after { content: ''; }
+  }
+  /* Dropzone focus visible state */
+  .dropzone:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(245,158,11,.15);
+  }
+
+  .dropzone {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 48px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .dropzone.drag-over {
+    border-color: var(--accent);
+    background: rgba(245,158,11,.04);
+  }
+  .dropzone-icon {
+    font-size: 2.8rem;
+    margin-bottom: 14px;
+    display: block;
+    filter: grayscale(30%);
+  }
+  .dropzone h3 { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+  .dropzone p { font-size: .85rem; color: var(--muted); }
+  .dropzone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .browse-link { color: var(--accent); text-decoration: underline; }
+
+  /* ─── SECTION LABEL ─── */
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  /* ─── SLIDER BLOCK ─── */
+  .slider-block { margin: 28px 0; }
+  .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .slider-header .label { font-size: .88rem; color: var(--text); font-weight: 500; }
+  .quality-pill {
+    font-family: 'Syne', sans-serif; font-size: .78rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(245,158,11,.15); color: var(--accent);
+    transition: background .2s, color .2s;
+  }
+  .quality-pill.low { background: rgba(248,113,113,.15); color: var(--danger); }
+  .quality-pill.medium { background: rgba(251,191,36,.12); color: #fbbf24; }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%; height: 4px;
+    background: var(--surface2);
+    border-radius: 4px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .slider-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: .75rem; color: var(--muted); }
+
+  /* ─── STATS COMPARE ─── */
+  .stats-compare {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 12px; align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+  .stat-box { text-align: center; }
+  .stat-label { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; }
+  .stat-value.old { color: var(--danger); }
+  .stat-value.new { color: var(--success); }
+  .stat-arrow { font-size: 1.3rem; color: var(--muted); }
+  .saving-badge {
+    text-align: center; margin-top: 6px;
+    font-size: .82rem; color: var(--success); font-weight: 500;
+  }
+
+  /* ─── IMAGE PREVIEW ─── */
+  .preview-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin: 20px 0;
+  }
+  .preview-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .preview-card-label {
+    padding: 8px 14px;
+    font-size: .75rem; font-weight: 500;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+  }
+  .preview-card img {
+    width: 100%; display: block;
+    max-height: 200px; object-fit: contain;
+    background: #111;
+  }
+
+  /* ─── PROGRESS ─── */
+  .progress-wrap {
+    background: var(--surface2);
+    border-radius: 6px; height: 6px;
+    margin: 16px 0; overflow: hidden;
+    display: none;
+  }
+  .progress-wrap.visible { display: block; }
+  .progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 6px;
+    transition: width .3s;
+  }
+  .progress-text { font-size: .8rem; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  /* ─── GLOBAL FOCUS RING ─── */
+  /* Single consistent focus style — visible only for keyboard nav */
+  :focus { outline: none; }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  /* Range slider focus ring (webkit/moz) */
+  input[type=range]:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent);
+  }
+  input[type=range]:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent);
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: none; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-size: .88rem; font-weight: 700;
+    padding: 12px 24px; border-radius: var(--radius-sm);
+    transition: opacity .2s, transform .1s;
+    letter-spacing: .1px;
+    text-decoration: none;
+    position: relative;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--accent); color: #0e0e0f; }
+  .btn-primary:hover:not(:disabled) { opacity: .9; }
+  .btn-primary:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+  /* Loading spinner state — add class="btn-loading" via JS */
+  .btn-loading { pointer-events: none; opacity: .7; }
+  .btn-loading::after {
+    content: '';
+    display: inline-block;
+    width: 12px; height: 12px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: btn-spin .6s linear infinite;
+    margin-left: 6px;
+  }
+  @keyframes btn-spin { to { transform: rotate(360deg); } }
+  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+  /* ─── ARIA-LIVE STATUS REGION ─── */
+  #a11y-status {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+  }
+
+  /* ─── RESIZER ─── */
+  .presets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px; margin: 16px 0 24px;
+  }
+  .preset-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .preset-card:hover { border-color: rgba(245,158,11,.4); }
+  .preset-card.selected {
+    border-color: var(--accent);
+    background: rgba(245,158,11,.05);
+  }
+  .preset-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 8px; right: 10px;
+    font-size: .75rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .preset-platform {
+    font-size: .7rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .8px; color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .preset-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .92rem; margin-bottom: 3px; }
+  .preset-dims { font-size: .78rem; color: var(--muted); }
+  .preset-aspect {
+    margin-top: 8px;
+    width: 100%; height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .preset-aspect-fill {
+    height: 100%;
+    background: var(--accent);
+    opacity: .5;
+    border-radius: 2px;
+  }
+
+  /* ─── FIT MODE ─── */
+  .fit-modes { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .fit-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem; font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .fit-btn.active {
+    background: rgba(245,158,11,.14);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .fit-desc { font-size: .8rem; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+
+  /* ─── OUTPUT CANVAS PREVIEW ─── */
+  #resize-preview-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    text-align: center;
+    padding: 20px;
+    min-height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 16px 0;
+  }
+  #resize-canvas { max-width: 100%; max-height: 300px; border-radius: 4px; display: none; }
+  #resize-placeholder { color: var(--muted); font-size: .88rem; }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--success);
+    color: var(--text);
+    padding: 12px 18px;
+    border-radius: var(--radius-sm);
+    font-size: .85rem;
+    transform: translateY(20px); opacity: 0;
+    transition: all .3s;
+    z-index: 100;
+    max-width: 300px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ─── HEADER BADGE RESPONSIVE ─── */
+  .header-badge {
+    background: rgba(245,158,11,.12);
+    border: 1px solid rgba(245,158,11,.3);
+    color: var(--accent);
+    font-size: .72rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: .3px;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .header-badge:hover { background: rgba(245,158,11,.2); }
+  /* Desktop: show full text, hide short */
+  .badge-short { display: none; }
+  .badge-full  { display: inline; }
+  /* Mobile: show short text only */
+  @media (max-width: 480px) {
+    .badge-short { display: inline; }
+    .badge-full  { display: none; }
+  }
+
+  /* ─── PRIVACY POPUP ─── */
+  .privacy-popup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 80px;
+    width: min(300px, calc(100vw - 32px));
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    z-index: 500;
+  }
+  .privacy-popup.open { display: block; }
+  .privacy-popup-close {
+    position: absolute;
+    top: 10px; right: 12px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: .85rem;
+    padding: 2px 6px;
+  }
+  .privacy-popup-close:hover { color: var(--text); }
+  .privacy-popup-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .92rem;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .privacy-popup-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: .8rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    header { padding: 18px 18px 14px; gap: 10px; }
+    .tabs { padding: 16px 18px 0; }
+    .panel { padding: 20px 18px; }
+    .preview-grid { grid-template-columns: 1fr; }
+    .stats-compare { grid-template-columns: 1fr; gap: 8px; }
+    .stat-arrow { transform: rotate(90deg); }
+  }
+
+  /* ─── EMPTY STATE ANIM ─── */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .dropzone-icon { animation: float 3s ease-in-out infinite; }
+
+  /* ─── AD SLOTS ─── */
+  /* Hidden by default — only shown when a real ad (<ins>/<iframe>) is injected.
+     CSS :has() handles modern browsers; JS MutationObserver handles the rest.
+     Never show a blank slot to users. */
+  .ad-slot {
+    width: 100%;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: none;               /* ← hidden until ad is present */
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  /* Show slot when a real ad child exists — modern browsers */
+  .ad-slot:has(> ins, > iframe) { display: flex; }
+
+  /* Slot 1: Header banner — 728×90 leaderboard */
+  .ad-slot-leaderboard {
+    min-height: 90px;
+  }
+  /* Slot 2: Results banner — 300×250 medium rectangle, centered */
+  .ad-slot-rectangle {
+    min-height: 250px;
+    margin: 24px 0 0;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  /* Placeholder shown until real ad fills the slot */
+  .ad-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%; height: 100%;
+    min-height: inherit;
+    pointer-events: none;
+  }
+  .ad-placeholder-label {
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--border);
+  }
+  .ad-placeholder-dims {
+    font-size: .65rem;
+    color: var(--border);
+  }
+  /* Hide placeholder once a real ad child is injected */
+  .ad-slot ins ~ .ad-placeholder,
+  .ad-slot iframe ~ .ad-placeholder { display: none; }
+
+  @media (max-width: 600px) {
+    /* On mobile, leaderboard downsizes to 320×50 */
+    .ad-slot-leaderboard { min-height: 50px; }
+    .ad-slot-rectangle   { min-height: 250px; }
+  }
+
+  /* ─── AD SLOT 3: Sticky footer 728×90 ─── */
+  .ad-slot-sticky-footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 500;
+    min-height: 90px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 20px rgba(0,0,0,.25);
+    justify-content: center;
+    align-items: center;
+  }
+  /* Close button for sticky footer */
+  .ad-sticky-close {
+    position: absolute;
+    top: 6px; right: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: .7rem;
+    width: 22px; height: 22px;
+    display: grid; place-items: center;
+    line-height: 1;
+    transition: all .15s;
+    z-index: 1;
+  }
+  .ad-sticky-close:hover { border-color: var(--accent); color: var(--accent); }
+  @media (max-width: 600px) {
+    .ad-slot-sticky-footer { min-height: 50px; }
+  }
+
+  /* ─── BACKGROUND REMOVER ─── */
+  .bgr-canvas-wrap {
+    position: relative;
+    background: repeating-conic-gradient(#3a3a3c 0% 25%, #2a2a2c 0% 50%) 0 0 / 20px 20px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 260px;
+    border: 1px solid var(--border);
+  }
+  [data-theme="light"] .bgr-canvas-wrap {
+    background: repeating-conic-gradient(#d8d8d8 0% 25%, #f0f0f0 0% 50%) 0 0 / 20px 20px;
+  }
+  .bgr-canvas-wrap canvas, .bgr-canvas-wrap img {
+    max-width: 100%; max-height: 420px;
+    object-fit: contain; display: block;
+  }
+  .bgr-bg-strip {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin: 14px 0 20px; align-items: center;
+  }
+  .bgr-bg-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: border-color .15s, transform .1s;
+    flex-shrink: 0;
+  }
+  .bgr-bg-btn:hover { border-color: var(--accent); transform: scale(1.08); }
+  .bgr-bg-btn.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(245,158,11,.3); }
+  .bgr-bg-btn.checker {
+    background: repeating-conic-gradient(#888 0% 25%, #fff 0% 50%) 0 0 / 12px 12px;
+  }
+  .bgr-model-note {
+    font-size: .75rem; color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .bgr-progress-label {
+    font-size: .82rem; color: var(--muted);
+    text-align: center; margin-top: 10px;
+  }
+
+  /* ─── AD SLOT: after download results ─── */
+  .ad-slot-after-result {
+    min-height: 250px;
+    margin: 24px 0 0;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  /* ─── AI UPSCALER ─── */
+  .upscale-scale-grid {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin: 16px 0 24px;
+  }
+  .scale-btn {
+    flex: 1; min-width: 80px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .scale-btn:hover { border-color: rgba(245,158,11,.4); }
+  .scale-btn.selected {
+    border-color: var(--accent);
+    background: rgba(245,158,11,.06);
+  }
+  .scale-btn.selected::after {
+    content: '✓';
+    position: absolute; top: 6px; right: 8px;
+    font-size: .7rem; color: var(--accent); font-weight: 700;
+  }
+  .scale-btn-value {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1.3rem; color: var(--text);
+    display: block; margin-bottom: 2px;
+  }
+  .scale-btn-label { font-size: .72rem; color: var(--muted); }
+
+  /* Processing spinner */
+  .upscale-processing {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .upscale-processing.visible { display: flex; }
+  .spinner-ring {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 3px solid var(--surface2);
+    border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .processing-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
+  }
+  .processing-sub { font-size: .82rem; color: var(--muted); }
+
+  /* Result compare */
+  .upscale-result { margin-top: 20px; }
+  .compare-wrap {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin: 16px 0;
+  }
+  .compare-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .compare-card-label {
+    padding: 8px 14px;
+    font-size: .75rem; font-weight: 500;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .compare-card img {
+    width: 100%; display: block;
+    max-height: 220px; object-fit: contain;
+    background: #111;
+  }
+  .res-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: .68rem; font-weight: 700;
+    padding: 2px 7px; border-radius: 10px;
+  }
+  .res-badge.old { background: rgba(248,113,113,.15); color: var(--danger); }
+  .res-badge.new { background: rgba(52,211,153,.15); color: var(--success); }
+
+  /* Daily limit bar */
+  .limit-bar-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .limit-bar-track {
+    flex: 1; height: 5px;
+    background: var(--surface2);
+    border-radius: 4px; overflow: hidden;
+  }
+  .limit-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success), var(--accent));
+    border-radius: 4px;
+    transition: width .4s;
+  }
+  .limit-bar-fill.warning { background: linear-gradient(90deg, var(--accent), var(--danger)); }
+  .limit-text { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+  .limit-text strong { color: var(--text); }
+
+  /* API key input */
+  .api-key-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-bottom: 20px;
+  }
+  .api-key-section label {
+    display: block; font-size: .78rem;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .api-key-row { display: flex; gap: 8px; }
+  .api-key-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .83rem;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .api-key-input:focus { border-color: var(--accent); }
+  .api-key-input::placeholder { color: var(--muted); }
+
+  @media (max-width: 600px) {
+    .compare-wrap { grid-template-columns: 1fr; }
+    .upscale-scale-grid .scale-btn { min-width: 60px; padding: 10px 6px; }
+  }
+
+  /* ─── DARK MODE TOGGLE ─── */
+  .theme-toggle {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: .85rem;
+    padding: 6px 12px;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── GUIDED TOUR BUTTON ─── */
+  .tour-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: .8rem;
+    font-weight: 700;
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    transition: all .2s;
+    flex-shrink: 0;
+  }
+  .tour-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── COMPARE SLIDER ─── */
+  .compare-slider-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    user-select: none;
+    background: var(--surface2);
+    height: 260px;        /* fixed height — no black bars */
+    touch-action: none;
+  }
+  /* Base (bottom) image: fills the slot with cover */
+  .compare-slider-wrap > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+  }
+  .compare-slider-top {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    width: 50%;
+  }
+  /* Top overlay image must match base exactly */
+  .compare-slider-top img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;         /* full wrap width — clip handled by overflow:hidden */
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    max-height: none;
+  }
+  .compare-divider {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: var(--accent);
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .compare-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid #fff;
+    display: grid; place-items: center;
+    font-size: .7rem;
+    color: #000;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+    z-index: 4;
+    transition: transform .15s;
+  }
+  .compare-handle.dragging { transform: translate(-50%, -50%) scale(1.15); }
+
+  /* ─── COMPARE TOOLBAR ─── */
+  .compare-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    border-bottom: none;
+  }
+  .cmp-tool-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: .75rem;
+    padding: 4px 8px;
+    line-height: 1;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .cmp-tool-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .cmp-tool-btn.active { background: rgba(245,158,11,.14); border-color: var(--accent); color: var(--accent); }
+  .cmp-zoom-level {
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem;
+    color: var(--muted);
+    min-width: 34px;
+    text-align: center;
+  }
+  .cmp-tool-sep { width: 1px; height: 16px; background: var(--border); margin: 0 2px; flex-shrink: 0; }
+
+  /* ─── COMPARE LABELS ─── */
+  .compare-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0;
+    font-size: .72rem;
+    color: var(--muted);
+    padding: 5px 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    border-top: none;
+  }
+
+  /* ─── FULLSCREEN MODAL ─── */
+  .fs-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(0,0,0,.96);
+    flex-direction: column;
+  }
+  .fs-modal.open { display: flex; }
+  .fs-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    flex-shrink: 0;
+  }
+  .fs-title { font-family: 'Syne', sans-serif; font-size: .88rem; font-weight: 700; color: #fff; margin-right: auto; }
+  .fs-tool-btn {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 6px;
+    color: rgba(255,255,255,.7);
+    cursor: pointer;
+    font-size: .78rem;
+    padding: 6px 12px;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .fs-tool-btn:hover { background: rgba(245,158,11,.2); border-color: var(--accent); color: var(--accent); }
+  .fs-zoom-level {
+    font-family: 'Syne', sans-serif;
+    font-size: .75rem;
+    color: rgba(255,255,255,.45);
+    min-width: 40px;
+    text-align: center;
+  }
+  .fs-hint {
+    font-size: .68rem;
+    color: rgba(255,255,255,.25);
+    padding: 0 4px;
+  }
+  .fs-body {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+  }
+  .fs-body.dragging { cursor: grabbing; }
+  .fs-compare-wrap {
+    position: absolute;
+    transform-origin: center center;
+    /* width/height set by JS to natural image size */
+  }
+  .fs-compare-wrap img {
+    display: block;
+    pointer-events: none;
+  }
+  .fs-top-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    width: 50%;
+  }
+  .fs-top-layer img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill; /* exact pixel match in fullscreen */
+  }
+  .fs-divider {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: var(--accent);
+    transform: translateX(-50%);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .fs-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid #fff;
+    display: grid; place-items: center;
+    font-size: .75rem;
+    color: #000;
+    z-index: 4;
+    box-shadow: 0 2px 12px rgba(0,0,0,.6);
+    pointer-events: none;
+  }
+  .fs-labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 16px;
+    font-size: .75rem;
+    color: rgba(255,255,255,.35);
+    border-top: 1px solid rgba(255,255,255,.06);
+    flex-shrink: 0;
+  }
+
+  /* ─── CUSTOM SIZE INPUT ─── */
+  .custom-size-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 12px 0 20px;
+    flex-wrap: wrap;
+  }
+  .custom-size-row input[type=number] {
+    width: 90px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .custom-size-row input[type=number]:focus { border-color: var(--accent); }
+  .custom-size-sep { color: var(--muted); font-weight: 700; }
+
+  /* ─── LETTERBOX COLOR PICKER ─── */
+  .letterbox-color-row {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: .82rem;
+    color: var(--muted);
+  }
+  .letterbox-color-row.visible { display: flex; }
+  .letterbox-color-row input[type=color] {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .stats-bar::-webkit-scrollbar { display: none; }
+  .stat-item {
+    flex: 1;
+    min-width: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 10px;
+    border-right: 1px solid var(--border);
+    position: relative;
+    gap: 3px;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item-icon {
+    font-size: .95rem;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .stat-item-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.08rem;
+    color: var(--accent);
+    letter-spacing: -.5px;
+    line-height: 1;
+  }
+  .stat-item-label {
+    font-size: .65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .stat-item-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    opacity: 0;
+    transition: opacity .4s;
+  }
+  .stat-item-badge.pulse {
+    opacity: 1;
+    animation: badge-pulse 1.2s ease-out forwards;
+  }
+  @keyframes badge-pulse {
+    0%   { opacity: 1; transform: scale(1); }
+    60%  { opacity: 1; transform: scale(1.8); }
+    100% { opacity: 0; transform: scale(1); }
+  }
+  @media (max-width: 600px) {
+    .stat-item { min-width: 80px; padding: 10px 6px; }
+    .stat-item-value { font-size: .92rem; }
+    .stat-item-label { font-size: .58rem; }
+  }
+
+  /* ─── RESULTS HERO BADGE ─── */
+  .ik-results-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 28px 20px 24px;
+    margin-bottom: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .ik-hero-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ik-hero-emoji { font-size: 2rem; line-height: 1; }
+  .ik-hero-pct {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    color: var(--success);
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .ik-hero-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--success);
+    letter-spacing: 2px;
+    align-self: flex-end;
+    padding-bottom: 6px;
+  }
+  .ik-hero-detail {
+    font-family: 'Syne', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 2px;
+  }
+  .ik-hero-sizes {
+    font-size: .78rem;
+    color: var(--muted);
+  }
+  .ik-hero-arrow { margin: 0 4px; }
+
+  /* ─── RESULT CARD ─── */
+  .ik-result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .ik-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ik-card-thumb {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--surface2);
+  }
+  .ik-card-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .ik-card-filename {
+    font-size: .85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text);
+  }
+  .ik-card-dims {
+    font-size: .72rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .ik-card-sizes {
+    font-size: .78rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .ik-size-orig { color: var(--danger); font-weight: 500; }
+  .ik-size-arrow { margin: 0 4px; color: var(--muted); }
+  .ik-size-comp { color: var(--success); font-weight: 500; }
+  .ik-card-badge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .ik-saved-badge {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--success);
+    white-space: nowrap;
+  }
+  .ik-ai-badge {
+    font-size: .65rem;
+    background: rgba(245,158,11,.15);
+    color: var(--accent);
+    border-radius: 10px;
+    padding: 2px 7px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  @media (max-width: 600px) {
+    .ik-card-thumb { width: 44px; height: 44px; }
+    .ik-hero-pct { font-size: 2.4rem; }
+  }
+
+  /* ─── FORMAT CONVERTER PANEL ─── */
+  .cvt-format-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 480px) {
+    .cvt-format-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .cvt-fmt-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 10px 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .cvt-fmt-btn:hover { border-color: rgba(245,158,11,.4); }
+  .cvt-fmt-btn.selected {
+    border-color: var(--accent);
+    background: rgba(245,158,11,.07);
+  }
+  .cvt-fmt-btn.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 6px; right: 9px;
+    font-size: .65rem;
+    color: var(--accent);
+    font-weight: 800;
+  }
+  .cvt-fmt-btn.disabled {
+    opacity: .35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .cvt-fmt-ext {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text);
+    letter-spacing: .5px;
+  }
+  .cvt-fmt-btn.selected .cvt-fmt-ext { color: var(--accent); }
+  .cvt-fmt-desc {
+    font-size: .68rem;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* Converted result row */
+  .cvt-result-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+  }
+  .cvt-result-thumb {
+    width: 40px; height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--surface2);
+  }
+  .cvt-result-info { flex: 1; min-width: 0; }
+  .cvt-result-name {
+    font-size: .82rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cvt-result-meta { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+  .cvt-result-badge {
+    font-size: .68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(52,211,153,.15);
+    color: var(--success);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* ─── COMPRESSION MODE BUTTONS ─── */
+  .compress-mode-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    text-align: left;
+  }
+  .compress-mode-btn:hover { border-color: rgba(245,158,11,.4); }
+  .compress-mode-btn.active {
+    border-color: var(--accent);
+    background: rgba(245,158,11,.06);
+  }
+  .compress-mode-icon { font-size: 1.15rem; margin-bottom: 2px; }
+  .compress-mode-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .88rem;
+    color: var(--text);
+  }
+  .compress-mode-btn.active .compress-mode-label { color: var(--accent); }
+  .compress-mode-desc { font-size: .72rem; color: var(--muted); }
+
+  /* ─── FORMAT RADIO GROUP ─── */
+  #format-options label.fit-btn { display:inline-flex; align-items:center; }
+  #format-options label.fit-btn.active {
+    background: rgba(245,158,11,.14);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  #format-options label.fit-btn.disabled {
+    opacity: .35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ─── SHEPHERD OVERRIDES ─── */
+  .shepherd-element {
+    border: 1px solid var(--accent) !important;
+    border-radius: var(--radius) !important;
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4) !important;
+    max-width: 300px !important;
+  }
+  .shepherd-text { color: var(--text) !important; font-size: .88rem !important; line-height: 1.6 !important; }
+  .shepherd-title { color: var(--accent) !important; font-family: 'Syne', sans-serif !important; font-weight: 700 !important; }
+  .shepherd-button { border-radius: 6px !important; font-family: 'Syne', sans-serif !important; font-weight: 700 !important; font-size: .8rem !important; }
+  .shepherd-button-primary { background: var(--accent) !important; color: #000 !important; }
+  .shepherd-button-secondary { background: var(--surface2) !important; color: var(--muted) !important; border: 1px solid var(--border) !important; }
+  .shepherd-arrow::before { background: var(--surface) !important; border-color: var(--accent) !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">🖼</div>
+  <div>
+    <div class="logo-text">ImageKit</div>
+    <div class="logo-sub">Free image tools for everyone</div>
+  </div>
+  <!-- Badge: compact on mobile, full on desktop. Click opens detail popup. -->
+  <button class="badge header-badge" id="privacy-badge" onclick="togglePrivacyPopup()" aria-expanded="false" style="margin-left:auto;">
+    <span class="badge-short">🔒 100% Private</span>
+    <span class="badge-full">100% Browser-based · No upload · Private</span>
+  </button>
+  <!-- Privacy detail popup -->
+  <div class="privacy-popup" id="privacy-popup"
+       role="dialog" aria-modal="true" aria-labelledby="privacy-popup-title"
+       aria-hidden="true">
+    <button class="privacy-popup-close" id="privacy-popup-close"
+            onclick="togglePrivacyPopup()" aria-label="Close privacy info">✕</button>
+    <div class="privacy-popup-title" id="privacy-popup-title">🔒 Your privacy, guaranteed</div>
+    <ul class="privacy-popup-list">
+      <li>✅ <strong>100% browser-based</strong> — all processing happens on your device</li>
+      <li>✅ <strong>No upload</strong> — your images never leave your browser</li>
+      <li>✅ <strong>No account</strong> — no sign-up, no tracking</li>
+      <li>✅ <strong>No server</strong> — we never see your files</li>
+    </ul>
+  </div>
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
+  <button class="tour-btn" onclick="startTour()" title="Guided tour">?</button>
+</header>
+
+<!-- ── AD SLOT 1: Leaderboard 728×90 (desktop) / 320×50 (mobile) ── -->
+<!-- Replace the <ins> tag below with your actual Google AdSense or network tag -->
+<div class="ad-slot ad-slot-leaderboard" id="ad-slot-top">
+  <!-- ins class="adsbygoogle" ... goes here -->
+  <div class="ad-placeholder">
+    <span class="ad-placeholder-label">Advertisement</span>
+    <span class="ad-placeholder-dims">728×90</span>
+  </div>
+</div>
+
+<div class="tabs" role="tablist" aria-label="ImageKit tools">
+  <button class="tab-btn active" role="tab" id="tab-compress"
+          aria-selected="true" aria-controls="panel-compress" tabindex="0"
+          onclick="switchTab('compress')">
+    <span class="tab-icon" aria-hidden="true">🗜️</span>
+    <span class="tab-label">Compressor</span>
+    <span class="tab-number" aria-hidden="true">1</span>
+  </button>
+  <button class="tab-btn" role="tab" id="tab-convert"
+          aria-selected="false" aria-controls="panel-convert" tabindex="-1"
+          onclick="switchTab('convert')">
+    <span class="tab-icon" aria-hidden="true">🔄</span>
+    <span class="tab-label">Converter</span>
+    <span class="tab-number" aria-hidden="true">3</span>
+  </button>
+  <button class="tab-btn" role="tab" id="tab-resize"
+          aria-selected="false" aria-controls="panel-resize" tabindex="-1"
+          onclick="switchTab('resize')">
+    <span class="tab-icon" aria-hidden="true">📐</span>
+    <span class="tab-label">Resizer</span>
+    <span class="tab-number" aria-hidden="true">2</span>
+  </button>
+  <button class="tab-btn" role="tab" id="tab-upscale"
+          aria-selected="false" aria-controls="panel-upscale" tabindex="-1"
+          onclick="switchTab('upscale')">
+    <span class="tab-icon" aria-hidden="true">✨</span>
+    <span class="tab-label">AI Upscaler</span>
+    <span class="tab-number" aria-hidden="true" style="background:rgba(139,92,246,.18);color:#a78bfa;">✨</span>
+  </button>
+  <button class="tab-btn" role="tab" id="tab-bgremove"
+          aria-selected="false" aria-controls="panel-bgremove" tabindex="-1"
+          onclick="switchTab('bgremove')">
+    <span class="tab-icon" aria-hidden="true">🪄</span>
+    <span class="tab-label">BG Remover</span>
+    <span class="tab-number" aria-hidden="true" style="background:rgba(52,211,153,.18);color:#34d399;">AI</span>
+  </button>
+</div>
+
+<!-- ════════════ STATS BAR ════════════ -->
+<div class="stats-bar" id="stats-bar">
+  <div class="stat-item" id="stat-images">
+    <div class="stat-item-badge" id="badge-images"></div>
+    <div class="stat-item-icon">🗜️</div>
+    <div class="stat-item-value" id="val-images">0</div>
+    <div class="stat-item-label">Images processed</div>
+  </div>
+  <div class="stat-item" id="stat-saved">
+    <div class="stat-item-badge" id="badge-saved"></div>
+    <div class="stat-item-icon">💾</div>
+    <div class="stat-item-value" id="val-saved">0 KB</div>
+    <div class="stat-item-label">Space saved</div>
+  </div>
+  <div class="stat-item" id="stat-resized">
+    <div class="stat-item-badge" id="badge-resized"></div>
+    <div class="stat-item-icon">📐</div>
+    <div class="stat-item-value" id="val-resized">0</div>
+    <div class="stat-item-label">Resized</div>
+  </div>
+  <div class="stat-item" id="stat-upscaled">
+    <div class="stat-item-badge" id="badge-upscaled"></div>
+    <div class="stat-item-icon">✨</div>
+    <div class="stat-item-value" id="val-upscaled">0</div>
+    <div class="stat-item-label">AI upscaled</div>
+  </div>
+</div>
+
+<!-- ════════════ PANEL 1: COMPRESSOR ════════════ -->
+<div id="panel-compress" class="panel active" role="tabpanel" aria-labelledby="tab-compress" tabindex="0">
+
+  <div class="dropzone" id="compress-drop" role="button" tabindex="0" aria-label="Image compressor upload area. Drag and drop images here, or press Enter to browse.">
+    <input type="file" id="compress-input" accept="image/*" multiple>
+    <span class="dropzone-icon">🗜️</span>
+    <h3>Drop your images here or click to browse</h3>
+    <p>JPG, PNG, WEBP — up to 20MB per image</p>
+    <p style="margin-top:8px;font-size:.82rem;">
+      <span class="browse-link" role="button" tabindex="-1" aria-hidden="true">Select from device</span>
+    </p>
+    <p class="dropzone-mobile-hint" aria-hidden="true">📱 On mobile: tap anywhere here to pick images</p>
+  </div>
+
+  <div id="compress-settings" style="display:none;">
+
+    <!-- ── COMPRESSION MODE ── -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;" id="compress-mode-row">
+      <button class="compress-mode-btn active" id="mode-normal" onclick="setCompressMode('normal')">
+        <span class="compress-mode-icon">🎚️</span>
+        <span class="compress-mode-label">Normal</span>
+        <span class="compress-mode-desc">You control quality</span>
+      </button>
+      <button class="compress-mode-btn" id="mode-ai" onclick="setCompressMode('ai')">
+        <span class="compress-mode-icon">🤖</span>
+        <span class="compress-mode-label">AI Recommended</span>
+        <span class="compress-mode-desc">Auto-picks best quality</span>
+      </button>
+    </div>
+
+    <!-- AI mode info banner (hidden in normal mode) -->
+    <div id="ai-mode-banner" style="display:none;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:.8rem;color:var(--muted);line-height:1.5;">
+      🤖 <strong style="color:var(--accent);">AI Recommended</strong> — Analyses each image (photo vs graphic, complexity) and picks the optimal quality automatically. No manual tuning needed.
+    </div>
+
+    <div class="slider-block" id="quality-slider-block">
+      <div class="slider-header">
+        <span class="label">Quality level</span>
+        <span class="quality-pill" id="quality-pill">High quality</span>
+      </div>
+      <input type="range" id="quality-slider" min="10" max="95" value="75"
+             role="slider" aria-label="Compression quality"
+             aria-valuemin="10" aria-valuemax="95" aria-valuenow="75"
+             aria-valuetext="High quality (75%)"
+             oninput="updateQualityLabel(this.value)">
+      <div class="slider-labels">
+        <span>Smallest file</span>
+        <span>Best quality</span>
+      </div>
+    </div>
+
+    <!-- ── FORMAT CONVERSION ── -->
+    <div class="slider-block" style="margin-top:0;">
+      <div class="section-label">Output Format</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;" id="format-options">
+        <label class="fit-btn active" id="fmt-original" style="cursor:pointer;">
+          <input type="radio" name="out-format" value="original" checked style="display:none;"> Auto (keep original)
+        </label>
+        <label class="fit-btn" id="fmt-jpg" style="cursor:pointer;">
+          <input type="radio" name="out-format" value="image/jpeg" style="display:none;"> JPG
+        </label>
+        <label class="fit-btn" id="fmt-png" style="cursor:pointer;">
+          <input type="radio" name="out-format" value="image/png" style="display:none;"> PNG
+        </label>
+        <label class="fit-btn" id="fmt-webp" style="cursor:pointer;">
+          <input type="radio" name="out-format" value="image/webp" style="display:none;"> WEBP
+        </label>
+        <label class="fit-btn" id="fmt-avif" style="cursor:pointer;" id="fmt-avif-label">
+          <input type="radio" name="out-format" value="image/avif" style="display:none;"> AVIF
+        </label>
+      </div>
+      <div style="font-size:.75rem;color:var(--muted);" id="format-hint">Convert all images to a single output format on download.</div>
+    </div>
+
+    <!-- ── METADATA REMOVAL ── -->
+    <div style="display:flex;align-items:center;gap:8px;margin:0 0 20px;font-size:.83rem;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);">
+      <input type="checkbox" id="strip-exif" checked style="accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;">
+      <label for="strip-exif" style="cursor:pointer;">
+        <span style="font-weight:500;">Remove EXIF Metadata</span>
+        <span style="color:var(--muted);display:block;font-size:.76rem;margin-top:1px;">Strips GPS, camera info, timestamps — improves privacy &amp; reduces file size</span>
+      </label>
+    </div>
+
+    <div id="file-list"></div>
+
+    <div class="progress-wrap" id="compress-progress-wrap">
+      <div class="progress-bar" id="compress-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Processing progress"></div>
+      <div class="progress-text" id="compress-progress-text" aria-live="polite" aria-atomic="true">Miandry...</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="compress-btn" onclick="startCompression()">
+        ⚡ Compress Now
+      </button>
+      <button class="btn btn-ghost" onclick="resetCompress()">↺ New Images</button>
+    </div>
+  </div>
+
+  <div id="compress-results" style="display:none;"></div>
+
+  <!-- ── AD SLOT 2: Medium Rectangle 300×250 — injected after results appear ── -->
+  <div class="ad-slot ad-slot-rectangle" id="ad-slot-results" style="display:none;">
+    <!-- ins class="adsbygoogle" ... goes here -->
+    <div class="ad-placeholder">
+      <span class="ad-placeholder-label">Advertisement</span>
+      <span class="ad-placeholder-dims">300×250</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ PANEL 2: RESIZER ════════════ -->
+<!-- ════════════ PANEL: FORMAT CONVERTER ════════════ -->
+<div id="panel-convert" class="panel" role="tabpanel" aria-labelledby="tab-convert" tabindex="0">
+
+  <!-- Dropzone -->
+  <div class="dropzone" id="convert-drop" role="button" tabindex="0" aria-label="Format converter upload area. Drag and drop images here, or press Enter to browse.">
+    <input type="file" id="convert-input" accept="image/*" multiple>
+    <span class="dropzone-icon">🔄</span>
+    <h3>Drop images to convert format</h3>
+    <p>JPG, PNG, WEBP, AVIF — up to 20MB per image</p>
+    <p style="margin-top:8px;font-size:.82rem;">
+      <span class="browse-link" role="button" tabindex="-1" aria-hidden="true">Select from device</span>
+    </p>
+    <p class="dropzone-mobile-hint" aria-hidden="true">📱 On mobile: tap anywhere here to pick images</p>
+  </div>
+
+  <!-- Settings (shown after files selected) -->
+  <div id="convert-settings" style="display:none;">
+
+    <!-- Output format selector -->
+    <div style="margin:24px 0 20px;">
+      <div class="section-label">Output Format</div>
+      <div class="cvt-format-grid" id="cvt-format-grid">
+        <button class="cvt-fmt-btn" id="cvtfmt-jpg" onclick="selectCvtFormat('image/jpeg')">
+          <span class="cvt-fmt-ext">JPG</span>
+          <span class="cvt-fmt-desc">Best for photos</span>
+        </button>
+        <button class="cvt-fmt-btn" id="cvtfmt-png" onclick="selectCvtFormat('image/png')">
+          <span class="cvt-fmt-ext">PNG</span>
+          <span class="cvt-fmt-desc">Lossless, transparency</span>
+        </button>
+        <button class="cvt-fmt-btn selected" id="cvtfmt-webp" onclick="selectCvtFormat('image/webp')">
+          <span class="cvt-fmt-ext">WEBP</span>
+          <span class="cvt-fmt-desc">Small &amp; modern</span>
+        </button>
+        <button class="cvt-fmt-btn" id="cvtfmt-avif" onclick="selectCvtFormat('image/avif')">
+          <span class="cvt-fmt-ext">AVIF</span>
+          <span class="cvt-fmt-desc">Next-gen, smallest</span>
+        </button>
+      </div>
+      <div id="cvt-format-hint" style="font-size:.75rem;color:var(--muted);margin-top:8px;"></div>
+    </div>
+
+    <!-- File list -->
+    <div id="cvt-file-list"></div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="cvt-progress-wrap">
+      <div class="progress-bar" id="cvt-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Processing progress"></div>
+      <div class="progress-text" id="cvt-progress-text" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="cvt-btn" onclick="startConversion()">
+        🔄 Convert Now
+      </button>
+      <button class="btn btn-ghost" onclick="resetConvert()">↺ New Images</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="cvt-results" style="display:none;"></div>
+
+</div>
+
+<div id="panel-resize" class="panel" role="tabpanel" aria-labelledby="tab-resize" tabindex="0">
+
+  <div class="dropzone" id="resize-drop" role="button" tabindex="0" aria-label="Image resizer upload area. Drag and drop images here, or press Enter to browse.">
+    <input type="file" id="resize-input" accept="image/*">
+    <span class="dropzone-icon">📐</span>
+    <h3>Drop your image here or click to browse</h3>
+    <p>JPG, PNG, WEBP · one image at a time</p>
+  </div>
+
+  <div id="resize-settings" style="display:none;">
+    <div class="section-label" style="margin-top:24px;">Choose a size preset</div>
+    <div class="presets-grid" id="presets-grid"></div>
+
+    <div class="section-label">Fit mode</div>
+    <div class="fit-modes">
+      <button class="fit-btn active" onclick="setFit('cover')" id="fit-cover">✂️ Crop (fill)</button>
+      <button class="fit-btn" onclick="setFit('contain')" id="fit-contain">🖼 Contain (letterbox)</button>
+      <button class="fit-btn" onclick="setFit('stretch')" id="fit-stretch">↔ Stretch</button>
+    </div>
+    <p class="fit-desc" id="fit-desc">
+      Crops the excess to perfectly fill the target size — best for square or feed posts.
+    </p>
+
+    <!-- Letterbox color picker — shown only in contain mode -->
+    <div class="letterbox-color-row" id="letterbox-color-row">
+      <span>Letterbox color:</span>
+      <input type="color" id="letterbox-color" value="#000000" oninput="if(AppState.resize.img && AppState.resize.preset!==null) renderResized()">
+      <span style="font-size:.75rem;">Background fill</span>
+    </div>
+
+    <!-- Custom size -->
+    <div class="section-label">Or enter a custom size</div>
+    <div class="custom-size-row">
+      <input type="number" id="custom-w" placeholder="Width" min="1" max="8000">
+      <span class="custom-size-sep">×</span>
+      <input type="number" id="custom-h" placeholder="Height" min="1" max="8000">
+      <span style="font-size:.78rem;color:var(--muted);">px</span>
+      <button class="btn btn-ghost" style="padding:8px 14px;font-size:.8rem;" onclick="applyCustomSize()">Apply</button>
+    </div>
+
+    <!-- Keep original filename -->
+    <div style="display:flex;align-items:center;gap:8px;margin:-8px 0 20px;font-size:.83rem;">
+      <input type="checkbox" id="keep-filename" style="accent-color:var(--accent);width:15px;height:15px;">
+      <label for="keep-filename" style="cursor:pointer;color:var(--muted);">Keep original filename</label>
+    </div>
+
+    <div id="resize-preview-wrap">
+      <canvas id="resize-canvas"></canvas>
+      <div id="resize-placeholder">Select a preset above to preview your resized image</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="resize-download-btn" style="display:none;" onclick="downloadResized()">
+        ⬇ Download Image
+      </button>
+      <button class="btn btn-ghost" onclick="resetResize()">↺ New Image</button>
+    </div>
+
+    <!-- ── AD SLOT: after resize download ── -->
+    <div class="ad-slot ad-slot-after-result" id="ad-slot-resize-result" style="display:none;">
+      <!-- ins class="adsbygoogle" ... goes here -->
+      <div class="ad-placeholder">
+        <span class="ad-placeholder-label">Advertisement</span>
+        <span class="ad-placeholder-dims">300×250</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ PANEL 3: AI UPSCALER ════════════ -->
+<div id="panel-upscale" class="panel" role="tabpanel" aria-labelledby="tab-upscale" tabindex="0">
+
+  <!-- Free service banner -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+    <span style="font-size:1.4rem;flex-shrink:0;">✨</span>
+    <div>
+      <div style="font-size:.85rem;font-weight:500;">AI Upscaler — 100% Free</div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:3px;">Powered by Real-ESRGAN · No account needed · 3 upscales/day</div>
+    </div>
+  </div>
+
+  <!-- Daily limit bar -->
+  <div class="limit-bar-wrap" id="upscale-limit-bar">
+    <div style="font-size:.82rem;"><strong id="limit-used">0</strong><span style="color:var(--muted);">/3 free upscales today</span></div>
+    <div class="limit-bar-track">
+      <div class="limit-bar-fill" id="limit-bar-fill" style="width:0%"></div>
+    </div>
+    <div class="limit-text" id="limit-reset-text">Resets at midnight</div>
+  </div>
+
+  <!-- Dropzone -->
+  <div class="dropzone" id="upscale-drop" role="button" tabindex="0" aria-label="AI upscaler upload area. Drag and drop images here, or press Enter to browse.">
+    <input type="file" id="upscale-input" accept="image/jpeg,image/png,image/webp">
+    <span class="dropzone-icon">🔬</span>
+    <h3>Drop your image here to upscale</h3>
+    <p>JPG, PNG, WEBP · max 10MB · one image at a time</p>
+    <p style="margin-top:8px;font-size:.82rem;">
+      <span class="browse-link" role="button" tabindex="-1" aria-hidden="true">Select from device</span>
+    </p>
+    <p class="dropzone-mobile-hint" aria-hidden="true">📱 On mobile: tap anywhere here to pick images</p>
+  </div>
+
+  <!-- Settings (shown after image selected) -->
+  <div id="upscale-settings" style="display:none;">
+
+    <!-- Image info row -->
+    <div id="upscale-info-row" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:20px;">
+      <img id="upscale-thumb" src="" alt="preview"
+           style="width:52px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">
+      <div>
+        <div id="upscale-filename" style="font-size:.88rem;font-weight:500;"></div>
+        <div id="upscale-dims" style="font-size:.78rem;color:var(--muted);margin-top:2px;"></div>
+      </div>
+      <button class="btn btn-ghost" style="margin-left:auto;padding:7px 12px;font-size:.78rem;" onclick="resetUpscale()">✕ Change</button>
+    </div>
+
+    <div class="section-label">Upscale factor</div>
+    <div class="upscale-scale-grid">
+      <div class="scale-btn selected" id="scale-2x" onclick="selectScale(2)">
+        <span class="scale-btn-value">2×</span>
+        <span class="scale-btn-label">HD</span>
+      </div>
+      <div class="scale-btn" id="scale-4x" onclick="selectScale(4)">
+        <span class="scale-btn-value">4×</span>
+        <span class="scale-btn-label">Full HD</span>
+      </div>
+      <div class="scale-btn" id="scale-8x" style="opacity:.4;cursor:not-allowed;" title="Coming soon">
+        <span class="scale-btn-value" style="color:var(--muted);">8×</span>
+        <span class="scale-btn-label">Coming Soon</span>
+        <span style="position:absolute;top:5px;right:7px;font-size:.6rem;color:var(--muted);">🔒</span>
+      </div>
+    </div>
+
+    <!-- Output size preview -->
+    <div id="upscale-output-dims" style="font-size:.8rem;color:var(--muted);margin:-12px 0 20px;"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="upscale-btn" onclick="startUpscale()">
+        ✨ Upscale with AI
+      </button>
+      <button class="btn btn-ghost" onclick="resetUpscale()">↺ New Image</button>
+    </div>
+  </div>
+
+  <!-- Processing state -->
+  <div class="upscale-processing" id="upscale-processing">
+    <div class="spinner-ring"></div>
+    <div class="processing-title">AI is enhancing your image…</div>
+    <div class="processing-sub" id="processing-sub">Sending to Real-ESRGAN · usually 10–30s</div>
+    <button class="btn btn-ghost" style="margin-top:8px;padding:8px 20px;font-size:.8rem;" onclick="cancelUpscale()">✕ Cancel</button>
+  </div>
+
+  <!-- Result -->
+  <div class="upscale-result" id="upscale-result" style="display:none;">
+    <div class="section-label">Result</div>
+    <div class="compare-wrap">
+      <div class="compare-card">
+        <div class="compare-card-label">
+          <span>Original</span>
+          <span class="res-badge old" id="res-orig-dims"></span>
+        </div>
+        <img id="res-orig-img" src="" alt="Original">
+      </div>
+      <div class="compare-card">
+        <div class="compare-card-label">
+          <span>Upscaled ✨</span>
+          <span class="res-badge new" id="res-new-dims"></span>
+        </div>
+        <img id="res-new-img" src="" alt="Upscaled">
+      </div>
+    </div>
+    <div class="btn-row">
+      <a class="btn btn-primary" id="upscale-download-btn" href="#" download="">⬇ Download Upscaled</a>
+      <button class="btn btn-ghost" onclick="resetUpscale()">↺ Upscale another</button>
+    </div>
+
+    <!-- ── AD SLOT: after upscale download ── -->
+    <div class="ad-slot ad-slot-after-result" id="ad-slot-upscale-result">
+      <!-- Replace with your AdSense tag, e.g.:
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+           data-ad-slot="XXXXXXXXXX"
+           data-ad-format="rectangle"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      -->
+      <div class="ad-placeholder">
+        <span class="ad-placeholder-label">Advertisement</span>
+        <span class="ad-placeholder-dims">300×250</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════ PANEL 5: BACKGROUND REMOVER ════════════ -->
+<div id="panel-bgremove" class="panel" role="tabpanel" aria-labelledby="tab-bgremove" tabindex="0">
+
+  <!-- Info banner -->
+  <div class="bgr-model-note">
+    🪄 <strong style="color:var(--text);">AI Background Remover</strong> — 100% in your browser, no upload, no account.
+    The AI model (~40MB) is downloaded once then cached. First use takes ~15s depending on your connection.
+  </div>
+
+  <!-- Dropzone -->
+  <div class="dropzone" id="bgr-drop" role="button" tabindex="0"
+       aria-label="Background remover upload area. Drop an image here or press Enter to browse.">
+    <input type="file" id="bgr-input" accept="image/jpeg,image/png,image/webp">
+    <span class="dropzone-icon">🪄</span>
+    <h3>Drop your image here to remove background</h3>
+    <p>JPG, PNG, WEBP · max 10MB · one image at a time</p>
+    <p style="margin-top:8px;font-size:.82rem;">
+      <span class="browse-link" role="button" tabindex="-1" aria-hidden="true">Select from device</span>
+    </p>
+    <p class="dropzone-mobile-hint" aria-hidden="true">📱 On mobile: tap here to pick an image</p>
+  </div>
+
+  <!-- Processing state -->
+  <div id="bgr-processing" style="display:none;flex-direction:column;align-items:center;gap:16px;padding:40px 20px;text-align:center;">
+    <div class="spinner-ring"></div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;" id="bgr-proc-title">Loading AI model…</div>
+    <div class="bgr-progress-label" id="bgr-proc-sub">Downloading model (~40MB) — cached after first use</div>
+    <div class="progress-wrap visible" style="width:100%;max-width:320px;">
+      <div class="progress-bar" id="bgr-progress-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="bgr-result" style="display:none;">
+    <div class="section-label" style="margin-bottom:10px;">Result — background removed</div>
+
+    <!-- Canvas preview with checkerboard -->
+    <div class="bgr-canvas-wrap" id="bgr-canvas-wrap">
+      <canvas id="bgr-canvas"></canvas>
+    </div>
+
+    <!-- Background color chooser -->
+    <div style="margin-top:14px;">
+      <div class="section-label" style="margin-bottom:8px;">Background fill</div>
+      <div class="bgr-bg-strip" id="bgr-bg-strip">
+        <button class="bgr-bg-btn checker active" data-bg="transparent" title="Transparent" aria-label="Transparent background"></button>
+        <button class="bgr-bg-btn" data-bg="#ffffff" style="background:#ffffff;" title="White" aria-label="White background"></button>
+        <button class="bgr-bg-btn" data-bg="#000000" style="background:#000000;" title="Black" aria-label="Black background"></button>
+        <button class="bgr-bg-btn" data-bg="#f5f4f0" style="background:#f5f4f0;border-color:#d4d2cc;" title="Light grey" aria-label="Light grey"></button>
+        <button class="bgr-bg-btn" data-bg="#0e0e0f" style="background:#0e0e0f;" title="Dark" aria-label="Dark background"></button>
+        <button class="bgr-bg-btn" data-bg="#3b82f6" style="background:#3b82f6;" title="Blue" aria-label="Blue background"></button>
+        <button class="bgr-bg-btn" data-bg="#22c55e" style="background:#22c55e;" title="Green" aria-label="Green background"></button>
+        <button class="bgr-bg-btn" data-bg="#f59e0b" style="background:#f59e0b;" title="Amber" aria-label="Amber background"></button>
+        <button class="bgr-bg-btn" data-bg="#ef4444" style="background:#ef4444;" title="Red" aria-label="Red background"></button>
+        <!-- Custom color -->
+        <label title="Custom color" style="position:relative;cursor:pointer;">
+          <div class="bgr-bg-btn" id="bgr-custom-swatch"
+               style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);"
+               title="Custom color" aria-label="Custom color"></div>
+          <input type="color" id="bgr-custom-color" value="#8b5cf6"
+                 style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
+        </label>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn btn-primary" id="bgr-download-btn" href="#" download="removed-bg.png">⬇ Download PNG</a>
+      <button class="btn btn-ghost" onclick="resetBgRemover()">↺ New Image</button>
+    </div>
+
+    <!-- Ad slot after result -->
+    <div class="ad-slot ad-slot-after-result" id="ad-slot-bgr-result" style="margin-top:24px;">
+      <!-- ins class="adsbygoogle" ... goes here -->
+      <div class="ad-placeholder">
+        <span class="ad-placeholder-label">Advertisement</span>
+        <span class="ad-placeholder-dims">300×250</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════ FULLSCREEN COMPARE MODAL ════════════ -->
+<div class="fs-modal" id="fs-modal" role="dialog" aria-modal="true"
+     aria-labelledby="fs-title" aria-hidden="true">
+  <div class="fs-header">
+    <div class="fs-title" id="fs-title">Before / After</div>
+    <button class="fs-tool-btn" onclick="fsZoom(-1)" title="Zoom out (−)">− Zoom out</button>
+    <span class="fs-zoom-level" id="fs-zoom-label">100%</span>
+    <button class="fs-tool-btn" onclick="fsZoom(1)" title="Zoom in (+)">+ Zoom in</button>
+    <button class="fs-tool-btn" onclick="fsResetView()" title="Reset (0)">↺ Reset</button>
+    <div class="cmp-tool-sep"></div>
+    <span class="fs-hint">Drag to pan · Scroll to zoom · Esc to close</span>
+    <button class="fs-tool-btn" onclick="closeFullscreen()" title="Close (Esc)">✕ Close</button>
+  </div>
+  <div class="fs-body" id="fs-body">
+    <div class="fs-compare-wrap" id="fs-wrap">
+      <img id="fs-orig-img" src="" alt="Original">
+      <div class="fs-top-layer" id="fs-top-layer">
+        <img id="fs-comp-img" src="" alt="Compressed">
+      </div>
+      <div class="fs-divider" id="fs-divider"></div>
+      <div class="fs-handle" id="fs-handle">◀▶</div>
+    </div>
+  </div>
+  <div class="fs-labels">
+    <span>⬅ Compressed</span>
+    <span>Original ➡</span>
+  </div>
+</div>
+
+<!-- ════════════ AD SLOT 3: STICKY FOOTER ════════════ -->
+<!-- Replace <ins> below with your AdSense sticky tag -->
+<div class="ad-slot ad-slot-sticky-footer" id="ad-slot-footer">
+  <button class="ad-sticky-close" onclick="this.closest('#ad-slot-footer').style.display='none'" aria-label="Close advertisement">✕</button>
+  <!-- ins class="adsbygoogle" ... goes here -->
+  <div class="ad-placeholder">
+    <span class="ad-placeholder-label">Advertisement</span>
+    <span class="ad-placeholder-dims">728×90</span>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+<!-- Accessible live region — screen reader announcements -->
+<div id="a11y-status" aria-live="polite" aria-atomic="true" role="status"></div>
+
+<script>
+// ═══════════════════════════════════════
+//  LAZY SCRIPT / CSS LOADER
+//  loadScript(src)  → Promise — resolves when script is ready; no-op if
+//                     already loaded.  Deduplicates concurrent calls via a
+//                     pending-promise map so the same URL is never fetched
+//                     twice even if called before the first load completes.
+//  loadCSS(href)    → Promise — non-fatal (CSS failure never blocks UI).
+// ═══════════════════════════════════════
+const _loadPending = new Map();   // src → Promise (in-flight dedup)
+
+function loadScript(src) {
+  if (document.querySelector(`script[src="${src}"]`)) return Promise.resolve();
+  if (_loadPending.has(src)) return _loadPending.get(src);
+  const p = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload  = () => { _loadPending.delete(src); resolve(); };
+    s.onerror = () => { _loadPending.delete(src); reject(new Error('Script load failed: ' + src)); };
+    document.head.appendChild(s);
+  });
+  _loadPending.set(src, p);
+  return p;
+}
+
+function loadCSS(href) {
+  if (document.querySelector(`link[href="${href}"]`)) return Promise.resolve();
+  return new Promise(resolve => {
+    const link = document.createElement('link');
+    link.rel  = 'stylesheet';
+    link.href = href;
+    link.onload  = resolve;
+    link.onerror = resolve;   // CSS failure is non-fatal
+    document.head.appendChild(link);
+  });
+}
+
+// CDN URLs — single source of truth; version bumps only here
+const CDN = {
+  imageCompression: 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js',
+  jszip:            'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',
+  shepherdJS:       'https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js',
+  shepherdCSS:      'https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/css/shepherd.css',
+  bgRemoval:        'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/background-removal.js',
+};
+
+// ═══════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════
+const TAB_IDS = ['compress','convert','resize','upscale','bgremove'];
+
+// ─── ACCESSIBILITY HELPERS ────────────────────────────────
+
+/** Announce a message to screen readers via aria-live region */
+function announceStatus(msg) {
+  const el = document.getElementById('a11y-status');
+  if (!el) return;
+  // Toggle text to force re-announcement even for identical messages
+  el.textContent = '';
+  requestAnimationFrame(() => { el.textContent = msg; });
+}
+
+/** Mark a button as loading (spinner) and optionally update its label */
+function setBtnLoading(btn, loading, label) {
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.classList.toggle('btn-loading', loading);
+  if (label) btn.dataset.origLabel = btn.dataset.origLabel || btn.textContent;
+  if (loading && label) btn.textContent = label;
+  if (!loading && btn.dataset.origLabel) {
+    btn.textContent = btn.dataset.origLabel;
+    delete btn.dataset.origLabel;
+  }
+}
+
+// ─── TAB KEYBOARD NAVIGATION (←→ Home/End) ───────────────
+document.addEventListener('keydown', e => {
+  const tab = document.activeElement;
+  if (!tab || tab.getAttribute('role') !== 'tab') return;
+  const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+  const idx  = tabs.indexOf(tab);
+  let next   = -1;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  next = (idx + 1) % tabs.length;
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    next = (idx - 1 + tabs.length) % tabs.length;
+  if (e.key === 'Home')                                  next = 0;
+  if (e.key === 'End')                                   next = tabs.length - 1;
+  if (next >= 0) {
+    e.preventDefault();
+    tabs[next].focus();
+    tabs[next].click(); // activate tab
+  }
+});
+
+// ─── DROPZONE KEYBOARD (Enter / Space to open picker) ────
+document.addEventListener('keydown', e => {
+  const el = document.activeElement;
+  if (!el || !el.classList.contains('dropzone')) return;
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    const inp = el.querySelector('input[type="file"]');
+    if (inp) inp.click();
+  }
+});
+
+// ─── GLOBAL ESCAPE — close fullscreen / privacy popup ────
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const fs = document.getElementById('fs-modal');
+  if (fs && fs.classList.contains('open')) { e.preventDefault(); closeFullscreen(); return; }
+  const pp = document.getElementById('privacy-popup');
+  if (pp && pp.classList.contains('open')) { e.preventDefault(); closePrivacyPopup(); }
+});
+const VALID_TABS = new Set(['compress', 'convert', 'resize', 'upscale']);
+
+function switchTab(tab, { pushHash = true } = {}) {
+  if (!VALID_TABS.has(tab)) tab = 'compress';
+  document.querySelectorAll('[role="tab"]').forEach(b => {
+    const isActive = b.id === 'tab-' + tab;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-selected', isActive);
+    b.setAttribute('tabindex', isActive ? '0' : '-1');
+  });
+  document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + tab);
+  if (panel) panel.classList.add('active');
+  // Scroll active tab into view on narrow screens
+  const activeBtn = document.getElementById('tab-' + tab);
+  if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+  // Update URL hash without triggering hashchange listener loop
+  if (pushHash && location.hash !== '#' + tab) {
+    history.replaceState(null, '', '#' + tab);
+  }
+  announceStatus('Switched to ' + tab + ' tool');
+  // Pre-warm libraries for the active tab so they are ready before
+  // the user triggers an action (silent — errors don't block the UI)
+  if (tab === 'compress')                        loadScript(CDN.imageCompression).catch(() => {});
+  if (tab === 'compress' || tab === 'convert')   loadScript(CDN.jszip).catch(() => {});
+  if (tab === 'bgremove')                        loadScript(CDN.bgRemoval).catch(() => {});
+}
+
+// Restore tab from URL hash on load + handle back/forward
+function initHashRouting() {
+  const fromHash = location.hash.replace('#', '');
+  switchTab(VALID_TABS.has(fromHash) ? fromHash : 'compress', { pushHash: false });
+  window.addEventListener('hashchange', () => {
+    const h = location.hash.replace('#', '');
+    switchTab(VALID_TABS.has(h) ? h : 'compress', { pushHash: false });
+  });
+}
+
+// ═══════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ════════════════════════════════════════════════════════
+//  APP STATE — single source of truth for all tool panels
+// ════════════════════════════════════════════════════════
+const AppState = {
+  // ── Compress ──────────────────────────────────────────
+  compress: {
+    files:   [],          // File[]
+    results: [],          // { name, original, compressed, originalSize, compressedSize, targetType, aiQuality }
+    mode:    'normal',    // 'normal' | 'ai'
+    zips:    [],          // { name, blob } ready for ZIP
+  },
+  // ── Convert ───────────────────────────────────────────
+  convert: {
+    files:   [],          // File[]
+    results: [],          // { name, blob } ready for ZIP
+    format:  'image/webp',
+  },
+  // ── Resize ────────────────────────────────────────────
+  resize: {
+    file:          null,  // File
+    img:           null,  // HTMLImageElement (decoded)
+    preset:        null,  // index into PRESETS or null
+    fitMode:       'cover',
+    originalType:  'image/jpeg',
+    originalName:  '',
+  },
+  // ── Upscale ───────────────────────────────────────────
+  upscale: {
+    file:       null,
+    scale:      2,
+    origW:      0,
+    origH:      0,
+    controller: null,     // AbortController
+  },
+  // ── ObjectURL registry ────────────────────────────────
+  _urls: [],
+};
+
+// ── Compact read/write helpers ──────────────────────────
+const S = {
+  compress: () => AppState.compress,
+  convert:  () => AppState.convert,
+  resize:   () => AppState.resize,
+  upscale:  () => AppState.upscale,
+};
+
+// ── ObjectURL lifecycle ─────────────────────────────────
+function trackedObjectURL(blob) {
+  const url = URL.createObjectURL(blob);
+  AppState._urls.push(url);
+  return url;
+}
+function revokeAllObjectURLs() {
+  while (AppState._urls.length) URL.revokeObjectURL(AppState._urls.pop());
+}
+function revokeTracked(url) {
+  const idx = AppState._urls.indexOf(url);
+  if (idx !== -1) AppState._urls.splice(idx, 1);
+  URL.revokeObjectURL(url);
+}
+
+// ════════════════════════════════════════════════════════
+//  DOM HELPERS — reusable builders, no raw innerHTML
+// ════════════════════════════════════════════════════════
+
+/** Safely set text on an element — never injects HTML */
+function setText(el, text) {
+  if (typeof el === 'string') el = document.getElementById(el);
+  if (el) el.textContent = text;
+}
+
+/** Create an element with optional attrs, classes, and children */
+function el(tag, opts = {}, ...children) {
+  const node = document.createElement(tag);
+  if (opts.cls)   opts.cls.split(' ').filter(Boolean).forEach(c => node.classList.add(c));
+  if (opts.id)    node.id = opts.id;
+  if (opts.css)   node.style.cssText = opts.css;
+  if (opts.attrs) Object.entries(opts.attrs).forEach(([k, v]) => node.setAttribute(k, v));
+  if (opts.on)    Object.entries(opts.on).forEach(([k, v]) => node.addEventListener(k, v));
+  children.forEach(c => {
+    if (c == null) return;
+    node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
+  return node;
+}
+
+/** Create an <img> with safe src (blob url only) + alt */
+function makeImg(src, alt, cls) {
+  const img = document.createElement('img');
+  img.alt = alt || '';
+  if (cls) img.className = cls;
+  img.src = src; // src is always a blob URL generated by trackedObjectURL
+  return img;
+}
+
+/** Create a .btn element */
+function makeBtn(text, cls, handler, attrs = {}) {
+  return el('button', { cls: 'btn ' + cls, attrs, on: { click: handler } }, text);
+}
+
+/** Create a .btn-row div with child buttons/links */
+function makeBtnRow(...children) {
+  return el('div', { cls: 'btn-row' }, ...children);
+}
+
+/** Build a file-list preview row (icon + name + size) */
+function makeFileRow(file) {
+  return el('div', { css: 'display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.83rem;' },
+    el('span', { css: 'color:var(--muted)' }, '🖼'),
+    el('span', { css: 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;', attrs: { title: file.name } }, file.name),
+    el('span', { css: 'color:var(--muted);flex-shrink:0;' }, formatBytes(file.size))
+  );
+}
+
+/** Render a file list into a container element */
+function renderFileList(containerId, files, headingText) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.textContent = ''; // safe clear
+  container.appendChild(
+    el('div', { cls: 'section-label', css: 'margin-bottom:12px;' }, headingText || files.length + ' image(s) selected')
+  );
+  const preview = files.slice(0, 5);
+  preview.forEach(f => container.appendChild(makeFileRow(f)));
+  if (files.length > 5) {
+    container.appendChild(el('div', { css: 'padding:7px 0;font-size:.8rem;color:var(--muted);' }, '+ ' + (files.length - 5) + ' more…'));
+  }
+}
+
+/** Update a progress bar + text + aria */
+function setProgress(pbId, ptId, pct, text) {
+  const pb = document.getElementById(pbId);
+  const pt = document.getElementById(ptId);
+  if (pb) { pb.style.width = pct + '%'; pb.setAttribute('aria-valuenow', pct); }
+  if (pt) pt.textContent = text || '';
+}
+
+/** Show/hide a progress wrap */
+function setProgressVisible(wrapId, visible) {
+  const wrap = document.getElementById(wrapId);
+  if (wrap) wrap.classList.toggle('visible', visible);
+}
+
+/** Create the results hero badge (🎉 94% SAVED) */
+function makeHeroBadge(pct, savedBytes, origBytes, compBytes) {
+  return el('div', { cls: 'ik-results-hero' },
+    el('div', { cls: 'ik-hero-badge' },
+      el('span', { cls: 'ik-hero-emoji' }, '🎉'),
+      el('span', { cls: 'ik-hero-pct'   }, pct + '%'),
+      el('span', { cls: 'ik-hero-label' }, 'SAVED')
+    ),
+    el('div', { cls: 'ik-hero-detail' }, formatBytes(savedBytes) + ' reduced'),
+    el('div', { cls: 'ik-hero-sizes'  },
+      el('span', { cls: 'ik-size-orig' }, formatBytes(origBytes)),
+      el('span', { cls: 'ik-hero-arrow'}, ' → '),
+      el('span', { cls: 'ik-size-comp' }, formatBytes(compBytes))
+    )
+  );
+}
+
+/** Create a compress result card (thumbnail + dims + sizes + compare) */
+function makeCompressCard(r, i) {
+  const pctI     = Math.round((1 - r.compressedSize / r.originalSize) * 100);
+  const url      = trackedObjectURL(r.compressed);
+  const thumbUrl = trackedObjectURL(r.original);
+  const outExt   = { 'image/webp': '.webp', 'image/png': '.png', 'image/avif': '.avif' }[r.compressed.type] || '.jpg';
+  const dlName   = 'imagekit_' + r.name.replace(/\.[^.]+$/, '') + outExt;
+
+  // Badge wrap: optional AI badge + savings %
+  const badgeWrap = el('div', { cls: 'ik-card-badge-wrap' });
+  if (r.aiQuality !== null) badgeWrap.appendChild(el('span', { cls: 'ik-ai-badge' }, '🤖 q' + r.aiQuality));
+  badgeWrap.appendChild(el('div', { cls: 'ik-saved-badge' }, '−' + pctI + '%'));
+
+  // Meta block
+  const dimsEl = el('div', { cls: 'ik-card-dims', id: 'dims-' + i }, '—');
+  const meta   = el('div', { cls: 'ik-card-meta' },
+    el('div', { cls: 'ik-card-filename' }, '📷 ' + r.name),
+    dimsEl,
+    el('div', { cls: 'ik-card-sizes' },
+      el('span', { cls: 'ik-size-orig' }, formatBytes(r.originalSize)),
+      el('span', { cls: 'ik-size-arrow'}, ' → '),
+      el('span', { cls: 'ik-size-comp' }, formatBytes(r.compressedSize))
+    )
+  );
+
+  // Thumbnail
+  const thumb = makeImg(thumbUrl, 'Preview thumbnail for ' + r.name, 'ik-card-thumb');
+  thumb.onerror = () => { thumb.style.display = 'none'; };
+
+  // Header row
+  const header = el('div', { cls: 'ik-card-header' }, thumb, meta, badgeWrap);
+
+  // Compare toolbar
+  const toolbar = el('div', { cls: 'compare-toolbar' },
+    el('button', { cls: 'cmp-tool-btn', attrs: { title: 'Zoom out' }, on: { click: () => cmpZoom('cmp-'+i, -1) } }, '−'),
+    el('span',   { cls: 'cmp-zoom-level', id: 'cmp-zoom-'+i }, '100%'),
+    el('button', { cls: 'cmp-tool-btn', attrs: { title: 'Zoom in' },  on: { click: () => cmpZoom('cmp-'+i,  1) } }, '+'),
+    el('button', { cls: 'cmp-tool-btn', attrs: { title: 'Reset zoom' }, on: { click: () => cmpResetZoom('cmp-'+i) } }, '↺'),
+    el('div',    { cls: 'cmp-tool-sep' }),
+    el('button', { cls: 'cmp-tool-btn', attrs: { title: 'Fullscreen' }, on: { click: () => openFullscreen(thumbUrl, url, r.name, r.originalSize, r.compressedSize) } }, '⛶ Fullscreen')
+  );
+
+  // Compare slider
+  const topLayer = el('div', { cls: 'compare-slider-top', css: 'width:50%;' }, makeImg(url, 'Compressed version', ''));
+  topLayer.querySelector('img').id = 'cmp-top-' + i;
+  const sliderWrap = el('div', {
+    cls: 'compare-slider-wrap', id: 'cmp-'+i,
+    attrs: { 'data-pct': '50', 'data-zoom': '1', 'data-px': '0', 'data-py': '0',
+             'aria-label': 'Before/after comparison. Use arrow keys to adjust split.' }
+  },
+    makeImg(thumbUrl, 'Original version'),
+    topLayer,
+    el('div', { cls: 'compare-divider', id: 'cmp-div-'+i, css: 'left:50%;' }),
+    el('div', { cls: 'compare-handle',  id: 'cmp-hdl-'+i, css: 'left:50%;', attrs: { tabindex: '0', role: 'slider', 'aria-label': 'Comparison split', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': '50' } }, '◀▶')
+  );
+
+  // Download link
+  const dlLink = el('a', { cls: 'btn btn-primary', attrs: { href: url, download: dlName } }, '⬇ Download');
+
+  const card = el('div', { cls: 'ik-result-card' },
+    header, toolbar, sliderWrap,
+    el('div', { cls: 'compare-labels' },
+      el('span', {}, '⬅ Compressed'),
+      el('span', {}, 'Original ➡')
+    ),
+    makeBtnRow(dlLink)
+  );
+
+  // Async dimension load
+  (function loadDims(file, dimsNode) {
+    const img = new Image();
+    const burl = URL.createObjectURL(file);
+    img.onload  = () => { setText(dimsNode, img.naturalWidth + ' × ' + img.naturalHeight + ' px'); URL.revokeObjectURL(burl); };
+    img.onerror = () => URL.revokeObjectURL(burl);
+    img.src = burl;
+  })(r.original, dimsEl);
+
+  return card;
+}
+
+/** Create a convert result row */
+function makeCvtResultRow(r, targetExt) {
+  if (!r.ok) {
+    return el('div', { css: 'color:var(--danger);font-size:.82rem;margin:4px 0;' }, '❌ ' + r.original.name + ' — ' + r.error);
+  }
+  const dlUrl    = trackedObjectURL(r.blob);
+  const thumbUrl = trackedObjectURL(r.original);
+  const thumb    = makeImg(thumbUrl, 'Preview of ' + r.original.name, 'cvt-result-thumb');
+  thumb.onerror  = () => { thumb.style.display = 'none'; };
+
+  const info = el('div', { cls: 'cvt-result-info' },
+    el('div', { cls: 'cvt-result-name' }, '📷 ' + r.original.name),
+    el('div', { cls: 'cvt-result-meta' },
+      formatBytes(r.original.size) + ' → ',
+      el('strong', { css: 'color:var(--success)' }, formatBytes(r.blob.size))
+    )
+  );
+  const badge   = el('span', { cls: 'cvt-result-badge' }, targetExt.replace('.', '').toUpperCase());
+  const dlBtn   = el('a', { cls: 'btn btn-primary', css: 'padding:8px 14px;font-size:.8rem;text-decoration:none;', attrs: { href: dlUrl, download: r.outName } }, '⬇');
+
+  return el('div', { cls: 'cvt-result-row' }, thumb, info, badge, dlBtn);
+}
+
+/** Error card for a failed result */
+function makeErrorRow(filename, message) {
+  return el('div', { css: 'color:var(--danger);font-size:.82rem;margin:4px 0;' }, '❌ ' + filename + (message ? ' — ' + message : ''));
+}
+
+// ════════════════════════════════════════════════════════
+//  COMPRESS (uses AppState.compress + helpers above)
+// ════════════════════════════════════════════════════════
+// compress state — accessed via AppState.compress.*
+
+// ════════════════════════════════════════════════════════
+//  IMAGE SERVICE — pure image-processing layer
+//  No DOM access. No AppState reads. Fully testable.
+// ════════════════════════════════════════════════════════
+const ImageService = (() => {
+
+  // ── Format support (detected once) ──────────────────
+  function _canEncode(mime) {
+    try { return document.createElement('canvas').toDataURL(mime).startsWith('data:' + mime); }
+    catch (_) { return false; }
+  }
+  const supportsWebP = typeof document !== 'undefined' && _canEncode('image/webp');
+  const supportsAVIF = typeof document !== 'undefined' && _canEncode('image/avif');
+
+  // ── Utilities ────────────────────────────────────────
+
+  /** Human-readable file size. Pure, testable. */
+  function formatBytes(b) {
+    if (b < 1024)           return b + ' B';
+    if (b < 1024 * 1024)    return (b / 1024).toFixed(1) + ' KB';
+    return (b / 1024 / 1024).toFixed(2) + ' MB';
+  }
+
+  /** Get natural dimensions from a File. Returns { w, h }. */
+  function getImgDims(file) {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload  = () => { URL.revokeObjectURL(url); resolve({ w: img.naturalWidth,  h: img.naturalHeight }); };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve({ w: 0, h: 0 }); };
+      img.src = url;
+    });
+  }
+
+  /** Yield execution so the browser can repaint between heavy tasks. */
+  function yieldToUI() {
+    return new Promise(resolve => {
+      if (typeof requestIdleCallback === 'function') requestIdleCallback(resolve, { timeout: 100 });
+      else setTimeout(resolve, 0);
+    });
+  }
+
+  // ── AI quality heuristic ─────────────────────────────
+
+  /**
+   * Pure heuristic — no side effects, no DOM.
+   * @param {{ name: string, type: string }} fileMeta — { name, type } subset of File
+   * @param {number} width  — natural pixel width
+   * @param {number} height — natural pixel height
+   * @returns {number} quality 0–1
+   */
+  function aiRecommendQuality(fileMeta, width, height) {
+    const name      = fileMeta.name.toLowerCase();
+    const isGraphic = /screen|screenshot|ui|logo|icon|banner|slide/.test(name);
+    const megapix   = (width * height) / 1_000_000;
+    if (fileMeta.type === 'image/png')  return isGraphic ? 0.92 : 0.85;
+    if (isGraphic)                      return 0.88;
+    if (fileMeta.type === 'image/webp') return 0.78;
+    if (megapix > 2)                    return 0.72;
+    if (megapix > 0.5)                  return 0.80;
+    return 0.75;
+  }
+
+  /**
+   * Resolve quality for a file given a mode and slider value.
+   * @param {{ name: string, type: string }} fileMeta
+   * @param {{ w: number, h: number }} dims
+   * @param {'normal'|'ai'} mode
+   * @param {number} sliderValue — 10..95 integer from UI slider
+   * @returns {number} quality 0–1
+   */
+  function resolveQuality(fileMeta, dims, mode, sliderValue) {
+    if (mode === 'ai') return aiRecommendQuality(fileMeta, dims.w, dims.h);
+    return sliderValue / 100;
+  }
+
+  // ── Target format resolution ─────────────────────────
+
+  /**
+   * Resolve the actual output MIME type for a file.
+   * @param {string} userFmt — selected format ('original'|'image/jpeg'|...)
+   * @param {string} fileType — file.type
+   * @returns {string} MIME type
+   */
+  function resolveOutputFormat(userFmt, fileType) {
+    if (userFmt !== 'original') {
+      if (userFmt === 'image/avif' && !supportsAVIF)
+        return supportsWebP ? 'image/webp' : fileType;
+      return userFmt;
+    }
+    if (fileType === 'image/gif') return fileType;
+    return supportsWebP ? 'image/webp' : fileType;
+  }
+
+  // ── Canvas re-encode (EXIF strip) ────────────────────
+
+  /**
+   * Re-encode a Blob through a canvas to guarantee EXIF removal.
+   * Canvas.toBlob() never carries metadata.
+   * @param {Blob} blob
+   * @param {string} mimeType
+   * @param {number} quality — 0..1
+   * @returns {Promise<Blob>}
+   */
+  function stripExifViaCanvas(blob, mimeType, quality) {
+    return new Promise((resolve, reject) => {
+      const blobUrl = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width  = img.naturalWidth;
+        c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img, 0, 0);
+        URL.revokeObjectURL(blobUrl);
+        c.toBlob(
+          b => b ? resolve(b) : reject(new Error('Canvas re-encode produced null blob')),
+          mimeType,
+          quality
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(blobUrl); reject(new Error('Image failed to load for EXIF strip')); };
+      img.src = blobUrl;
+    });
+  }
+
+  // ── Convert (format-only, no quality loss for lossless) ─
+
+  /**
+   * Convert a File to a different format using canvas.
+   * @param {File} file
+   * @param {string} targetMime
+   * @returns {Promise<Blob>}
+   */
+  function convertFormat(file, targetMime) {
+    const quality = targetMime === 'image/png' ? 1 : 0.88;
+    return stripExifViaCanvas(file, targetMime, quality);
+  }
+
+  // ── Compress a single file ───────────────────────────
+
+  /**
+   * Compress one image file.
+   * @param {File} file
+   * @param {{ quality: number, targetType: string, stripExif: boolean, maxWidthOrHeight?: number }} opts
+   * @param {(compressed: Blob) => void} imageCompressionFn — injected to allow testing
+   * @returns {Promise<Blob>}
+   */
+  async function compressFile(file, opts, imageCompressionFn) {
+    const { quality, targetType, stripExif, maxWidthOrHeight = 1920 } = opts;
+    let blob = await imageCompressionFn(file, {
+      maxSizeMB:        50,
+      initialQuality:   quality,
+      useWebWorker:     true,
+      fileType:         targetType,
+      maxWidthOrHeight,
+      exifOrientation:  stripExif ? -1 : undefined,
+    });
+    if (stripExif && targetType !== 'image/png') {
+      blob = await stripExifViaCanvas(blob, targetType, quality);
+    }
+    return blob;
+  }
+
+  // ── Resize helpers ──────────────────────────────────
+
+  /**
+   * Compute draw parameters for a given fit mode.
+   * Pure — no DOM needed, fully testable.
+   * @param {{ naturalWidth: number, naturalHeight: number }} imgDims
+   * @param {number} targetW
+   * @param {number} targetH
+   * @param {'cover'|'contain'|'stretch'} fitMode
+   * @returns {{ sx:number, sy:number, sw:number, sh:number }}
+   */
+  function computeFitDraw(imgDims, targetW, targetH, fitMode) {
+    const { naturalWidth: iw, naturalHeight: ih } = imgDims;
+    if (fitMode === 'stretch') {
+      return { dx: 0, dy: 0, dw: targetW, dh: targetH };
+    }
+    if (fitMode === 'contain') {
+      const scale = Math.min(targetW / iw, targetH / ih);
+      const dw = iw * scale, dh = ih * scale;
+      return { dx: (targetW - dw) / 2, dy: (targetH - dh) / 2, dw, dh };
+    }
+    // cover (default)
+    const scale = Math.max(targetW / iw, targetH / ih);
+    const dw = iw * scale, dh = ih * scale;
+    return { dx: (targetW - dw) / 2, dy: (targetH - dh) / 2, dw, dh };
+  }
+
+  // ── Public API ───────────────────────────────────────
+  return {
+    supportsWebP,
+    supportsAVIF,
+    formatBytes,
+    getImgDims,
+    yieldToUI,
+    aiRecommendQuality,
+    resolveQuality,
+    resolveOutputFormat,
+    stripExifViaCanvas,
+    convertFormat,
+    compressFile,
+    computeFitDraw,
+  };
+})();
+
+// ── Convenience shims (keep existing callers working) ──────────
+const formatBytes         = ImageService.formatBytes;
+const supportsWebP        = ImageService.supportsWebP;
+const supportsAVIF        = ImageService.supportsAVIF;
+
+// Wire format radio buttons
+function initFormatOptions() {
+  const labels = document.querySelectorAll('#format-options label');
+  // Disable AVIF if browser can't encode it
+  if (!supportsAVIF) {
+    const avifLabel = document.querySelector('#format-options label:last-child');
+    if (avifLabel) {
+      avifLabel.classList.add('disabled');
+      avifLabel.title = 'AVIF encoding not supported in this browser';
+    }
+  }
+  labels.forEach(lbl => {
+    lbl.addEventListener('click', () => {
+      labels.forEach(l => l.classList.remove('active'));
+      lbl.classList.add('active');
+      lbl.querySelector('input').checked = true;
+    });
+  });
+}
+
+function getSelectedOutputFormat() {
+  const checked = document.querySelector('#format-options input[name="out-format"]:checked');
+  return checked ? checked.value : 'original'; // 'original' | 'image/jpeg' | 'image/png' | 'image/webp' | 'image/avif'
+}
+
+function shouldStripExif() {
+  const cb = document.getElementById('strip-exif');
+  return cb ? cb.checked : true;
+}
+
+// ═══════════════════════════════════════
+//  FORMAT CONVERTER
+// ═══════════════════════════════════════
+const CVT_FORMAT_HINTS = {
+  'image/jpeg': 'JPG — lossy, universal, best for photos. No transparency.',
+  'image/png':  'PNG — lossless, supports transparency. Larger files.',
+  'image/webp': 'WEBP — modern format: smaller than JPG/PNG, supports transparency.',
+  'image/avif': 'AVIF — next-gen, smallest file size, excellent quality.'
+};
+
+// convert state — accessed via AppState.convert.*
+
+function setupConvertDrop() {
+  const drop = document.getElementById('convert-drop');
+  const inp  = document.getElementById('convert-input');
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag-over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('drag-over');
+    handleCvtFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+  });
+  inp.addEventListener('change', () => handleCvtFiles(Array.from(inp.files)));
+
+  // Disable AVIF button if browser can't encode
+  if (!supportsAVIF) {
+    const avifBtn = document.getElementById('cvtfmt-avif');
+    if (avifBtn) {
+      avifBtn.classList.add('disabled');
+      avifBtn.title = 'AVIF encoding not supported in this browser';
+    }
+  }
+  // Set initial hint
+  updateCvtHint();
+}
+
+function handleCvtFiles(files) {
+  if (!files.length) return;
+  AppState.convert.files = files;
+  document.getElementById('convert-drop').style.display = 'none';
+  document.getElementById('convert-settings').style.display = 'block';
+  renderCvtFileList();
+}
+
+function renderCvtFileList() {
+  renderFileList('cvt-file-list', AppState.convert.files);
+}
+
+function selectCvtFormat(fmt) {
+  AppState.convert.format = fmt;
+  // Update button states
+  const map = { 'image/jpeg': 'cvtfmt-jpg', 'image/png': 'cvtfmt-png', 'image/webp': 'cvtfmt-webp', 'image/avif': 'cvtfmt-avif' };
+  Object.values(map).forEach(id => document.getElementById(id)?.classList.remove('selected'));
+  const activeId = map[fmt];
+  if (activeId) document.getElementById(activeId)?.classList.add('selected');
+  updateCvtHint();
+}
+
+function updateCvtHint() {
+  const el = document.getElementById('cvt-format-hint');
+  if (el) el.textContent = CVT_FORMAT_HINTS[AppState.convert.format] || '';
+}
+
+async function startConversion() {
+  if (!AppState.convert.files.length) return;
+  const btn = document.getElementById('cvt-btn');
+  btn.disabled = true;
+  const pw = document.getElementById('cvt-progress-wrap');
+  const pb = document.getElementById('cvt-progress-bar');
+  const pt = document.getElementById('cvt-progress-text');
+  pw.classList.add('visible');
+
+  // Resolve target ext for filenames
+  const extMap = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/avif': '.avif' };
+  const targetExt = extMap[AppState.convert.format] || '.jpg';
+
+  const results = [];
+  AppState.convert.results = [];
+
+  for (let i = 0; i < AppState.convert.files.length; i++) {
+    const f = AppState.convert.files[i];
+    setProgress('cvt-progress-bar', 'cvt-progress-text',
+      Math.round((i / AppState.convert.files.length) * 100),
+      'Converting: ' + f.name + ' (' + (i + 1) + '/' + AppState.convert.files.length + ')'
+    );
+    // yield to UI
+    await new Promise(r => setTimeout(r, 0));
+
+    try {
+      const blob = await ImageService.convertFormat(f, AppState.convert.format);
+
+      const baseName = f.name.replace(/\.[^.]+$/, '');
+      const outName  = baseName + targetExt;
+      AppState.convert.results.push({ name: outName, blob });
+      results.push({ original: f, blob, outName, ok: true });
+    } catch (e) {
+      results.push({ original: f, ok: false, error: e.message });
+    }
+  }
+
+  setProgress('cvt-progress-bar', 'cvt-progress-text', 100, 'Done!');
+  announceStatus('Conversion complete. ' + results.filter(r => r.ok).length + ' images converted.');
+  setTimeout(() => { setProgressVisible('cvt-progress-wrap', false); showCvtResults(results, targetExt); }, 400);
+}
+
+function showCvtResults(results, targetExt) {
+  document.getElementById('convert-settings').style.display = 'none';
+  const container = document.getElementById('cvt-results');
+  container.style.display = 'block';
+  container.textContent = '';
+  const ok = results.filter(r => r.ok);
+
+  // Summary
+  container.appendChild(
+    el('div', { cls: 'section-label', css: 'margin-bottom:12px;' },
+      'Converted ' + ok.length + ' / ' + results.length + ' images → ' + targetExt.toUpperCase()
+    )
+  );
+
+  // ZIP button
+  if (ok.length > 1) {
+    const zipBtn = makeBtn(
+      '📦 Download All as .ZIP (' + ok.length + ' files)',
+      'btn-primary', downloadCvtZip, { id: 'cvt-zip-btn' }
+    );
+    container.appendChild(el('div', { cls: 'btn-row', css: 'margin-bottom:12px;' }, zipBtn));
+  }
+
+  // Per-file rows (using helper)
+  results.forEach(r => container.appendChild(makeCvtResultRow(r, targetExt)));
+
+  // Reset
+  container.appendChild(
+    el('div', { cls: 'btn-row', css: 'margin-top:8px;' },
+      makeBtn('↺ Convert more images', 'btn-ghost', resetConvert)
+    )
+  );
+
+  showToast(`✅ Converted ${ok.length} image${ok.length !== 1 ? 's' : ''} to ${targetExt.toUpperCase()}`);
+}
+
+async function downloadCvtZip() {
+  const btn = document.getElementById('cvt-zip-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Building ZIP...'; }
+  await loadScript(CDN.jszip);
+  const zip = new JSZip();
+  AppState.convert.results.forEach(r => zip.file(r.name, r.blob));
+  const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+  const zipUrl = trackedObjectURL(zipBlob);
+  const link = document.createElement('a');
+  link.download = `imagekit_converted_${AppState.convert.results.length}files.zip`;
+  link.href = zipUrl;
+  link.click();
+  setTimeout(() => revokeTracked(zipUrl), 10000);
+  if (btn) { btn.disabled = false; setText(btn, '📦 Download All as .ZIP (' + AppState.convert.results.length + ' files)'); }
+  showToast(`📦 ZIP downloaded — ${AppState.convert.results.length} files`);
+}
+
+function resetConvert() {
+  revokeAllObjectURLs();
+  AppState.convert.files = []; AppState.convert.results = [];
+  document.getElementById('convert-input').value = '';
+  document.getElementById('convert-drop').style.display = 'block';
+  document.getElementById('convert-settings').style.display = 'none';
+  document.getElementById('cvt-results').style.display = 'none';
+  document.getElementById('cvt-results').textContent = '';
+  document.getElementById('cvt-file-list').textContent = '';
+  document.getElementById('cvt-progress-wrap').classList.remove('visible');
+  document.getElementById('cvt-btn').disabled = false;
+}
+
+// ═══════════════════════════════════════
+//  AI SMART COMPRESSION MODE
+// ═══════════════════════════════════════
+// compress.mode managed via AppState.compress.mode (initialised in AppState above)
+
+function setCompressMode(mode) {
+  AppState.compress.mode = mode;
+  document.getElementById('mode-normal').classList.toggle('active', mode === 'normal');
+  document.getElementById('mode-ai').classList.toggle('active', mode === 'ai');
+  // Show/hide slider and AI banner
+  const sliderBlock = document.getElementById('quality-slider-block');
+  const banner      = document.getElementById('ai-mode-banner');
+  if (mode === 'ai') {
+    sliderBlock.style.opacity  = '0.35';
+    sliderBlock.style.pointerEvents = 'none';
+    banner.style.display = 'block';
+  } else {
+    sliderBlock.style.opacity  = '1';
+    sliderBlock.style.pointerEvents = 'auto';
+    banner.style.display = 'none';
+  }
+}
+
+/**
+ * AI quality recommendation heuristic — runs per-file in the browser.
+ * Analyses: file type, file size relative to pixel count, and filename hints.
+ * Returns a quality value 0–1 for imageCompression().
+ *
+ * Logic:
+ *  - PNG (lossless format, graphics/logos) → preserve at 0.92
+ *  - Large photo (>2MP equiv) → 0.72  (humans can't tell at high res)
+ *  - Small/medium photo       → 0.80
+ *  - WEBP input               → 0.78
+ *  - Filename contains 'screen','screenshot','ui','logo','icon' → treat as graphic → 0.88
+ *  - Otherwise                → 0.75 balanced default
+ */
+
+function setupCompressDrop() {
+  const drop = document.getElementById('compress-drop');
+  const inp  = document.getElementById('compress-input');
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag-over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('drag-over');
+    handleCompressFiles(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')));
+  });
+  inp.addEventListener('change', () => handleCompressFiles(Array.from(inp.files)));
+}
+
+function handleCompressFiles(files) {
+  if (!files.length) return;
+  const existing = Array.from(AppState.compress.files);
+  // Merge new files — skip duplicates by name+size
+  const deduped = Array.from(files).filter(
+    f => !existing.some(e => e.name === f.name && e.size === f.size)
+  );
+  AppState.compress.files = existing.concat(deduped);
+  document.getElementById('compress-drop').style.display = 'none';
+  document.getElementById('compress-settings').style.display = 'block';
+  renderCompressFileList();
+}
+
+function renderCompressFileList() {
+  const container = document.getElementById('file-list');
+  const files     = AppState.compress.files;
+  container.textContent = '';
+  if (!files.length) return;
+
+  // Header row: count + "Add more" button
+  const addMoreBtn = el('button', {
+    cls: 'compress-add-more',
+    attrs: { type: 'button', title: 'Add more images' },
+    on: { click: () => document.getElementById('compress-input').click() }
+  }, '+ Add more');
+
+  container.appendChild(el('div', { cls: 'compress-preview-header' },
+    el('span', { cls: 'compress-preview-count' }, files.length + ' image' + (files.length !== 1 ? 's' : '') + ' selected'),
+    addMoreBtn
+  ));
+
+  // Grid: show up to MAX_PREVIEW thumbnails + overflow tile
+  const MAX_PREVIEW = 11;
+  const grid        = el('div', { cls: 'compress-preview-grid' });
+  const shown       = files.slice(0, MAX_PREVIEW);
+
+  shown.forEach((file, idx) => {
+    const item    = el('div', { cls: 'cpg-item' });
+    const img     = document.createElement('img');
+    img.className = 'cpg-thumb';
+    img.alt       = file.name;
+
+    // Load thumbnail from file
+    const burl = URL.createObjectURL(file);
+    img.src = burl;
+    img.onload = () => URL.revokeObjectURL(burl);
+    img.onerror = () => { URL.revokeObjectURL(burl); img.style.display = 'none'; };
+
+    const overlay = el('div', { cls: 'cpg-overlay' },
+      el('div', { cls: 'cpg-name', attrs: { title: file.name } }, file.name),
+      el('div', { cls: 'cpg-size' }, ImageService.formatBytes(file.size))
+    );
+
+    // Remove button
+    const rmBtn = el('button', {
+      cls: 'cpg-remove',
+      attrs: { type: 'button', 'aria-label': 'Remove ' + file.name, title: 'Remove' },
+      on: { click: () => {
+        AppState.compress.files = Array.from(AppState.compress.files).filter((_, i) => i !== idx);
+        if (!AppState.compress.files.length) resetCompress();
+        else renderCompressFileList();
+      }}
+    }, '✕');
+
+    item.appendChild(img);
+    item.appendChild(overlay);
+    item.appendChild(rmBtn);
+    grid.appendChild(item);
+  });
+
+  // Overflow tile: "+N more"
+  if (files.length > MAX_PREVIEW) {
+    const overflow = el('div', { cls: 'cpg-more',
+      attrs: { role: 'button', tabindex: '0', title: 'Click to add more' },
+      on: { click: () => document.getElementById('compress-input').click() }
+    }, '+' + (files.length - MAX_PREVIEW) + ' more');
+    grid.appendChild(overflow);
+  }
+
+  container.appendChild(grid);
+}
+
+function updateQualityLabel(v) {
+  const pill   = document.getElementById('quality-pill');
+  const slider = document.getElementById('quality-slider');
+  v = parseInt(v);
+  let label, cls;
+  if (v < 35)       { label = 'Smallest file'; cls = 'low'; }
+  else if (v < 65)  { label = 'Balanced';      cls = 'medium'; }
+  else              { label = 'High quality';  cls = ''; }
+  pill.textContent = label;
+  pill.className   = 'quality-pill' + (cls ? ' ' + cls : '');
+  if (slider) {
+    slider.setAttribute('aria-valuenow',  v);
+    slider.setAttribute('aria-valuetext', label + ' (' + v + '%)');
+  }
+}
+
+async function startCompression() {
+  // JIT guard — library is pre-warmed on tab switch but may not have
+  // resolved yet (slow connection) or the user may have jumped straight here
+  if (typeof imageCompression === 'undefined') {
+    const guardBtn = document.getElementById('compress-btn');
+    setBtnLoading(guardBtn, true, '⏳ Loading…');
+    try {
+      await loadScript(CDN.imageCompression);
+    } catch {
+      showToast('❌ Could not load compression library. Check your connection.');
+      setBtnLoading(guardBtn, false);
+      return;
+    }
+    setBtnLoading(guardBtn, false);
+  }
+  const { compress } = AppState;
+  const btn = document.getElementById('compress-btn');
+  setBtnLoading(btn, true, 'Compressing…');
+  setProgressVisible('compress-progress-wrap', true);
+  announceStatus('Compression started. Processing ' + compress.files.length + ' image' + (compress.files.length !== 1 ? 's' : '') + '.');
+
+  const sliderValue = parseInt(document.getElementById('quality-slider').value);
+  const userFmt     = getSelectedOutputFormat();
+  const stripExif   = shouldStripExif();
+  const results     = [];
+
+  for (let i = 0; i < compress.files.length; i++) {
+    const f          = compress.files[i];
+    const targetType = ImageService.resolveOutputFormat(userFmt, f.type);
+
+    // Resolve quality — AI mode needs dimensions first
+    let dims   = { w: 0, h: 0 };
+    if (compress.mode === 'ai') dims = await ImageService.getImgDims(f);
+    const quality = ImageService.resolveQuality(f, dims, compress.mode, sliderValue);
+
+    const progressText = compress.mode === 'ai'
+      ? '🤖 AI: ' + f.name + ' → q' + Math.round(quality * 100) + '% (' + (i+1) + '/' + compress.files.length + ')'
+      : 'Processing: ' + f.name + ' (' + (i+1) + '/' + compress.files.length + ')';
+    setProgress('compress-progress-bar', 'compress-progress-text',
+      Math.round((i / compress.files.length) * 100), progressText);
+    await ImageService.yieldToUI();
+
+    try {
+      const compressed = await ImageService.compressFile(f, { quality, targetType, stripExif }, imageCompression);
+      results.push({
+        name: f.name, original: f, compressed,
+        originalSize: f.size, compressedSize: compressed.size,
+        targetType,
+        aiQuality: compress.mode === 'ai' ? Math.round(quality * 100) : null,
+      });
+    } catch (e) {
+      results.push({ name: f.name, error: true, original: f });
+    }
+  }
+
+  setProgress('compress-progress-bar', 'compress-progress-text', 100, 'Done!');
+  announceStatus('Compression complete. ' + results.filter(r => !r.error).length + ' images processed.');
+  setTimeout(() => {
+    setProgressVisible('compress-progress-wrap', false);
+    setBtnLoading(btn, false);
+    btn.textContent = '⚡ Compress Now';
+    showResults(results);
+  }, 400);
+}
+
+function showResults(results) {
+  document.getElementById('compress-settings').style.display='none';
+  const container = document.getElementById('compress-results');
+  container.style.display='block';
+
+  const totalOrig  = results.reduce((a,r)=>a+(r.originalSize||0),0);
+  const totalComp  = results.reduce((a,r)=>a+(r.compressedSize||0),0);
+  const pct = totalOrig ? Math.round((1-totalComp/totalOrig)*100) : 0;
+
+  // Store successful blobs for ZIP
+  AppState.compress.zips = results
+    .filter(r => !r.error)
+    .map(r => {
+      // Rename extension if format changed (e.g. .jpg → .webp)
+      const outExt = r.compressed.type === 'image/webp' ? '.webp'
+                   : r.compressed.type === 'image/png'  ? '.png'
+                   : r.compressed.type === 'image/avif' ? '.avif'
+                   : '.jpg';
+      const baseName = r.name.replace(/\.[^.]+$/, '');
+      return { name: 'imagekit_' + baseName + outExt, blob: r.compressed };
+    });
+
+  // Hero badge (built via DOM helper — no innerHTML)
+  container.textContent = '';
+  container.appendChild(makeHeroBadge(pct, totalOrig - totalComp, totalOrig, totalComp));
+
+  // ZIP button (> 1 success)
+  if (AppState.compress.zips.length > 1) {
+    const zipBtn = makeBtn(
+      '📦 Download All as .ZIP (' + AppState.compress.zips.length + ' images)',
+      'btn-primary', downloadAllAsZip, { id: 'zip-btn' }
+    );
+    container.appendChild(makeBtnRow(zipBtn));
+  }
+
+  // Per-file cards
+  results.forEach((r, i) => {
+    if (r.error) { container.appendChild(makeErrorRow(r.name, 'Failed to compress')); return; }
+    container.appendChild(makeCompressCard(r, i));
+  });
+
+  container.appendChild(makeBtnRow(makeBtn('↺ Compress more images', 'btn-ghost', resetCompress)));
+  showToast(`✅ Done! You saved ${pct}%.`);
+  trackCompressStats(results); // ← update stats bar
+  // Init compare sliders after DOM is updated
+  setTimeout(initCompareSliders, 50);
+
+  // Delayed ad: show after 1s so user sees results first, not the ad
+  setTimeout(() => {
+    const adSlot = document.getElementById('ad-slot-results');
+    if (adSlot) {
+      adSlot.style.display = 'flex';
+      // If using AdSense: (adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  }, 1000);
+}
+
+async function downloadAllAsZip() {
+  const btn = document.getElementById('zip-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Building ZIP...'; }
+  await loadScript(CDN.jszip);
+  const zip = new JSZip();
+  AppState.compress.zips.forEach(r => zip.file(r.name, r.blob));
+
+  const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+  const zipUrl = trackedObjectURL(zipBlob);
+  const link = document.createElement('a');
+  link.download = `imagekit_compressed_${AppState.compress.zips.length}images.zip`;
+  link.href = zipUrl;
+  link.click();
+  // Revoke ZIP URL after browser has had time to start the download
+  setTimeout(() => revokeTracked(zipUrl), 10000);
+
+  if (btn) { btn.disabled = false; setText(btn, '📦 Download All as .ZIP (' + AppState.compress.zips.length + ' images)'); }
+  showToast(`📦 ZIP downloaded — ${AppState.compress.zips.length} images`);
+}
+
+function resetCompress() {
+  revokeAllObjectURLs(); // free RAM from all blob URLs created during this session
+  AppState.compress.files=[];
+  AppState.compress.zips=[];
+  document.getElementById('compress-input').value='';
+  document.getElementById('compress-drop').style.display='block';
+  document.getElementById('compress-settings').style.display='none';
+  document.getElementById('compress-results').style.display='none';
+  document.getElementById('compress-results').textContent='';
+  document.getElementById('file-list').textContent='';
+  document.getElementById('compress-progress-wrap').classList.remove('visible');
+  document.getElementById('compress-btn').disabled=false;
+  // Reset compression mode UI to normal
+  setCompressMode('normal');
+  // Hide delayed ad slot until next result cycle
+  const adSlot = document.getElementById('ad-slot-results');
+  if (adSlot) adSlot.style.display = 'none';
+}
+
+// ═══════════════════════════════════════
+//  RESIZE
+// ═══════════════════════════════════════
+const PRESETS = [
+  { platform:'Instagram', name:'Square', w:1080, h:1080, icon:'🟧' },
+  { platform:'Facebook',  name:'Post',   w:1200, h:630,  icon:'🟦' },
+  { platform:'Facebook',  name:'Profile',w:320,  h:320,  icon:'👤' },
+  { platform:'TikTok',    name:'Video / Story', w:1080, h:1920, icon:'▶️' },
+  { platform:'Instagram', name:'Portrait', w:1080, h:1350, icon:'📱' },
+  { platform:'Twitter/X', name:'Post', w:1200, h:675, icon:'🐦' },
+];
+
+// resize state — accessed via AppState.resize.*
+
+function buildPresets() {
+  const grid = document.getElementById('presets-grid');
+  PRESETS.forEach((p,i) => {
+    const ratio = p.w/p.h;
+    const fillPct = Math.min(100, ratio*50)+'%';
+    const card = document.createElement('div');
+    card.className='preset-card';
+    card.onclick=()=>selectPreset(i);
+    card.id=`preset-${i}`;
+    card.appendChild(el('div', { cls: 'preset-platform' }, p.icon + ' ' + p.platform));
+    card.appendChild(el('div', { cls: 'preset-name' }, p.name));
+    card.appendChild(el('div', { cls: 'preset-dims' }, p.w + ' × ' + p.h + ' px'));
+    card.appendChild(el('div', { cls: 'preset-aspect' },
+      el('div', { cls: 'preset-aspect-fill', css: 'width:' + fillPct })
+    ));
+    grid.appendChild(card);
+  });
+}
+
+function applyCustomSize() {
+  const w = parseInt(document.getElementById('custom-w').value);
+  const h = parseInt(document.getElementById('custom-h').value);
+  if (!w || !h || w < 1 || h < 1) { showToast('❌ Enter a valid width and height'); return; }
+  if (w > 8000 || h > 8000) { showToast('❌ Max size: 8000×8000px'); return; }
+  // Deselect any preset
+  document.querySelectorAll('.preset-card').forEach(c=>c.classList.remove('selected'));
+  AppState.resize.preset = null;
+  if (!AppState.resize.img) { showToast('❌ Drop an image first'); return; }
+  // Render directly onto canvas at custom size
+  const canvas = document.getElementById('resize-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = w; canvas.height = h;
+  const img    = AppState.resize.img;
+  const isPNG  = AppState.resize.originalType === 'image/png';
+  const fit    = AppState.resize.fitMode;
+  const lbColor = document.getElementById('letterbox-color')?.value || '#000000';
+  const { dx, dy, dw, dh } = ImageService.computeFitDraw(img, w, h, fit);
+  if (isPNG)        { ctx.clearRect(0, 0, w, h); }
+  else if (fit === 'contain') { ctx.fillStyle = lbColor; ctx.fillRect(0, 0, w, h); }
+  else              { ctx.fillStyle = '#111'; ctx.fillRect(0, 0, w, h); }
+  ctx.drawImage(img, dx, dy, dw, dh);
+  canvas.style.display='block';
+  document.getElementById('resize-placeholder').style.display='none';
+  document.getElementById('resize-download-btn').style.display='inline-flex';
+  // Show ad slot after resize result
+  const rsAd = document.getElementById('ad-slot-resize-result');
+  if (rsAd) rsAd.style.display = 'flex';
+  showToast(`✅ Resized to ${w}×${h}px`);
+}
+
+function selectPreset(i) {
+  AppState.resize.preset=i;
+  document.querySelectorAll('.preset-card').forEach((c,j)=>c.classList.toggle('selected',j===i));
+  if(AppState.resize.img) renderResized();
+}
+
+function setFit(mode) {
+  AppState.resize.fitMode=mode;
+  ['cover','contain','stretch'].forEach(m=>{
+    document.getElementById('fit-'+m).classList.toggle('active',m===mode);
+  });
+  const descs={
+    cover:'Crops the excess to perfectly fill the target size — best for square or feed posts.',
+    contain:'Adds a letterbox to preserve the original aspect ratio. Choose a background color below.',
+    stretch:'Stretches the image to fill — may distort the original proportions.'
+  };
+  document.getElementById('fit-desc').textContent=descs[mode];
+  // Show letterbox color picker only in contain mode
+  document.getElementById('letterbox-color-row').classList.toggle('visible', mode==='contain');
+  if(AppState.resize.img && AppState.resize.preset!==null) renderResized();
+}
+
+function setupResizeDrop() {
+  const drop=document.getElementById('resize-drop');
+  const inp=document.getElementById('resize-input');
+  drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag-over');});
+  drop.addEventListener('dragleave',()=>drop.classList.remove('drag-over'));
+  drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag-over');
+    const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
+    if(files[0]) loadResizeImage(files[0]);
+  });
+  inp.addEventListener('change',()=>{ if(inp.files[0]) loadResizeImage(inp.files[0]); });
+}
+
+function loadResizeImage(file) {
+  AppState.resize.originalType = file.type || 'image/jpeg';
+  AppState.resize.originalName = file.name;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      AppState.resize.img=img;
+      document.getElementById('resize-drop').style.display='none';
+      document.getElementById('resize-settings').style.display='block';
+      if(AppState.resize.preset!==null) renderResized();
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderResized() {
+  const { img, preset: presetIdx, fitMode: fit, originalType } = AppState.resize;
+  if (!img || presetIdx === null) return;
+  const p      = PRESETS[presetIdx];
+  const w = p.w, h = p.h;
+  const canvas = document.getElementById('resize-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width = w; canvas.height = h;
+
+  const isPNG   = originalType === 'image/png';
+  const lbColor = document.getElementById('letterbox-color')?.value || '#000000';
+  const { dx, dy, dw, dh } = ImageService.computeFitDraw(img, w, h, fit);
+
+  if (isPNG)              { ctx.clearRect(0, 0, w, h); }
+  else if (fit === 'contain') { ctx.fillStyle = lbColor; ctx.fillRect(0, 0, w, h); }
+  else                    { ctx.fillStyle = '#111'; ctx.fillRect(0, 0, w, h); }
+
+  ctx.drawImage(img, dx, dy, dw, dh);
+  canvas.style.display = 'block';
+  document.getElementById('resize-placeholder').style.display = 'none';
+  document.getElementById('resize-download-btn').style.display = 'inline-flex';
+}
+
+function downloadResized() {
+  const canvas=document.getElementById('resize-canvas');
+  const link=document.createElement('a');
+  const isPNG = AppState.resize.originalType === 'image/png';
+  const mimeType = isPNG ? 'image/png' : 'image/jpeg';
+  const ext = isPNG ? 'png' : 'jpg';
+  const keepName = document.getElementById('keep-filename')?.checked;
+  if (keepName && AppState.resize.originalName) {
+    link.download = AppState.resize.originalName;
+  } else if (AppState.resize.preset !== null) {
+    const p = PRESETS[AppState.resize.preset];
+    link.download=`imagekit_${p.platform.toLowerCase()}_${p.name.toLowerCase().replace(/\s/g,'_')}_${p.w}x${p.h}.${ext}`;
+  } else {
+    link.download=`imagekit_custom_${canvas.width}x${canvas.height}.${ext}`;
+  }
+  link.href=canvas.toDataURL(mimeType, isPNG ? 1 : 0.92);
+  link.click();
+  showToast(`⬇ Downloaded: ${canvas.width}×${canvas.height}px`);
+  trackResizeStats(); // ← update stats bar
+}
+
+function resetResize() {
+  AppState.resize.img=null; AppState.resize.preset=null; AppState.resize.originalType='image/jpeg'; AppState.resize.originalName='';
+  document.getElementById('resize-input').value='';
+  document.getElementById('custom-w').value='';
+  document.getElementById('custom-h').value='';
+  document.getElementById('keep-filename').checked=false;
+  document.getElementById('letterbox-color-row').classList.remove('visible');
+  document.getElementById('resize-drop').style.display='block';
+  document.getElementById('resize-settings').style.display='none';
+  const canvas=document.getElementById('resize-canvas');
+  canvas.style.display='none'; canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+  document.getElementById('resize-placeholder').style.display='block';
+  document.getElementById('resize-download-btn').style.display='none';
+  document.querySelectorAll('.preset-card').forEach(c=>c.classList.remove('selected'));
+}
+
+// ═══════════════════════════════════════
+//  AI UPSCALER
+// ═══════════════════════════════════════
+const UPSCALE_DAILY_LIMIT = 3;
+const UPSCALE_LIMIT_KEY   = 'ik_upscale_limit'; // {date, count}
+
+// upscale state — accessed via AppState.upscale.*
+
+// ── Daily limit helpers ──────────────────
+function getLimitData() {
+  try {
+    const raw = localStorage.getItem(UPSCALE_LIMIT_KEY);
+    if (!raw) return { date: '', count: 0 };
+    return JSON.parse(raw);
+  } catch { return { date: '', count: 0 }; }
+}
+function getTodayStr() {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+function getUsedToday() {
+  const d = getLimitData();
+  return d.date === getTodayStr() ? d.count : 0;
+}
+function incrementUsed() {
+  localStorage.setItem(UPSCALE_LIMIT_KEY, JSON.stringify({ date: getTodayStr(), count: getUsedToday() + 1 }));
+}
+function updateLimitUI() {
+  const used = getUsedToday();
+  const remaining = UPSCALE_DAILY_LIMIT - used;
+  document.getElementById('limit-used').textContent = used;
+  const pct = (used / UPSCALE_DAILY_LIMIT) * 100;
+  const fill = document.getElementById('limit-bar-fill');
+  fill.style.width = pct + '%';
+  fill.className = 'limit-bar-fill' + (pct >= 67 ? ' warning' : '');
+  const resetEl = document.getElementById('limit-reset-text');
+  if (remaining <= 0) {
+    resetEl.textContent = '⛔ Limit reached — resets tomorrow';
+    resetEl.style.color = 'var(--danger)';
+  } else {
+    resetEl.textContent = `${remaining} remaining today`;
+    resetEl.style.color = 'var(--muted)';
+  }
+}
+
+// ── Drop / file load ─────────────────────
+function setupUpscaleDrop() {
+  const drop = document.getElementById('upscale-drop');
+  const inp  = document.getElementById('upscale-input');
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag-over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('drag-over');
+    const f = Array.from(e.dataTransfer.files).find(f => f.type.startsWith('image/'));
+    if (f) loadUpscaleFile(f);
+  });
+  inp.addEventListener('change', () => { if (inp.files[0]) loadUpscaleFile(inp.files[0]); });
+}
+
+function loadUpscaleFile(file) {
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('❌ File too large — max 10MB'); return;
+  }
+  AppState.upscale.file = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      AppState.upscale.origW = img.naturalWidth;
+      AppState.upscale.origH = img.naturalHeight;
+      document.getElementById('upscale-thumb').src = e.target.result;
+      document.getElementById('upscale-filename').textContent = file.name;
+      document.getElementById('upscale-dims').textContent =
+        `${AppState.upscale.origW} × ${AppState.upscale.origH} px · ${formatBytes(file.size)}`;
+      document.getElementById('upscale-drop').style.display = 'none';
+      document.getElementById('upscale-settings').style.display = 'block';
+      updateOutputDims();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function selectScale(s) {
+  AppState.upscale.scale = s;
+  [2, 4, 8].forEach(n => {
+    document.getElementById('scale-'+n+'x').classList.toggle('selected', n === s);
+  });
+  updateOutputDims();
+}
+
+function updateOutputDims() {
+  const el = document.getElementById('upscale-output-dims');
+  if (!AppState.upscale.origW) return;
+  el.textContent = `Output: ${AppState.upscale.origW * AppState.upscale.scale} × ${AppState.upscale.origH * AppState.upscale.scale} px`;
+}
+
+// ── Main upscale call ────────────────────
+async function startUpscale() {
+  if (getUsedToday() >= UPSCALE_DAILY_LIMIT) {
+    showToast('⛔ Daily limit reached — come back tomorrow'); return;
+  }
+  if (!AppState.upscale.file) return;
+
+  // Show processing state
+  document.getElementById('upscale-settings').style.display = 'none';
+  document.getElementById('upscale-result').style.display   = 'none';
+  const proc = document.getElementById('upscale-processing');
+  proc.classList.add('visible');
+  document.getElementById('processing-sub').textContent = 'Preparing image…';
+
+  try {
+    // Step 1: Convert file to base64 — send raw base64 (no data URL prefix) + mime separately
+    // This avoids the 33% Base64 overhead of JSON.stringify on a data URL,
+    // and is compatible with Vercel serverless (no multipart parser needed).
+    document.getElementById('processing-sub').textContent = 'Preparing image…';
+    const dataUrl = await fileToBase64(AppState.upscale.file);
+    const mimeType = dataUrl.split(';')[0].slice(5);   // "data:image/jpeg;..." → "image/jpeg"
+    const rawB64   = dataUrl.split(',')[1];             // strip "data:...;base64," prefix
+
+    // Step 2: Send to our backend — backend handles Replicate + IP rate limit
+    document.getElementById('processing-sub').textContent = 'AI is enhancing · Real-ESRGAN running…';
+    AppState.upscale.controller = new AbortController();
+    const timeoutId = setTimeout(() => AppState.upscale.controller.abort(), 90000); // 90s max
+
+    const response = await fetch('/api/upscale', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image:       rawB64,
+        mime:        mimeType,
+        scale:       AppState.upscale.scale,
+        faceEnhance: false
+      }),
+      signal: AppState.upscale.controller.signal
+    });
+    clearTimeout(timeoutId);
+    AppState.upscale.controller = null;
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // 429 = backend confirmed limit reached — sync localStorage immediately
+      if (response.status === 429) {
+        localStorage.setItem(UPSCALE_LIMIT_KEY, JSON.stringify({ date: getTodayStr(), count: UPSCALE_DAILY_LIMIT }));
+        updateLimitUI();
+      }
+      throw new Error(data.error || 'Server error');
+    }
+
+    const outputUrl = data.outputUrl;
+    if (!outputUrl) throw new Error('No output image returned');
+
+    // Step 3: Sync localStorage count from backend source of truth
+    localStorage.setItem(UPSCALE_LIMIT_KEY, JSON.stringify({ date: getTodayStr(), count: data.used }));
+    updateLimitUI();
+    proc.classList.remove('visible');
+
+    document.getElementById('res-orig-img').src  = trackedObjectURL(AppState.upscale.file);
+    document.getElementById('res-orig-dims').textContent = `${AppState.upscale.origW}×${AppState.upscale.origH}`;
+    document.getElementById('res-new-img').src   = outputUrl;
+    document.getElementById('res-new-dims').textContent  =
+      `${AppState.upscale.origW * AppState.upscale.scale}×${AppState.upscale.origH * AppState.upscale.scale}`;
+
+    const dlBtn = document.getElementById('upscale-download-btn');
+    dlBtn.href = outputUrl;
+    dlBtn.download = 'imagekit_upscaled_' + AppState.upscale.scale + 'x_' + AppState.upscale.file.name;
+
+    document.getElementById('upscale-result').style.display = 'block';
+    showToast(`✨ Done! ${AppState.upscale.scale}× upscale complete · ${data.remaining} remaining today`);
+    trackUpscaleStats(); // ← update stats bar
+
+  } catch (err) {
+    AppState.upscale.controller = null;
+    proc.classList.remove('visible');
+    document.getElementById('upscale-settings').style.display = 'block';
+    // AbortError = user cancelled or timeout — message different
+    if (err.name === 'AbortError') {
+      showToast('🛑 Cancelled — quota not used');
+    } else {
+      showToast('❌ ' + (err.message || 'Something went wrong'));
+    }
+    document.getElementById('processing-sub').textContent = 'Sending to Real-ESRGAN · usually 10–30s';
+  }
+}
+
+// ── Cancel in-flight upscale ──────────────
+function cancelUpscale() {
+  if (AppState.upscale.controller) {
+    AppState.upscale.controller.abort();
+    AppState.upscale.controller = null;
+  }
+}
+
+// ── Helper: File → Base64 data URL (kept for potential future use)
+// NOTE: startUpscale() now uses FormData directly — no Base64 needed
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('File read failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function resetUpscale() {
+  // Clear tracked blob URLs (original preview) before resetting
+  const origImg = document.getElementById('res-orig-img');
+  if (origImg.src && origImg.src.startsWith('blob:')) revokeTracked(origImg.src);
+  AppState.upscale.file = null; AppState.upscale.origW = 0; AppState.upscale.origH = 0; AppState.upscale.scale = 2;
+  document.getElementById('upscale-input').value = '';
+  document.getElementById('upscale-drop').style.display     = 'block';
+  document.getElementById('upscale-settings').style.display = 'none';
+  document.getElementById('upscale-result').style.display   = 'none';
+  document.getElementById('upscale-processing').classList.remove('visible');
+  document.getElementById('upscale-thumb').src = '';
+  [2, 4, 8].forEach(n => document.getElementById('scale-'+n+'x').classList.toggle('selected', n === 2));
+}
+
+// ═══════════════════════════════════════
+//  STATS ENGINE
+// ═══════════════════════════════════════
+const STATS_KEY = 'ik_stats_v1';
+
+function loadStats() {
+  try {
+    const raw = localStorage.getItem(STATS_KEY);
+    return raw ? JSON.parse(raw) : { images: 0, bytesSaved: 0, resized: 0, upscaled: 0 };
+  } catch { return { images: 0, bytesSaved: 0, resized: 0, upscaled: 0 }; }
+}
+
+function saveStats(s) {
+  try { localStorage.setItem(STATS_KEY, JSON.stringify(s)); } catch {}
+}
+
+// Animated counter — eases from current displayed value to target
+function animateStat(elId, toValue, formatter) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const fromText = el.textContent;
+  // parse numeric part of current display (strip non-digits/dots)
+  const from = parseFloat(fromText.replace(/[^0-9.]/g, '')) || 0;
+  const to   = toValue;
+  if (from === to) return;
+
+  const duration = 600; // ms
+  const start    = performance.now();
+
+  function tick(now) {
+    const t   = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    el.textContent = formatter(from + (to - from) * ease);
+    if (t < 1) requestAnimationFrame(tick);
+    else el.textContent = formatter(to);
+  }
+  requestAnimationFrame(tick);
+}
+
+function formatStatBytes(bytes) {
+  if (bytes < 1024)             return bytes + ' B';
+  if (bytes < 1024 * 1024)     return (bytes / 1024).toFixed(0) + ' KB';
+  if (bytes < 1024 ** 3)       return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+  return (bytes / 1024 ** 3).toFixed(2) + ' GB';
+}
+
+function formatStatCount(n) {
+  if (n < 1000)   return String(Math.round(n));
+  if (n < 1e6)    return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return (n / 1e6).toFixed(2) + 'M';
+}
+
+function pulseBadge(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('pulse');
+  void el.offsetWidth; // force reflow to restart animation
+  el.classList.add('pulse');
+}
+
+function updateStatsUI(s, changedKeys = []) {
+  animateStat('val-images',  s.images,     formatStatCount);
+  animateStat('val-saved',   s.bytesSaved, formatStatBytes);
+  animateStat('val-resized', s.resized,    formatStatCount);
+  animateStat('val-upscaled',s.upscaled,   formatStatCount);
+  changedKeys.forEach(k => {
+    const map = { images: 'badge-images', bytesSaved: 'badge-saved', resized: 'badge-resized', upscaled: 'badge-upscaled' };
+    if (map[k]) pulseBadge(map[k]);
+  });
+}
+
+// Called from showResults() after successful compression batch
+function trackCompressStats(results) {
+  const s = loadStats();
+  const successful = results.filter(r => !r.error);
+  const bytesSaved = successful.reduce((acc, r) => acc + Math.max(0, r.originalSize - r.compressedSize), 0);
+  s.images     += successful.length;
+  s.bytesSaved += bytesSaved;
+  saveStats(s);
+  updateStatsUI(s, ['images', 'bytesSaved']);
+}
+
+// Called from downloadResized()
+function trackResizeStats() {
+  const s = loadStats();
+  s.resized += 1;
+  saveStats(s);
+  updateStatsUI(s, ['resized']);
+}
+
+// Called from startUpscale() on success
+function trackUpscaleStats() {
+  const s = loadStats();
+  s.upscaled += 1;
+  saveStats(s);
+  updateStatsUI(s, ['upscaled']);
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+setupCompressDrop();
+setupConvertDrop();
+setupResizeDrop();
+buildPresets();
+setupUpscaleDrop();
+updateLimitUI();
+updateStatsUI(loadStats());
+initFormatOptions();
+initHashRouting(); // restore tab from URL hash + handle hashchange
+
+// ═══════════════════════════════════════
+//  COMPARE SLIDER — Zoom · Pan · Fullscreen
+// ═══════════════════════════════════════
+
+// Per-slider state keyed by wrap element id
+// ════════════════════════════════════════════════════════
+//  CompareSlider — encapsulates one before/after widget
+// ════════════════════════════════════════════════════════
+class CompareSlider {
+  static ZOOM_STEPS = [0.5, 0.75, 1, 1.5, 2, 3, 4];
+
+  constructor(wrapEl) {
+    this.wrap    = wrapEl;
+    this.id      = wrapEl.id;
+    this.top     = wrapEl.querySelector('.compare-slider-top');
+    this.divider = wrapEl.querySelector('.compare-divider');
+    this.handle  = wrapEl.querySelector('.compare-handle');
+    // State
+    this._st = { zoom: 1, px: 0, py: 0, splitPct: 50 };
+    // Touch tracking
+    this._touch = null;
+    this._pinch = null;
+    // Bound handlers stored for destroy()
+    this._onWheel     = this._onWheel.bind(this);
+    this._onMouseDown = this._onMouseDown.bind(this);
+    this._onTouchStart= this._onTouchStart.bind(this);
+    this._onTouchMove = this._onTouchMove.bind(this);
+    this._onTouchEnd  = this._onTouchEnd.bind(this);
+    this._onKeyDown   = this._onKeyDown.bind(this);
+    this._bindEvents();
+  }
+
+  // ── Public API ─────────────────────────────────────
+
+  setSplit(pct) {
+    pct = Math.max(2, Math.min(98, pct));
+    this._st.splitPct = pct;
+    this.top.style.width    = pct + '%';
+    this.divider.style.left = pct + '%';
+    this.handle.style.left  = pct + '%';
+    if (this.handle.getAttribute('role') === 'slider')
+      this.handle.setAttribute('aria-valuenow', Math.round(pct));
+  }
+
+  zoomIn()    { this._stepZoom(+1); }
+  zoomOut()   { this._stepZoom(-1); }
+  resetZoom() {
+    this._st.zoom = 1; this._st.px = 0; this._st.py = 0;
+    this._applyTransform();
+    this._updateZoomLabel();
+    this.wrap.style.cursor = 'col-resize';
+  }
+
+  destroy() {
+    this.wrap.removeEventListener('wheel',      this._onWheel);
+    this.wrap.removeEventListener('mousedown',  this._onMouseDown);
+    this.wrap.removeEventListener('touchstart', this._onTouchStart);
+    this.wrap.removeEventListener('touchmove',  this._onTouchMove);
+    this.wrap.removeEventListener('touchend',   this._onTouchEnd);
+    if (this.handle) this.handle.removeEventListener('keydown', this._onKeyDown);
+  }
+
+  // ── Private helpers ────────────────────────────────
+
+  _applyTransform() {
+    const { zoom, px, py, splitPct } = this._st;
+    const T = `scale(${zoom}) translate(${px}px, ${py}px)`;
+    this.wrap.querySelectorAll('img').forEach(img => {
+      img.style.transform       = T;
+      img.style.transformOrigin = 'center center';
+    });
+    this.top.style.width = splitPct + '%';
+  }
+
+  _clampPan() {
+    const { zoom } = this._st;
+    const maxX = (zoom - 1) * this.wrap.offsetWidth  / 2 / zoom;
+    const maxY = (zoom - 1) * this.wrap.offsetHeight / 2 / zoom;
+    this._st.px = Math.max(-maxX, Math.min(maxX, this._st.px));
+    this._st.py = Math.max(-maxY, Math.min(maxY, this._st.py));
+  }
+
+  _stepZoom(dir) {
+    const steps = CompareSlider.ZOOM_STEPS;
+    let idx = steps.findIndex(s => s >= this._st.zoom - 0.01);
+    idx = Math.max(0, Math.min(steps.length - 1, idx + dir));
+    this._st.zoom = steps[idx];
+    if (this._st.zoom === 1) { this._st.px = 0; this._st.py = 0; }
+    this._clampPan();
+    this._applyTransform();
+    this._updateZoomLabel();
+    this.wrap.style.cursor = this._st.zoom > 1 ? 'grab' : 'col-resize';
+  }
+
+  _updateZoomLabel() {
+    const lbl = document.getElementById('cmp-zoom-' + this.id);
+    if (lbl) lbl.textContent = Math.round(this._st.zoom * 100) + '%';
+  }
+
+  _splitFromClientX(clientX) {
+    const rect = this.wrap.getBoundingClientRect();
+    this.setSplit(((clientX - rect.left) / rect.width) * 100);
+  }
+
+  // ── Event handlers ─────────────────────────────────
+
+  _onWheel(e) {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.15 : -0.15;
+    this._st.zoom = Math.max(0.5, Math.min(4, this._st.zoom + delta));
+    if (this._st.zoom <= 1.01) { this._st.zoom = 1; this._st.px = 0; this._st.py = 0; }
+    this._clampPan();
+    this._applyTransform();
+    this._updateZoomLabel();
+    this.wrap.style.cursor = this._st.zoom > 1 ? 'grab' : 'col-resize';
+  }
+
+  _onMouseDown(e) {
+    e.preventDefault();
+    const startX = e.clientX, startY = e.clientY;
+    const startPx = this._st.px, startPy = this._st.py;
+    this.handle.classList.add('dragging');
+
+    const onMove = e2 => {
+      if (this._st.zoom > 1) {
+        this.wrap.style.cursor = 'grabbing';
+        this._st.px = startPx + (e2.clientX - startX) / this._st.zoom;
+        this._st.py = startPy + (e2.clientY - startY) / this._st.zoom;
+        this._clampPan();
+        this._applyTransform();
+      } else {
+        this._splitFromClientX(e2.clientX);
+      }
+    };
+    const onUp = () => {
+      this.handle.classList.remove('dragging');
+      this.wrap.style.cursor = this._st.zoom > 1 ? 'grab' : 'col-resize';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup',  onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',  onUp);
+  }
+
+  _onTouchStart(e) {
+    if (e.touches.length === 1) {
+      this._touch = { x: e.touches[0].clientX, y: e.touches[0].clientY,
+                      px: this._st.px, py: this._st.py };
+      this._pinch = null;
+    } else if (e.touches.length === 2) {
+      const [a, b] = [e.touches[0], e.touches[1]];
+      this._pinch = { dist: Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY),
+                      zoom: this._st.zoom };
+      this._touch = null;
+    }
+  }
+
+  _onTouchMove(e) {
+    e.preventDefault();
+    if (e.touches.length === 2 && this._pinch) {
+      const [a, b] = [e.touches[0], e.touches[1]];
+      const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+      this._st.zoom = Math.max(0.5, Math.min(4, this._pinch.zoom * dist / this._pinch.dist));
+      if (this._st.zoom <= 1.01) { this._st.zoom = 1; this._st.px = 0; this._st.py = 0; }
+      this._clampPan();
+      this._applyTransform();
+      this._updateZoomLabel();
+      this.wrap.style.cursor = this._st.zoom > 1 ? 'grab' : 'col-resize';
+    } else if (e.touches.length === 1 && this._touch) {
+      const dx = e.touches[0].clientX - this._touch.x;
+      const dy = e.touches[0].clientY - this._touch.y;
+      if (this._st.zoom > 1) {
+        this._st.px = this._touch.px + dx / this._st.zoom;
+        this._st.py = this._touch.py + dy / this._st.zoom;
+        this._clampPan();
+        this._applyTransform();
+      } else {
+        this._splitFromClientX(e.touches[0].clientX);
+      }
+    }
+  }
+
+  _onTouchEnd() { this._touch = null; this._pinch = null; }
+
+  _onKeyDown(e) {
+    // Arrow keys on handle adjust split
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); this.setSplit(this._st.splitPct - 2); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); this.setSplit(this._st.splitPct + 2); }
+    if (e.key === 'Home')       { e.preventDefault(); this.setSplit(2); }
+    if (e.key === 'End')        { e.preventDefault(); this.setSplit(98); }
+    if (e.key === '+' || e.key === '=') this.zoomIn();
+    if (e.key === '-')          this.zoomOut();
+    if (e.key === '0')          this.resetZoom();
+  }
+
+  _bindEvents() {
+    this.wrap.addEventListener('wheel',      this._onWheel,      { passive: false });
+    this.wrap.addEventListener('mousedown',  this._onMouseDown);
+    this.wrap.addEventListener('touchstart', this._onTouchStart, { passive: true });
+    this.wrap.addEventListener('touchmove',  this._onTouchMove,  { passive: false });
+    this.wrap.addEventListener('touchend',   this._onTouchEnd,   { passive: true });
+    if (this.handle) this.handle.addEventListener('keydown', this._onKeyDown);
+  }
+}
+
+// ── Registry of active CompareSlider instances ─────────────────
+const _compareSliders = new Map(); // id → CompareSlider
+
+function initCompareSliders() {
+  document.querySelectorAll('.compare-slider-wrap').forEach(wrap => {
+    if (!_compareSliders.has(wrap.id)) {
+      _compareSliders.set(wrap.id, new CompareSlider(wrap));
+    }
+  });
+}
+
+// Global bridge functions (called from makeCompressCard toolbar buttons)
+function cmpZoom(id, dir) {
+  _compareSliders.get(id)?.[dir > 0 ? 'zoomIn' : 'zoomOut']();
+}
+function cmpResetZoom(id) {
+  _compareSliders.get(id)?.resetZoom();
+}
+
+// ════════════════════════════════════════════════════════
+//  FullscreenCompare — manages the fullscreen compare modal
+// ════════════════════════════════════════════════════════
+class FullscreenCompare {
+  static ZOOM_STEPS = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 6];
+
+  constructor() {
+    this._st       = { zoom: 1, px: 0, py: 0, splitPct: 50 };
+    this._trigger  = null;  // element to return focus to on close
+    this._drag     = null;
+    this._pinch    = null;
+    // Bound handlers for cleanup
+    this._onDown   = this._onDown.bind(this);
+    this._onMove   = this._onMove.bind(this);
+    this._onUp     = this._onUp.bind(this);
+    this._onWheel  = this._onWheel.bind(this);
+    this._onKey    = this._onKey.bind(this);
+    this._onResize = this._onResize.bind(this);
+    this._onTouchStart = this._onTouchStart.bind(this);
+    this._onTouchMove  = this._onTouchMove.bind(this);
+  }
+
+  // ── DOM refs (lazy — modal may not exist at construction time) ─
+  get _modal()   { return document.getElementById('fs-modal'); }
+  get _body()    { return document.getElementById('fs-body'); }
+  get _wrap()    { return document.getElementById('fs-wrap'); }
+  get _origImg() { return document.getElementById('fs-orig-img'); }
+  get _compImg() { return document.getElementById('fs-comp-img'); }
+  get _title()   { return document.getElementById('fs-title'); }
+  get _zoomLbl() { return document.getElementById('fs-zoom-label'); }
+  get _topLayer(){ return document.getElementById('fs-top-layer'); }
+  get _divider() { return document.getElementById('fs-divider'); }
+  get _handle()  { return document.getElementById('fs-handle'); }
+
+  // ── Public API ─────────────────────────────────────
+
+  open(origUrl, compUrl, name, origSize, compSize) {
+    const pct = origSize ? Math.round((1 - compSize / origSize) * 100) : 0;
+    this._title.textContent = name + (pct ? ' — −' + pct + '%' : '');
+    this._origImg.src = origUrl;
+    this._compImg.src = compUrl;
+    this._st = { zoom: 1, px: 0, py: 0, splitPct: 50 };
+
+    this._origImg.onload = () => { this._fitToBody(); this._applyTransform(); this.setSplit(50); };
+    if (this._origImg.complete && this._origImg.naturalWidth) {
+      this._fitToBody(); this._applyTransform(); this.setSplit(50);
+    }
+
+    this._modal.classList.add('open');
+    this._modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    this._bindEvents();
+    setText(this._zoomLbl, '100%');
+    this._trigger = document.activeElement;
+    requestAnimationFrame(() => {
+      const closeBtn = this._modal.querySelector('button[title="Close (Esc)"]');
+      if (closeBtn) closeBtn.focus();
+    });
+  }
+
+  close() {
+    this._modal.classList.remove('open');
+    this._modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    this._unbindEvents();
+    if (this._trigger) { this._trigger.focus(); this._trigger = null; }
+    announceStatus('Fullscreen comparison closed');
+  }
+
+  setSplit(pct) {
+    pct = Math.max(2, Math.min(98, pct));
+    this._st.splitPct = pct;
+    this._topLayer.style.width = pct + '%';
+    this._divider.style.left   = pct + '%';
+    this._handle.style.left    = pct + '%';
+  }
+
+  zoomIn()  { this._stepZoom(+1); }
+  zoomOut() { this._stepZoom(-1); }
+
+  resetView() {
+    this._st.zoom = 1; this._st.px = 0; this._st.py = 0;
+    this._fitToBody();
+    this._applyTransform();
+    this.setSplit(50);
+    setText(this._zoomLbl, '100%');
+  }
+
+  // ── Private ─────────────────────────────────────────
+
+  _fitToBody() {
+    const bw = this._body.offsetWidth, bh = this._body.offsetHeight;
+    const iw = this._origImg.naturalWidth  || bw;
+    const ih = this._origImg.naturalHeight || bh;
+    const scale = Math.min(bw / iw, bh / ih, 1);
+    const w = Math.round(iw * scale), h = Math.round(ih * scale);
+    this._wrap.style.width  = w + 'px';
+    this._wrap.style.height = h + 'px';
+    this._wrap.style.left   = ((bw - w) / 2) + 'px';
+    this._wrap.style.top    = ((bh - h) / 2) + 'px';
+    [this._origImg, this._compImg].forEach(img => {
+      img.style.width = w + 'px'; img.style.height = h + 'px';
+    });
+  }
+
+  _applyTransform() {
+    const { zoom, px, py } = this._st;
+    const bw = this._body.offsetWidth,  bh = this._body.offsetHeight;
+    const ww = this._wrap.offsetWidth,  wh = this._wrap.offsetHeight;
+    this._wrap.style.transformOrigin = '0 0';
+    this._wrap.style.transform =
+      'translate(' + (bw/2 + px - ww/2*zoom) + 'px, ' + (bh/2 + py - wh/2*zoom) + 'px) scale(' + zoom + ')';
+  }
+
+  _clampPan() {
+    const excess  = (this._st.zoom - 1) * this._wrap.offsetWidth  / 2;
+    const excessY = (this._st.zoom - 1) * this._wrap.offsetHeight / 2;
+    this._st.px = Math.max(-excess,  Math.min(excess,  this._st.px));
+    this._st.py = Math.max(-excessY, Math.min(excessY, this._st.py));
+  }
+
+  _updateZoomLabel() {
+    setText(this._zoomLbl, Math.round(this._st.zoom * 100) + '%');
+  }
+
+  _stepZoom(dir) {
+    const steps = FullscreenCompare.ZOOM_STEPS;
+    let idx = steps.findIndex(s => s >= this._st.zoom - 0.01);
+    idx = Math.max(0, Math.min(steps.length - 1, idx + dir));
+    this._st.zoom = steps[idx];
+    if (this._st.zoom <= 1) { this._st.px = 0; this._st.py = 0; }
+    this._clampPan();
+    this._applyTransform();
+    this._updateZoomLabel();
+  }
+
+  _splitFromClientX(clientX) {
+    const wRect = this._wrap.getBoundingClientRect();
+    this.setSplit(((clientX - wRect.left) / wRect.width) * 100);
+  }
+
+  _onDown(e) {
+    e.preventDefault();
+    const cx = e.clientX ?? e.touches?.[0].clientX;
+    const cy = e.clientY ?? e.touches?.[0].clientY;
+    this._drag = { cx, cy, px: this._st.px, py: this._st.py };
+    this._body.classList.add('dragging');
+  }
+
+  _onMove(e) {
+    if (!this._drag) return;
+    const cx = e.clientX ?? e.touches?.[0].clientX;
+    const cy = e.clientY ?? e.touches?.[0].clientY;
+    if (this._st.zoom > 1) {
+      this._st.px = this._drag.px + (cx - this._drag.cx);
+      this._st.py = this._drag.py + (cy - this._drag.cy);
+      this._clampPan();
+      this._applyTransform();
+    } else {
+      this._splitFromClientX(cx);
+    }
+  }
+
+  _onUp() { this._drag = null; this._body.classList.remove('dragging'); }
+
+  _onTouchStart(e) {
+    if (e.touches.length === 2) {
+      this._pinch = {
+        dist: Math.hypot(e.touches[1].clientX - e.touches[0].clientX,
+                         e.touches[1].clientY - e.touches[0].clientY),
+        zoom: this._st.zoom,
+      };
+    } else { this._onDown(e); }
+  }
+
+  _onTouchMove(e) {
+    e.preventDefault();
+    if (e.touches.length === 2 && this._pinch) {
+      const dist = Math.hypot(e.touches[1].clientX - e.touches[0].clientX,
+                              e.touches[1].clientY - e.touches[0].clientY);
+      this._st.zoom = Math.max(0.25, Math.min(6, this._pinch.zoom * dist / this._pinch.dist));
+      this._clampPan(); this._applyTransform(); this._updateZoomLabel();
+    } else { this._onMove(e); }
+  }
+
+  _onWheel(e) {
+    e.preventDefault();
+    this._st.zoom = Math.max(0.25, Math.min(6, this._st.zoom + (e.deltaY < 0 ? 0.15 : -0.15)));
+    if (this._st.zoom <= 1.01) { this._st.zoom = 1; this._st.px = 0; this._st.py = 0; }
+    this._clampPan(); this._applyTransform(); this._updateZoomLabel();
+  }
+
+  _onKey(e) {
+    if (e.key === 'Escape')          { this.close(); return; }
+    if (e.key === '+' || e.key === '=') this.zoomIn();
+    if (e.key === '-')               this.zoomOut();
+    if (e.key === '0')               this.resetView();
+    if (e.key === 'ArrowLeft')       { e.preventDefault(); this.setSplit(this._st.splitPct - 2); }
+    if (e.key === 'ArrowRight')      { e.preventDefault(); this.setSplit(this._st.splitPct + 2); }
+  }
+
+  _onResize() { this._fitToBody(); this._applyTransform(); }
+
+  _bindEvents() {
+    this._body.addEventListener('mousedown',  this._onDown);
+    this._body.addEventListener('touchstart', this._onTouchStart, { passive: false });
+    this._body.addEventListener('touchmove',  this._onTouchMove,  { passive: false });
+    this._body.addEventListener('touchend',   this._onUp,         { passive: true });
+    this._body.addEventListener('wheel',      this._onWheel,      { passive: false });
+    document.addEventListener('mousemove',   this._onMove);
+    document.addEventListener('mouseup',     this._onUp);
+    document.addEventListener('keydown',     this._onKey);
+    window.addEventListener('resize',        this._onResize);
+  }
+
+  _unbindEvents() {
+    this._body.removeEventListener('mousedown',  this._onDown);
+    this._body.removeEventListener('touchstart', this._onTouchStart);
+    this._body.removeEventListener('touchmove',  this._onTouchMove);
+    this._body.removeEventListener('touchend',   this._onUp);
+    this._body.removeEventListener('wheel',      this._onWheel);
+    document.removeEventListener('mousemove',    this._onMove);
+    document.removeEventListener('mouseup',      this._onUp);
+    document.removeEventListener('keydown',      this._onKey);
+    window.removeEventListener('resize',         this._onResize);
+  }
+}
+
+// ── Singleton instance + global bridge functions ───────────────
+const _fsCompare = new FullscreenCompare();
+
+function openFullscreen(origUrl, compUrl, name, origSize, compSize) {
+  _fsCompare.open(origUrl, compUrl, name, origSize, compSize);
+}
+function closeFullscreen() { _fsCompare.close(); }
+function fsZoom(dir)       { dir > 0 ? _fsCompare.zoomIn() : _fsCompare.zoomOut(); }
+function fsResetView()     { _fsCompare.resetView(); }
+
+// ═══════════════════════════════════════
+//  BACKGROUND REMOVER
+// ═══════════════════════════════════════
+(function() {
+  // ── State ──────────────────────────────
+  const BgrState = {
+    file: null,
+    originalBlob: null,   // result PNG blob from AI
+    currentBg: 'transparent',
+  };
+
+  // ── DOM helpers ────────────────────────
+  const $ = id => document.getElementById(id);
+
+  // ── Dropzone wiring ────────────────────
+  function initBgrDrop() {
+    const drop  = $('bgr-drop');
+    const input = $('bgr-input');
+    if (!drop || !input) return;
+
+    drop.addEventListener('click', () => input.click());
+    drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
+    input.addEventListener('change', e => { if (e.target.files[0]) handleBgrFile(e.target.files[0]); });
+
+    drop.addEventListener('dragover',  e => { e.preventDefault(); drop.classList.add('drag-over'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+    drop.addEventListener('drop', e => {
+      e.preventDefault(); drop.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) handleBgrFile(file);
+    });
+  }
+
+  // ── File handler ───────────────────────
+  function handleBgrFile(file) {
+    if (file.size > 10 * 1024 * 1024) { showToast('⚠️ Image too large — max 10MB'); return; }
+    BgrState.file = file;
+    startBgrRemoval(file);
+  }
+
+  // ── Main removal function ──────────────
+  async function startBgrRemoval(file) {
+    $('bgr-drop').style.display     = 'none';
+    $('bgr-result').style.display   = 'none';
+    const proc = $('bgr-processing');
+    proc.style.display = 'flex';
+    $('bgr-proc-title').textContent = 'Loading AI model…';
+    $('bgr-proc-sub').textContent   = 'Downloading model (~40MB) — cached after first use';
+    $('bgr-progress-bar').style.width = '0%';
+
+    try {
+      // Lazy-load the library as ESM module
+      if (!window._imglyBgRemoval) {
+        $('bgr-proc-title').textContent = 'Loading AI model…';
+        const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/background-removal.js');
+        window._imglyBgRemoval = mod.removeBackground || mod.default;
+      }
+
+      $('bgr-proc-title').textContent = 'Removing background…';
+      $('bgr-proc-sub').textContent   = 'AI is processing your image…';
+      $('bgr-progress-bar').style.width = '30%';
+
+      const config = {
+        progress: (key, cur, total) => {
+          if (total > 0) {
+            const pct = Math.round((cur / total) * 100);
+            $('bgr-progress-bar').style.width = Math.max(30, pct) + '%';
+            if (key.includes('fetch') || key.includes('model')) {
+              $('bgr-proc-sub').textContent = `Downloading model… ${pct}%`;
+            } else {
+              $('bgr-proc-sub').textContent = `Processing… ${pct}%`;
+            }
+          }
+        },
+        output: { format: 'image/png', quality: 1 },
+      };
+
+      const resultBlob = await window._imglyBgRemoval(file, config);
+      BgrState.originalBlob = resultBlob;
+
+      $('bgr-progress-bar').style.width = '100%';
+      await renderBgrResult('transparent');
+      proc.style.display = 'none';
+      $('bgr-result').style.display = 'block';
+
+      // Show ad slot
+      const adSlot = $('ad-slot-bgr-result');
+      if (adSlot) adSlot.style.display = 'flex';
+
+      // Update stats
+      AppState.stats.images++;
+      updateStatsBar();
+      announceStatus('Background removed successfully');
+      showToast('✅ Background removed!');
+
+    } catch (err) {
+      console.error('BG removal error:', err);
+      proc.style.display = 'none';
+      $('bgr-drop').style.display = '';
+      showToast('❌ Error: ' + (err.message || 'Could not remove background'));
+    }
+  }
+
+  // ── Render result on canvas ─────────────
+  async function renderBgrResult(bg) {
+    BgrState.currentBg = bg;
+    const canvas = $('bgr-canvas');
+    const ctx    = canvas.getContext('2d');
+    const img    = new Image();
+    const url    = URL.createObjectURL(BgrState.originalBlob);
+
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+    URL.revokeObjectURL(url);
+
+    canvas.width  = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (bg !== 'transparent') {
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.drawImage(img, 0, 0);
+
+    // Update download link
+    const downloadUrl = canvas.toDataURL('image/png');
+    const dlBtn = $('bgr-download-btn');
+    dlBtn.href     = downloadUrl;
+    dlBtn.download = (BgrState.file?.name.replace(/\.[^.]+$/, '') || 'image') + '-nobg.png';
+
+    // Mark active bg button
+    document.querySelectorAll('.bgr-bg-btn').forEach(b => b.classList.remove('active'));
+    const active = document.querySelector(`.bgr-bg-btn[data-bg="${bg}"]`);
+    if (active) active.classList.add('active');
+  }
+
+  // ── Background color buttons ────────────
+  function initBgrBgStrip() {
+    document.querySelectorAll('.bgr-bg-btn[data-bg]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (BgrState.originalBlob) renderBgrResult(btn.dataset.bg);
+      });
+    });
+
+    const colorInput = $('bgr-custom-color');
+    if (colorInput) {
+      colorInput.addEventListener('input', () => {
+        const swatch = $('bgr-custom-swatch');
+        if (swatch) swatch.style.background = colorInput.value;
+        swatch.dataset.bg = colorInput.value;
+        if (BgrState.originalBlob) renderBgrResult(colorInput.value);
+        // Deactivate other buttons
+        document.querySelectorAll('.bgr-bg-btn').forEach(b => b.classList.remove('active'));
+        swatch.classList.add('active');
+      });
+    }
+  }
+
+  // ── Reset ───────────────────────────────
+  window.resetBgRemover = function() {
+    BgrState.file = null;
+    BgrState.originalBlob = null;
+    BgrState.currentBg = 'transparent';
+    $('bgr-drop').style.display     = '';
+    $('bgr-result').style.display   = 'none';
+    $('bgr-processing').style.display = 'none';
+    const input = $('bgr-input');
+    if (input) input.value = '';
+    // Reset bg buttons
+    document.querySelectorAll('.bgr-bg-btn').forEach(b => b.classList.remove('active'));
+    const checker = document.querySelector('.bgr-bg-btn.checker');
+    if (checker) checker.classList.add('active');
+  };
+
+  // ── Init on DOM ready ───────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    initBgrDrop();
+    initBgrBgStrip();
+  });
+  // If already loaded
+  if (document.readyState !== 'loading') {
+    initBgrDrop();
+    initBgrBgStrip();
+  }
+})();
+
+// ═══════════════════════════════════════
+//  DARK MODE
+// ═══════════════════════════════════════
+// ─── PRIVACY POPUP ───────────────────────────────
+function togglePrivacyPopup() {
+  const popup  = document.getElementById('privacy-popup');
+  const badge  = document.getElementById('privacy-badge');
+  const isOpen = popup.classList.toggle('open');
+  badge.setAttribute('aria-expanded', isOpen);
+  popup.setAttribute('aria-hidden', !isOpen);
+  if (isOpen) {
+    // Move focus to close button
+    requestAnimationFrame(() => {
+      const close = document.getElementById('privacy-popup-close');
+      if (close) close.focus();
+    });
+  } else {
+    badge.focus(); // return focus to trigger
+  }
+}
+function closePrivacyPopup() {
+  const popup = document.getElementById('privacy-popup');
+  const badge = document.getElementById('privacy-badge');
+  if (!popup.classList.contains('open')) return;
+  popup.classList.remove('open');
+  badge.setAttribute('aria-expanded', 'false');
+  popup.setAttribute('aria-hidden', 'true');
+  badge.focus();
+}
+// Close on click outside
+document.addEventListener('click', e => {
+  const popup = document.getElementById('privacy-popup');
+  const badge = document.getElementById('privacy-badge');
+  if (popup && popup.classList.contains('open') &&
+      !popup.contains(e.target) && !badge.contains(e.target)) {
+    closePrivacyPopup();
+  }
+});
+// Focus trap + Escape inside privacy popup
+document.addEventListener('keydown', e => {
+  const popup = document.getElementById('privacy-popup');
+  if (!popup || !popup.classList.contains('open')) return;
+  if (e.key === 'Escape') { e.preventDefault(); closePrivacyPopup(); return; }
+  if (e.key !== 'Tab') return;
+  const focusable = Array.from(popup.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  )).filter(el => !el.disabled && el.offsetParent !== null);
+  if (!focusable.length) return;
+  const first = focusable[0], last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault(); last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault(); first.focus();
+  }
+});
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('ik_theme', theme);
+  document.getElementById('theme-toggle').textContent = theme === 'light' ? '🌙' : '☀️';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// Init theme: saved → system → dark default
+(function initTheme() {
+  const saved = localStorage.getItem('ik_theme');
+  if (saved) { applyTheme(saved); return; }
+  const preferLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+  applyTheme(preferLight ? 'light' : 'dark');
+})();
+
+// ═══════════════════════════════════════
+//  GUIDED TOUR (Shepherd.js)
+// ═══════════════════════════════════════
+async function startTour() {
+  await Promise.all([
+    loadScript(CDN.shepherdJS),
+    loadCSS(CDN.shepherdCSS),
+  ]);
+  const tour = new Shepherd.Tour({
+    useModalOverlay: true,
+    defaultStepOptions: {
+      cancelIcon: { enabled: true },
+      scrollTo: { behavior: 'smooth', block: 'center' },
+      buttons: [
+        { text: 'Skip', action: function() { this.cancel(); }, classes: 'shepherd-button-secondary' },
+        { text: 'Next →', action: function() { this.next(); }, classes: 'shepherd-button-primary' }
+      ]
+    }
+  });
+
+  tour.addStep({ id: 'welcome', title: '👋 Welcome to ImageKit', text: 'A fast, free toolkit for images — no account, no uploads to our servers. Everything runs in your browser.', attachTo: { element: 'header', on: 'bottom' } });
+  tour.addStep({ id: 'compress', title: '🗜️ Image Compressor', text: 'Drag & drop images here to shrink their file size. Adjust quality with the slider — preview before you download.', attachTo: { element: '#panel-compress .dropzone', on: 'bottom' }, buttons: [ { text: 'Skip', action: function() { this.cancel(); }, classes: 'shepherd-button-secondary' }, { text: 'Next →', action: function() { switchTab('resize'); this.next(); }, classes: 'shepherd-button-primary' } ] });
+  tour.addStep({ id: 'resize', title: '📐 Social Media Resizer', text: 'Pick a preset (Instagram, TikTok…) or enter a custom size. Choose Crop, Contain, or Stretch fit modes.', attachTo: { element: '#panel-resize', on: 'top' }, buttons: [ { text: 'Skip', action: function() { this.cancel(); }, classes: 'shepherd-button-secondary' }, { text: 'Next →', action: function() { switchTab('upscale'); this.next(); }, classes: 'shepherd-button-primary' } ] });
+  tour.addStep({ id: 'upscale', title: '✨ AI Upscaler', text: 'Enhance low-resolution images up to 4× using Real-ESRGAN. Completely free — 3 upscales per day.', attachTo: { element: '#panel-upscale', on: 'top' }, buttons: [ { text: 'Skip', action: function() { this.cancel(); }, classes: 'shepherd-button-secondary' }, { text: 'Done ✓', action: function() { this.complete(); }, classes: 'shepherd-button-primary' } ] });
+
+  tour.start();
+}
+
+// ═══════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════
+document.addEventListener('keydown', e => {
+  // Esc — clear drag-over state + cancel upscale (skip if fullscreen modal is open)
+  if (e.key === 'Escape') {
+    if (document.getElementById('fs-modal')?.classList.contains('open')) return; // handled by fs modal
+    document.querySelectorAll('.dropzone.drag-over').forEach(d => d.classList.remove('drag-over'));
+    if (AppState.upscale.controller) cancelUpscale();
+  }
+  // Ctrl/Cmd+Enter — trigger active panel action
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    const idx = ['compress','convert','resize','upscale'].findIndex(t =>
+      document.getElementById('panel-'+t).classList.contains('active')
+    );
+    if (idx === 0 && AppState.compress.files.length)  { e.preventDefault(); startCompression(); }
+    if (idx === 2 && AppState.upscale.file)           { e.preventDefault(); startUpscale(); }
+  }
+});
+
+// ── Cross-tab quota sync ──────────────────
+window.addEventListener('storage', (e) => {
+  if (e.key === UPSCALE_LIMIT_KEY) updateLimitUI();
+});
+
+// ═══════════════════════════════════════
+//  I18N — lang attribute management
+//  TODO: replace strings map + DOM traversal when a full i18n
+//  framework is wired in.  For now, setLang() is the single
+//  place that updates <html lang="…"> so screen readers and
+//  search engines always see the correct language code.
+// ═══════════════════════════════════════
+function setLang(code) {
+  document.documentElement.setAttribute('lang', code);
+  localStorage.setItem('ik_lang', code);
+}
+// Restore saved language on load (no-op until strings are implemented)
+(function initLang() {
+  const saved = localStorage.getItem('ik_lang');
+  if (saved) setLang(saved);
+})();
+
+// ═══════════════════════════════════════
+//  AD SLOT VISIBILITY — MutationObserver
+//  Fallback for browsers that don't support CSS :has().
+//  Watches each .ad-slot; shows it (display:flex) the moment a
+//  real <ins> or <iframe> child is added, hides it otherwise.
+// ═══════════════════════════════════════
+(function initAdSlots() {
+  function checkSlot(slot) {
+    const hasAd = !!slot.querySelector(':scope > ins, :scope > iframe');
+    // Sticky footer keeps its own display logic (fixed positioning)
+    if (slot.classList.contains('ad-slot-sticky-footer')) {
+      if (hasAd) slot.style.display = 'flex';
+      return;
+    }
+    slot.style.display = hasAd ? 'flex' : 'none';
+  }
+  document.querySelectorAll('.ad-slot').forEach(slot => {
+    checkSlot(slot); // initial state
+    new MutationObserver(() => checkSlot(slot))
+      .observe(slot, { childList: true });
+  });
+})();
+</script>
+</body>
+</html>
