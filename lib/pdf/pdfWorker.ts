@@ -95,9 +95,11 @@ async function handlePdfToJpg(
 ) {
   const pdfjsLib = await import('pdfjs-dist');
   // We're already off the main UI thread inside this dedicated Worker, so
-  // there's no need for pdf.js's own nested worker — disableWorker keeps
-  // parsing on this same thread and avoids loading a second worker script.
-  const doc = await pdfjsLib.getDocument({ data: file, disableWorker: true }).promise;
+  // pdf.js's own nested worker isn't needed — spawning one from inside a
+  // Worker isn't reliably supported anyway, so we simply don't set
+  // GlobalWorkerOptions.workerSrc and let pdf.js fall back to running
+  // parsing on this same thread automatically.
+  const doc = await pdfjsLib.getDocument({ data: file }).promise;
   const outputs: { name: string; bytes: Uint8Array }[] = [];
 
   for (let i = 1; i <= doc.numPages; i++) {
@@ -106,7 +108,7 @@ async function handlePdfToJpg(
     const viewport = page.getViewport({ scale });
     const canvas = new OffscreenCanvas(viewport.width, viewport.height);
     const ctx = canvas.getContext('2d') as any;
-    await page.render({ canvasContext: ctx, viewport }).promise;
+    await page.render({ canvas: canvas as any, canvasContext: ctx, viewport }).promise;
     const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.92 });
     const bytes = new Uint8Array(await blob.arrayBuffer());
     outputs.push({
