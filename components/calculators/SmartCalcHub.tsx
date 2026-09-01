@@ -10,6 +10,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLang } from '../../lib/hooks/useLang'
 import { DARK, LIGHT, COLORS } from '../../lib/theme'
+import { BP } from '../../lib/breakpoints'
 import { TOOLS, resolveToolFromPath, getCats, RELATED_TOOLS, registryTools } from '../../lib/tools'
 import { SEO_CONTENT } from '../../lib/seoContent'
 import { ThemeCtx, useTheme, ResultCtx, useOnResult, HistoryCtx, useHistory } from './shared/contexts'
@@ -388,17 +389,17 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
         input[type=range]{width:100%;height:4px;border-radius:99px;}
         textarea{font-family:'JetBrains Mono',monospace;}
         select option{background:${T.selectOption};color:${T.txt};}
-        @media(max-width:1100px){
+        @media(max-width:${BP.laptop}px){
           .layout{grid-template-columns:220px 1fr!important;}
           .right-panel{display:none!important;}
         }
-        @media(max-width:800px){
+        @media(max-width:${BP.tablet}px){
           .layout{grid-template-columns:1fr!important;}
           .sidebar{border-right:none!important;border-bottom:1px solid ${T.border}!important;padding:12px!important;max-height:none!important;position:relative!important;top:auto!important;overflow-y:visible!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;}
           .sidebar-ad{display:none!important;}
           .tool-grid{grid-template-columns:repeat(3,1fr)!important;}
         }
-        @media(max-width:480px){
+        @media(max-width:${BP.mobile}px){
           .tool-grid{grid-template-columns:repeat(2,1fr)!important;}
         }
       `}</style>

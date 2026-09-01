@@ -341,13 +341,13 @@ function RegexTesterTab({ lang }: { lang: string }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', gap: 10 }}>
-        <div style={{ flex: 1 }}>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 200px' }}>
           <Label>{lang === 'fr' ? 'Expression régulière' : 'Pattern'}</Label>
           <input value={pattern} onChange={e => setPattern(e.target.value)}
             style={{ ...monoInp(), resize: undefined }} />
         </div>
-        <div style={{ width: 100 }}>
+        <div style={{ flex: '0 1 100px', minWidth: 80 }}>
           <Label>Flags</Label>
           <input value={flags} onChange={e => setFlags(e.target.value)} maxLength={6}
             style={{ ...monoInp(), resize: undefined }} placeholder="gi" />

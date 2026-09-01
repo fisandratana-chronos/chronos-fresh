@@ -4,6 +4,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useDark } from '../../lib/hooks/useDark'
 import { useLang } from '../../lib/hooks/useLang'
+import { BP } from '../../lib/breakpoints'
 import { IMAGE_SEO_CONTENT } from '../../lib/imageSeoContent'
 
 // ── Types ─────────────────────────────────────────────────────
@@ -342,7 +343,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
         .ih-fam-nav-wrap { flex-wrap: nowrap; }
-        @media (max-width: 700px) {
+        @media (max-width: ${BP.tablet}px) {
           .ih-fam-nav-wrap { flex-wrap: wrap; row-gap: 4px; padding-top: 6px; padding-bottom: 2px; }
         }
         .ih-dropzone {
@@ -387,16 +388,14 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         .ih-drop-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
         .ih-breadcrumb { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: ${T.accent}; margin-bottom: 4px; }
         .ih-free-badge { position: absolute; top: 48px; right: 6vw; display: inline-flex; align-items: center; padding: 7px 12px; border: 1px solid rgba(245,166,35,.35); border-radius: 999px; background: rgba(245,166,35,.10); color: ${T.accent}; font-size: 12px; font-weight: 600; white-space: nowrap; }
-        @media (max-width: 780px) {
+        @media (max-width: ${BP.tablet}px) {
           .ih-free-badge { position: static; margin-top: 20px; }
         }
-        @media (max-width: 600px) {
+        @media (max-width: ${BP.mobile}px) {
           .ih-page-header { padding: 32px 5vw 24px !important; }
           .ih-main { padding: 36px 5vw 80px !important; }
           .ih-dropzone { min-height: 280px !important; padding: 32px 20px !important; }
           .ih-fmt-grid { grid-template-columns: repeat(2,1fr) !important; }
-        }
-        @media (max-width: 560px) {
           .ih-export-grid, .ih-passport-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>

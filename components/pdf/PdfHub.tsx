@@ -12,7 +12,10 @@
 import React from 'react'
 import * as PDFLib from 'pdf-lib'
 import { useLang } from '../../lib/hooks/useLang'
+import { BP } from '../../lib/breakpoints'
 import { PDF_SEO_CONTENT } from '../../lib/pdfSeoContent'
+import { compressPdfImages, COMPRESS_PRESETS } from '../../lib/pdf/compressImages'
+import { runPdfWorkerTask } from '../../lib/pdf/usePdfWorker';
 
 // ── Theme tokens — CHRONOS design system ──
 
@@ -38,7 +41,7 @@ const FONT_STYLE = `
 // Mobile breakpoint rules. Inline styles below have higher specificity than
 // plain selectors, so these use !important to override at ≤880px / ≤560px.
 const RESPONSIVE_STYLE = `
-  @media (max-width: 880px) {
+  @media (max-width: ${BP.tablet}px) {
     .chronos-shell { grid-template-columns: 1fr !important; }
     .chronos-sidebar {
       border-right: none !important;
@@ -63,7 +66,7 @@ const RESPONSIVE_STYLE = `
     .chronos-tool-grid { grid-template-columns: 1fr !important; }
     .chronos-related-grid { grid-template-columns: repeat(2, 1fr) !important; }
   }
-  @media (max-width: 560px) {
+  @media (max-width: ${BP.mobile}px) {
     .chronos-related-grid { grid-template-columns: 1fr !important; }
     .chronos-hero-title { font-size: 28px !important; }
   }
@@ -343,6 +346,10 @@ async function loadPdfJs() {
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
   return pdfjsLib;
+}
+async function loadJSZip() {
+  const { default: JSZip } = await import('jszip');
+  return JSZip;
 }
 
 // Map raw pdf-lib / pdfjs error text to a friendly, on-brand, bilingual message.
@@ -646,12 +653,30 @@ function PdfSplitTab({ lang }: { lang: string }) {
           if (p.includes("-")) { const [a, b] = p.split("-").map(n => parseInt(n) - 1); return Array.from({ length: b - a + 1 }, (_, i) => a + i); }
           return [parseInt(p) - 1];
         });
+
+      const outputs: { name: string; bytes: Uint8Array }[] = [];
       for (let i = 0; i < sets.length; i++) {
+        setMsg(lang === "fr" ? `Traitement ${i + 1}/${sets.length}…` : `Processing ${i + 1}/${sets.length}…`);
         const out = await PDFDocument.create();
         const cp = await out.copyPages(src, sets[i]); cp.forEach(p => out.addPage(p));
-        pdfDownload(await out.save(), sets.length === total ? `page_${sets[i][0] + 1}.pdf` : `part_${i + 1}.pdf`);
-        await new Promise(r => setTimeout(r, 80));
+        const name = sets.length === total ? `page_${sets[i][0] + 1}.pdf` : `part_${i + 1}.pdf`;
+        outputs.push({ name, bytes: await out.save() });
       }
+
+      if (outputs.length === 1) {
+        pdfDownload(outputs[0].bytes, outputs[0].name);
+      } else {
+        // Zip multi-file output into one download — browsers block or prompt
+        // for permission after several auto-triggered downloads in one tab.
+        setMsg(lang === "fr" ? "Compression en ZIP…" : "Zipping…");
+        const JSZip = await loadJSZip();
+        const zip = new JSZip();
+        outputs.forEach(o => zip.file(o.name, o.bytes));
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const base = file!.name.replace(/\.pdf$/i, "");
+        fileDownload(zipBlob, `${base}_split.zip`, "application/zip");
+      }
+
       setSt("ok"); setMsg(lang === "fr" ? `Divisé en ${sets.length} fichier(s) !` : `Split into ${sets.length} file(s)!`);
     } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
   };
@@ -689,28 +714,76 @@ function PdfSplitTab({ lang }: { lang: string }) {
   );
 }
 
+// ── Replacement for PdfCompressTab in components/pdf/PdfHub.tsx ──
+// 1. Add this import near the top of PdfHub.tsx, alongside the existing
+//    `import * as PDFLib from 'pdf-lib'`:
+//
+//      import { compressPdfImages, COMPRESS_PRESETS } from '../../lib/pdf/compressImages';
+//
+// 2. Replace the existing `function PdfCompressTab(...) { ... }` block
+//    (around line 692) with this entire function.
+
 function PdfCompressTab({ lang }: { lang: string }) {
   const [file, setFile] = React.useState<File | null>(null);
-  const [level, setLevel] = React.useState("medium");
+  const [level, setLevel] = React.useState<"low" | "medium" | "high">("medium");
   const [st, setSt] = React.useState<string | null>(null);
   const [msg, setMsg] = React.useState("");
   const fmtSize = (b: number) => (b / 1048576).toFixed(2) + " MB";
+
   const run = async () => {
-    setSt("loading"); setMsg(lang === "fr" ? "Compression en cours…" : "Compressing…");
+    setSt("loading");
+    setMsg(lang === "fr" ? "Compression en cours…" : "Compressing…");
     try {
-      const { PDFDocument } = PDFLib;
-      const buf = await file!.arrayBuffer();
-      const doc = await PDFDocument.load(buf);
-      const opts: any = { low: { useObjectStreams: false }, medium: { useObjectStreams: true }, high: { useObjectStreams: true, objectsPerTick: 100 } }[level];
-      const bytes = await doc.save(opts);
-      const ratio = +((1 - bytes.length / buf.byteLength) * 100).toFixed(1);
-      pdfDownload(bytes, "compressed.pdf");
-      setSt("ok"); setMsg(ratio > 0
-        ? (lang === "fr" ? `Réduit de ${ratio}% : ${fmtSize(buf.byteLength)} → ${fmtSize(bytes.length)}` : `Reduced by ${ratio}%: ${fmtSize(buf.byteLength)} → ${fmtSize(bytes.length)}`)
-        : `Saved as ${fmtSize(bytes.length)}`);
-    } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
+      const buf = new Uint8Array(await file!.arrayBuffer());
+      const result = await compressPdfImages(buf, {
+        ...COMPRESS_PRESETS[level],
+        onProgress: (done, total) => {
+          if (total > 0) {
+            setMsg(
+              lang === "fr"
+                ? `Compression des images ${done}/${total}…`
+                : `Compressing images ${done}/${total}…`
+            );
+          }
+        },
+      });
+
+      pdfDownload(result.bytes, "compressed.pdf");
+
+      const ratio = +((1 - result.compressedSize / result.originalSize) * 100).toFixed(1);
+
+      if (result.imagesCompressed === 0) {
+        // Honest message when there was nothing this engine could safely shrink —
+        // e.g. a text-only PDF, or one with only CMYK/CCITT/JBIG2/masked images.
+        setSt("ok");
+        setMsg(
+          lang === "fr"
+            ? `Aucune image compressible trouvée (PDF texte, ou images déjà optimisées/CMYK). Fichier enregistré sans changement notable : ${fmtSize(result.compressedSize)}`
+            : `No compressible images found (text-only PDF, or images already optimized/CMYK). Saved with no significant change: ${fmtSize(result.compressedSize)}`
+        );
+      } else if (ratio > 0) {
+        setSt("ok");
+        setMsg(
+          lang === "fr"
+            ? `Réduit de ${ratio}% (${result.imagesCompressed}/${result.imagesFound} image(s) recompressée(s)) : ${fmtSize(result.originalSize)} → ${fmtSize(result.compressedSize)}`
+            : `Reduced by ${ratio}% (${result.imagesCompressed}/${result.imagesFound} image(s) recompressed): ${fmtSize(result.originalSize)} → ${fmtSize(result.compressedSize)}`
+        );
+      } else {
+        setSt("ok");
+        setMsg(
+          lang === "fr"
+            ? `Déjà optimisé — pas de réduction supplémentaire possible. Enregistré : ${fmtSize(result.compressedSize)}`
+            : `Already optimized — no further reduction possible. Saved as ${fmtSize(result.compressedSize)}`
+        );
+      }
+    } catch (e: any) {
+      setSt("err");
+      setMsg(friendlyError(e, lang));
+    }
   };
-  const levels = ["low", "medium", "high"];
+
+  const levels: Array<"low" | "medium" | "high"> = ["low", "medium", "high"];
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {!file
@@ -731,8 +804,13 @@ function PdfCompressTab({ lang }: { lang: string }) {
                 </button>
               ))}
             </div>
+            <div style={{ fontSize: 10, color: C.muted, marginTop: 6, lineHeight: 1.5 }}>
+              {lang === "fr"
+                ? "Recompresse les images JPEG intégrées (RVB/niveaux de gris, sans transparence). Les PDF principalement composés de texte, ou d'images CMJN/scannées, verront peu ou pas de réduction — c'est normal."
+                : "Recompresses embedded JPEG images (RGB/grayscale, no transparency). Text-heavy PDFs, or ones with CMYK/scanned images, will see little or no reduction — that's expected."}
+            </div>
           </div>
-          <button onClick={run} style={s.cta()}>
+          <button onClick={run} style={s.cta()} disabled={st === "loading"}>
             ⇣ &nbsp; {lang === "fr" ? "Compresser le PDF" : "Compress PDF"}
           </button>
         </>
@@ -883,24 +961,32 @@ function PdfToJpgTab({ lang }: { lang: string }) {
   const run = async () => {
     setSt("loading"); setMsg(lang === "fr" ? "Rendu des pages…" : "Rendering pages…");
     try {
-      const pdfjsLib = await loadPdfJs();
-      const doc = await pdfjsLib.getDocument({ data: await file!.arrayBuffer() }).promise;
+      const buf = await file!.arrayBuffer();
       const base = file!.name.replace(/\.pdf$/i, "");
-      for (let i = 1; i <= doc.numPages; i++) {
-        setMsg(lang === "fr" ? `Rendu page ${i} sur ${doc.numPages}…` : `Rendering page ${i} of ${doc.numPages}…`);
-        const page = await doc.getPage(i);
-        const viewport = page.getViewport({ scale });
-        const canvas = document.createElement("canvas");
-        canvas.width = viewport.width; canvas.height = viewport.height;
-        const ctx = canvas.getContext("2d")!;
-        await page.render({ canvas, canvasContext: ctx, viewport }).promise;
-        const blob = await new Promise<Blob>(res => canvas.toBlob(b => res(b!), "image/jpeg", 0.92));
-        fileDownload(blob, doc.numPages === 1 ? `${base}.jpg` : `${base}_page${i}.jpg`, "image/jpeg");
-        await new Promise(r => setTimeout(r, 80));
+
+      const { outputs } = await runPdfWorkerTask<{ outputs: { name: string; bytes: Uint8Array }[] }>(
+        'pdfToJpg',
+        { file: buf, scale, baseName: base },
+        [buf],
+        (done, total) =>
+          setMsg(lang === "fr" ? `Rendu page ${done + 1} sur ${total}…` : `Rendering page ${done + 1} of ${total}…`)
+      );
+
+      if (outputs.length === 1) {
+        fileDownload(new Blob([outputs[0].bytes as BlobPart], { type: "image/jpeg" }), outputs[0].name, "image/jpeg");
+      } else {
+        setMsg(lang === "fr" ? "Compression en ZIP…" : "Zipping…");
+        const JSZip = await loadJSZip();
+        const zip = new JSZip();
+        outputs.forEach(o => zip.file(o.name, o.bytes));
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        fileDownload(zipBlob, `${base}_pages.zip`, "application/zip");
       }
-      setSt("ok"); setMsg(lang === "fr" ? `${doc.numPages} page(s) exportées en JPG !` : `Exported ${doc.numPages} page(s) as JPG!`);
+
+      setSt("ok"); setMsg(lang === "fr" ? `${outputs.length} page(s) exportées en JPG !` : `Exported ${outputs.length} page(s) as JPG!`);
     } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
   };
+
   const qualities = [
     { k: 1.5, en: "Standard", fr: "Standard" },
     { k: 2,   en: "High",     fr: "Haute" },

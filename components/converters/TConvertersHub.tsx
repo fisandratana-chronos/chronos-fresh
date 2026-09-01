@@ -7,6 +7,7 @@
 
 import React from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { BP } from '../../lib/breakpoints'
 
 // ── Theme ──
 
@@ -950,7 +951,7 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
       <style>{`
         .conv-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:flex-start;}
         .conv-tool{position:sticky;top:76px;}
-        @media(max-width:860px){
+        @media(max-width:${BP.tablet}px){
           .conv-layout{grid-template-columns:1fr;}
           .conv-tool{position:static;order:-1;}
         }

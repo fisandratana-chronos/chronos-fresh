@@ -20,7 +20,7 @@ function QrCodeGenerator() {
     <Inp label="URL or text" type="text" value={url} onChange={setUrl} placeholder="https://example.com"/>
     <Btn label="Generate QR Code" onClick={gen} color={T.amber}/>
     {qr&&<div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12,padding:20,background:T.bg2,borderRadius:12,border:`1px solid ${T.amber}25`}}>
-      <img src={qr} alt="QR Code" style={{width:200,height:200,borderRadius:8,imageRendering:"pixelated"}}/>
+      <img src={qr} alt="QR Code" style={{width:"100%",maxWidth:200,height:"auto",aspectRatio:"1 / 1",borderRadius:8,imageRendering:"pixelated"}}/>
       <a href={qr} download="qrcode.png" style={{fontFamily:"Inter,sans-serif",fontSize:12,color:T.amber,textDecoration:"none",padding:"7px 14px",border:`1px solid ${T.amber}50`,borderRadius:7}}>↓ Download PNG</a>
     </div>}
   </div>;
