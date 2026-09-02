@@ -52,7 +52,7 @@ export const COLORS = {
 export const DARK = {
   bg0:"#07090F", bg1:"#0C1018", bg2:"#111520", bg3:"#171D2E", bg4:"#1C2438",
   border:"#1E2A40", borderHov:"#2A3A58",
-  amber:"#F59E0B", amberD:"#D97706", amberL:"#FCD34D",
+  amber:"#06B6D4", amberD:"#0891B2", amberL:"#22D3EE", // ← cyan accent, itovizana amin'ny Converters (C_ACCENT #06B6D4)
   emerald:"#10B981", red:"#EF4444", blue:"#3B82F6", purple:"#8B5CF6",
   cyan:"#06B6D4",
   txt:"#F1F5F9", txt2:"#94A3B8", txt3:"#64748B", txt4:"#334155",
@@ -63,7 +63,7 @@ export const DARK = {
 export const LIGHT = {
   bg0:"#F0F4FA", bg1:"#FFFFFF", bg2:"#F8FAFC", bg3:"#EEF2F8", bg4:"#E4EAF4",
   border:"#CBD5E1", borderHov:"#94A3B8",
-  amber:"#D97706", amberD:"#B45309", amberL:"#F59E0B",
+  amber:"#0891B2", amberD:"#0E7490", amberL:"#06B6D4", // ← cyan accent, itovizana amin'ny Converters
   emerald:"#059669", red:"#DC2626", blue:"#2563EB", purple:"#7C3AED",
   cyan:"#0891B2",
   txt:"#0F172A", txt2:"#374151", txt3:"#6B7280", txt4:"#9CA3AF",

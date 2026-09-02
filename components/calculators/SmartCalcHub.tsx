@@ -395,7 +395,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
         }
         @media(max-width:${BP.tablet}px){
           .layout{grid-template-columns:1fr!important;}
-          .sidebar{border-right:none!important;border-bottom:1px solid ${T.border}!important;padding:12px!important;max-height:none!important;position:relative!important;top:auto!important;overflow-y:visible!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;}
+          .sidebar{width:100%!important;border-right:none!important;border-bottom:1px solid ${T.border}!important;padding:12px!important;max-height:none!important;position:relative!important;top:auto!important;overflow-y:visible!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;}
           .sidebar-ad{display:none!important;}
           .tool-grid{grid-template-columns:repeat(3,1fr)!important;}
         }
