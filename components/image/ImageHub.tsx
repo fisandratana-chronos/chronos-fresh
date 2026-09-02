@@ -329,7 +329,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
     surface:  dark ? '#181819' : '#ffffff',
     surface2: dark ? '#222224' : '#ebebeb',
     border:   dark ? '#2e2e32' : '#d4d2cc',
-    accent:   '#f59e0b',
+    accent:   '#06B6D4',
     text:     dark ? '#f0ede8' : '#1a1a1b',
     muted:    dark ? '#7a7a82' : '#7a7a82',
     danger:   '#f87171',
@@ -351,13 +351,13 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
           display: flex; flex-direction: column; align-items: center; justify-content: center;
           text-align: center;
           border: 1px dashed #38383d; border-radius: 22px;
-          background: radial-gradient(circle at center, rgba(245,166,35,.045), transparent 55%);
+          background: radial-gradient(circle at center, rgba(6,182,212,.045), transparent 55%);
           transition: border-color .2s, background .2s, transform .2s;
           cursor: pointer; padding: 48px 32px;
         }
         .ih-dropzone:hover, .ih-dropzone.drag-over {
           border-color: ${T.accent};
-          background: radial-gradient(circle at center, rgba(245,166,35,.09), transparent 60%);
+          background: radial-gradient(circle at center, rgba(6,182,212,.09), transparent 60%);
           transform: translateY(-2px);
         }
         .ih-btn-primary { background: ${T.accent}; color: #000; border: none; border-radius: 10px; padding: 12px 28px; font-family: 'DM Sans',sans-serif; font-weight: 700; font-size: .92rem; cursor: pointer; transition: opacity .15s; }
@@ -365,14 +365,14 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         .ih-btn-ghost { background: none; color: ${T.text}; border: 1px solid ${T.border}; border-radius: 10px; padding: 11px 22px; font-family: 'DM Sans',sans-serif; font-weight: 600; font-size: .88rem; cursor: pointer; transition: border-color .15s; }
         .ih-btn-ghost:hover { border-color: ${T.accent}; color: ${T.accent}; }
         .ih-fit-btn { background: ${T.surface2}; color: ${T.muted}; border: 1px solid ${T.border}; border-radius: 8px; padding: 8px 16px; font-size: .82rem; cursor: pointer; transition: all .15s; }
-        .ih-fit-btn.active, .ih-fit-btn:hover { border-color: ${T.accent}; color: ${T.accent}; background: rgba(245,166,35,.08); }
+        .ih-fit-btn.active, .ih-fit-btn:hover { border-color: ${T.accent}; color: ${T.accent}; background: rgba(6,182,212,.08); }
         .ih-progress-wrap { background: ${T.surface2}; border-radius: 99px; height: 6px; margin: 20px 0 8px; overflow: hidden; }
         .ih-progress-bar { height: 100%; background: ${T.accent}; border-radius: 99px; transition: width .3s; }
         input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; background: ${T.surface2}; border-radius: 4px; outline: none; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: ${T.accent}; cursor: pointer; border: 3px solid ${T.bg}; }
         .ih-result-card { background: ${T.surface}; border: 1px solid ${T.border}; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
         .ih-fmt-btn { background: ${T.surface}; border: 1.5px solid ${T.border}; border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: all .15s; flex: 1; }
-        .ih-fmt-btn.selected, .ih-fmt-btn:hover { border-color: ${T.accent}; background: rgba(245,166,35,.06); }
+        .ih-fmt-btn.selected, .ih-fmt-btn:hover { border-color: ${T.accent}; background: rgba(6,182,212,.06); }
         .ih-upload-icon { width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 22px; border: 1px solid ${T.border}; border-radius: 18px; background: ${T.surface2}; color: ${T.accent}; font-size: 28px; }
         .ih-fam-btn { position: relative; display: flex; align-items: center; gap: 6px; padding: 18px 20px; color: ${T.muted}; font-size: 13.5px; white-space: nowrap; cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: color .15s; flex-shrink: 0; letter-spacing: .01em; }
         .ih-fam-btn:hover { color: ${T.text}; }
@@ -384,10 +384,10 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         @keyframes ih-fade-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
         .ih-drop-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; background: none; border: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; font-size: .85rem; color: ${T.muted}; transition: background .12s, color .12s; }
         .ih-drop-item:hover { background: ${T.surface2}; color: ${T.text}; }
-        .ih-drop-item.tool-active { background: rgba(245,158,11,.1); color: ${T.accent}; font-weight: 600; }
+        .ih-drop-item.tool-active { background: rgba(6,182,212,.1); color: ${T.accent}; font-weight: 600; }
         .ih-drop-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
         .ih-breadcrumb { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: ${T.accent}; margin-bottom: 4px; }
-        .ih-free-badge { position: absolute; top: 48px; right: 6vw; display: inline-flex; align-items: center; padding: 7px 12px; border: 1px solid rgba(245,166,35,.35); border-radius: 999px; background: rgba(245,166,35,.10); color: ${T.accent}; font-size: 12px; font-weight: 600; white-space: nowrap; }
+        .ih-free-badge { position: absolute; top: 48px; right: 6vw; display: inline-flex; align-items: center; padding: 7px 12px; border: 1px solid rgba(6,182,212,.35); border-radius: 999px; background: rgba(6,182,212,.10); color: ${T.accent}; font-size: 12px; font-weight: 600; white-space: nowrap; }
         @media (max-width: ${BP.tablet}px) {
           .ih-free-badge { position: static; margin-top: 20px; }
         }
@@ -609,7 +609,7 @@ function CompressPanel({ T }: { T: any }) {
           <div style={{ margin: '20px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
               <span style={{ fontSize: '.88rem' }}>Quality</span>
-              <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: '.78rem', padding: '3px 10px', borderRadius: 20, background: quality < 50 ? 'rgba(248,113,113,.15)' : 'rgba(245,158,11,.15)', color: quality < 50 ? T.danger : T.accent }}>{quality}%</span>
+              <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: '.78rem', padding: '3px 10px', borderRadius: 20, background: quality < 50 ? 'rgba(248,113,113,.15)' : 'rgba(6,182,212,.15)', color: quality < 50 ? T.danger : T.accent }}>{quality}%</span>
             </div>
             <input type="range" min={10} max={95} value={quality} onChange={e => setQuality(+e.target.value)} />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: '.75rem', color: T.muted }}><span>Smallest file</span><span>Best quality</span></div>
@@ -883,7 +883,7 @@ function ResizePanel({ T }: { T: any }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 8, marginBottom: 20 }}>
             {PRESETS.map(p => (
               <button key={p.label} onClick={() => selectPreset(p)}
-                style={{ background: preset?.label === p.label ? `rgba(245,158,11,.1)` : T.surface, border: `1.5px solid ${preset?.label === p.label ? T.accent : T.border}`, borderRadius: T.radiusSm, padding: '10px 12px', cursor: 'pointer', textAlign: 'left', transition: 'all .15s' }}>
+                style={{ background: preset?.label === p.label ? `rgba(6,182,212,.1)` : T.surface, border: `1.5px solid ${preset?.label === p.label ? T.accent : T.border}`, borderRadius: T.radiusSm, padding: '10px 12px', cursor: 'pointer', textAlign: 'left', transition: 'all .15s' }}>
                 <div style={{ fontSize: '.78rem', fontWeight: 600, color: preset?.label === p.label ? T.accent : T.text }}>{p.icon} {p.label}</div>
                 <div style={{ fontSize: '.72rem', color: T.muted, marginTop: 2 }}>{p.w}×{p.h}</div>
               </button>
@@ -1033,7 +1033,7 @@ function CropPanel({ T }: { T: any }) {
             style={{ position: 'relative', width: displayW, height: displayH, cursor: 'crosshair', userSelect: 'none', marginBottom: 16, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, overflow: 'hidden' }}>
             <img src={img.src} draggable={false} style={{ width: displayW, height: displayH, display: 'block', pointerEvents: 'none' }} />
             {sel && sel.w > 0 && sel.h > 0 && (
-              <div style={{ position: 'absolute', left: sel.x, top: sel.y, width: sel.w, height: sel.h, border: `2px dashed ${T.accent}`, background: 'rgba(245,158,11,.15)', boxShadow: '0 0 0 9999px rgba(0,0,0,.4)' }} />
+              <div style={{ position: 'absolute', left: sel.x, top: sel.y, width: sel.w, height: sel.h, border: `2px dashed ${T.accent}`, background: 'rgba(6,182,212,.15)', boxShadow: '0 0 0 9999px rgba(0,0,0,.4)' }} />
             )}
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
@@ -1403,7 +1403,7 @@ function UpscalePanel({ T }: { T: any }) {
           <div style={{ fontSize: '.75rem', color: T.muted, marginTop: 3 }}>Upscale images 2× or 4× using AI · No account needed</div>
         </div>
       </div>
-      <div style={{ background: `rgba(245,158,11,.06)`, border: `1.5px dashed ${T.accent}`, borderRadius: T.radius, padding: '40px 32px', textAlign: 'center' }}>
+      <div style={{ background: `rgba(6,182,212,.06)`, border: `1.5px dashed ${T.accent}`, borderRadius: T.radius, padding: '40px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: '3rem', marginBottom: 16 }}>🔬</div>
         <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 8, color: T.accent }}>Coming Soon</h3>
         <p style={{ fontSize: '.88rem', color: T.muted, maxWidth: 400, margin: '0 auto' }}>
@@ -1423,7 +1423,7 @@ function UpscalePanel({ T }: { T: any }) {
 function BgRemovePanel({ T }: { T: any }) {
   return (
     <div>
-      <div style={{ background: `rgba(245,158,11,.06)`, border: `1.5px dashed ${T.accent}`, borderRadius: T.radius, padding: '40px 32px', textAlign: 'center' }}>
+      <div style={{ background: `rgba(6,182,212,.06)`, border: `1.5px dashed ${T.accent}`, borderRadius: T.radius, padding: '40px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: '3rem', marginBottom: 16 }}>🪄</div>
         <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 8, color: T.accent }}>Coming Soon</h3>
         <p style={{ fontSize: '.88rem', color: T.muted, maxWidth: 400, margin: '0 auto' }}>
@@ -1775,7 +1775,7 @@ function ScreenshotRedactPanel({ T }: { T: any }) {
               <div key={z.id} style={{ position: 'absolute', left: z.x, top: z.y, width: z.w, height: z.h, background: mode === 'blackout' ? '#000' : 'rgba(0,0,0,.35)', backdropFilter: mode === 'blur' ? 'blur(8px)' : 'none', border: `1.5px solid ${T.accent}` }} />
             ))}
             {dragging && dragging.w > 0 && dragging.h > 0 && (
-              <div style={{ position: 'absolute', left: dragging.x, top: dragging.y, width: dragging.w, height: dragging.h, border: `2px dashed ${T.accent}`, background: 'rgba(245,158,11,.15)' }} />
+              <div style={{ position: 'absolute', left: dragging.x, top: dragging.y, width: dragging.w, height: dragging.h, border: `2px dashed ${T.accent}`, background: 'rgba(6,182,212,.15)' }} />
             )}
           </div>
 

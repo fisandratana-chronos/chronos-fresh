@@ -26,7 +26,7 @@ const C = {
   border:  "#28313d",
   text:    "#f5f2eb",
   muted:   "#8b94a1",
-  accent:  "#f2a63b",   // amber
+  accent:  "#06B6D4",   // cyan — itovizana amin'ny Converters/Calculators (CHRONOS brand accent)
   hot:     "#ff6b55",   // coral/red
   green:   "#63d39b",
   err:     "#ff6b55",
