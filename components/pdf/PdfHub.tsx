@@ -119,7 +119,7 @@ const s = {
     width: "100%", height: 42, border: 0, borderRadius: 9,
     background: disabled
       ? "#2a3040"
-      : `linear-gradient(135deg, ${C.hot}, ${C.accent})`,
+      : `linear-gradient(135deg, #22D3EE, ${C.accent})`,
     color: disabled ? C.muted : "#17110b",
     fontWeight: 700, fontSize: 13, cursor: disabled ? "not-allowed" : "pointer",
     fontFamily: "'DM Sans', sans-serif",
@@ -1169,12 +1169,12 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
           height: 42, width: "100%",
           display: "flex", alignItems: "center", gap: 10,
           padding: "0 12px",
-          color: active ? C.hot : "#c4cad2",
+          color: active ? C.accent : "#c4cad2",
           textDecoration: "none",
           borderRadius: 8, fontSize: 13,
-          background: active ? `${C.hot}18` : "transparent",
+          background: active ? `${C.accent}18` : "transparent",
           border: active ? `none` : "none",
-          borderLeft: active ? `2px solid ${C.hot}` : "2px solid transparent",
+          borderLeft: active ? `2px solid ${C.accent}` : "2px solid transparent",
           cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
           textAlign: "left",
           transition: "all .15s",
@@ -1213,7 +1213,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
           padding: "20px 16px",
           background: "rgba(12,15,21,.72)",
         }}>
-          <div style={{ color: C.hot, fontWeight: 700, fontSize: 13 }}>PDF TOOLS</div>
+          <div style={{ color: C.accent, fontWeight: 700, fontSize: 13 }}>PDF TOOLS</div>
           <div style={{ color: C.muted, fontSize: 11, marginTop: 4 }}>8 tools</div>
 
           <div className="chronos-sidebar-groups">
