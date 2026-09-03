@@ -1,12 +1,13 @@
 // ── lib/pdfSeoContent.ts ─────────────────────────────────────
-// Content lalindalina (what/how/examples/faq) ho an'ny tool 8 ao
+// Content lalindalina (what/how/examples/faq) ho an'ny tool 14 ao
 // anatin'ny PDF_HUB (components/pdf/PdfHub.tsx), mba tsy ho "fiche
 // vide" isaky ny tab — mitovy endrika amin'ny lib/networkSeoContent.ts
 // ampiasain'ny NET_HUB.
 //
 // Ny "key" ao amin'ity dictionnaire ity (merge, split, compress,
-// jpg2pdf, pdf2jpg, pdf2word, pdf2excel, rotate) dia MITOVY amin'ny
-// "id" ao amin'ny PDF_TABS an'ny PdfHub.tsx.
+// jpg2pdf, pdf2jpg, pdf2word, pdf2excel, rotate, html2pdf,
+// removepages, rearrange, watermark, protect, unlock) dia MITOVY
+// amin'ny "id" ao amin'ny PDF_TABS an'ny PdfHub.tsx.
 
 export interface PdfSeoExample {
   label: string
@@ -279,6 +280,192 @@ export const PDF_SEO_CONTENT: Record<string, PdfSeoEntry> = {
       { q: "Pourquoi le résultat est-il un CSV plutôt qu'un fichier .xlsx ?", a: "Le CSV est un format simple et universel qu'Excel, Google Sheets et tout tableur ouvrent nativement sans étape de conversion supplémentaire — cela garde l'outil rapide et sans dépendance." },
       { q: "Fonctionne-t-il sur des PDF scannés ?", a: "Non — comme le convertisseur Word, il lit les données textuelles intégrées au PDF. Une image scannée d'un tableau n'a pas de couche de texte extractible, donc rien ne peut en être tiré." },
       { q: "Que se passe-t-il avec les PDF multi-pages ?", a: "Chaque page est traitée et ajoutée au même fichier CSV, avec une ligne de repère de page insérée entre les données de chaque page pour distinguer où finit le tableau d'une page et où commence le suivant." },
+    ],
+  },
+
+  html2pdf: {
+    title: "HTML to PDF Converter — Turn Web Content into a PDF Document",
+    frTitle: "Convertisseur HTML en PDF — Transformer du Contenu Web en Document PDF",
+    what: "Converting HTML to PDF takes markup — a page you paste in or an .html file you upload — and renders it as a fixed, paginated PDF document. It's useful for turning a saved web page, an email template, or a piece of formatted content into a file that looks the same everywhere and can be archived, printed, or shared without needing a browser to view it.",
+    frWhat: "Convertir du HTML en PDF prend du contenu — collé directement ou importé via un fichier .html — et le transforme en document PDF fixe et paginé. Pratique pour transformer une page web enregistrée, un modèle d'email ou du contenu mis en forme en un fichier qui s'affiche pareil partout, archivable, imprimable ou partageable sans navigateur.",
+    how: "Paste your HTML into the text box, or upload an .html file, then generate the PDF. The tool renders the markup in your browser exactly as it would appear on screen, then slices that rendered page into standard-sized PDF pages. Because it renders locally, only HTML you paste or upload is supported — an external website's URL can't be fetched directly, since the browser blocks reading another site's styles and scripts for security reasons.",
+    frHow: "Collez votre HTML dans la zone de texte, ou importez un fichier .html, puis générez le PDF. L'outil affiche le contenu dans votre navigateur exactement comme il apparaîtrait à l'écran, puis découpe ce rendu en pages PDF de taille standard. Comme le rendu se fait localement, seul le HTML collé ou importé est pris en charge — l'URL d'un site externe ne peut pas être récupérée directement, le navigateur bloquant par sécurité la lecture des styles et scripts d'un autre site.",
+    examples: [
+      { label: "Save an email template", input: "newsletter.html", result: "→ document.pdf, ready to archive" },
+      { label: "Turn notes into a PDF", input: "pasted HTML with headings and a list", result: "→ paginated PDF" },
+      { label: "Archive a formatted report", input: "report.html, 3 printed pages worth", result: "→ document.pdf, 3 pages" },
+    ],
+    frExamples: [
+      { label: "Enregistrer un modèle d'email", input: "newsletter.html", result: "→ document.pdf, prêt à archiver" },
+      { label: "Transformer des notes en PDF", input: "HTML collé avec titres et liste", result: "→ PDF paginé" },
+      { label: "Archiver un rapport mis en forme", input: "rapport.html, équivalent 3 pages", result: "→ document.pdf, 3 pages" },
+    ],
+    faq: [
+      { q: "Can I convert a live website by pasting its URL?", a: "No — this tool renders HTML you paste or upload directly. Fetching and rendering an external URL accurately would require a server-side tool, since browsers block reading another site's styles, fonts, and scripts for security reasons." },
+      { q: "Will external images and CSS load correctly?", a: "Images and styles referenced by public URLs generally load if your browser can reach them, but local file references or content behind a login won't resolve. For best results, keep styling inline or embedded in the HTML itself." },
+      { q: "How are page breaks decided?", a: "The tool slices the rendered content into standard page-height chunks automatically. Very long single elements, like a huge image or table, may get cut across a page boundary." },
+      { q: "Is my HTML content uploaded anywhere?", a: "No — the HTML is rendered and converted entirely in your browser tab; it's never sent to a server." },
+    ],
+    frFaq: [
+      { q: "Puis-je convertir un site en ligne en collant son URL ?", a: "Non — cet outil rend le HTML que vous collez ou importez directement. Récupérer et afficher fidèlement une URL externe nécessiterait un outil côté serveur, les navigateurs bloquant par sécurité la lecture des styles, polices et scripts d'un autre site." },
+      { q: "Les images et le CSS externes se chargeront-ils correctement ?", a: "Les images et styles référencés par des URL publiques se chargent généralement si votre navigateur peut y accéder, mais les références à des fichiers locaux ou un contenu derrière une connexion ne fonctionneront pas. Pour un meilleur résultat, gardez le style en ligne ou intégré directement dans le HTML." },
+      { q: "Comment les sauts de page sont-ils décidés ?", a: "L'outil découpe automatiquement le rendu en blocs de la hauteur d'une page standard. Un élément unique très long (grande image ou tableau) peut être coupé à cheval sur un saut de page." },
+      { q: "Mon contenu HTML est-il envoyé quelque part ?", a: "Non — le HTML est rendu et converti entièrement dans votre onglet de navigateur ; il n'est jamais envoyé à un serveur." },
+    ],
+  },
+
+  removepages: {
+    title: "Remove PDF Pages — Delete the Pages You Don't Need",
+    frTitle: "Supprimer des Pages PDF — Retirer les Pages Inutiles",
+    what: "Removing pages from a PDF deletes the ones you specify — a blank scan, a duplicate page, an outdated cover sheet — and produces a new file with just the pages you want to keep, in their original order. It's the quick fix for a document that has extra pages mixed in, without needing to rebuild it from scratch.",
+    frWhat: "Supprimer des pages d'un PDF retire celles que vous précisez — une page scannée vierge, un doublon, une page de garde obsolète — et produit un nouveau fichier avec uniquement les pages à conserver, dans leur ordre d'origine. La solution rapide pour un document qui contient des pages en trop, sans devoir tout reconstruire.",
+    how: "Upload your PDF, then type the page numbers or ranges you want removed (e.g. 2, 5-7). The tool keeps every other page exactly as it was and writes them into a new PDF — nothing about the remaining pages' content or order is changed.",
+    frHow: "Importez votre PDF, puis tapez les numéros ou plages de pages à supprimer (ex. 2, 5-7). L'outil conserve toutes les autres pages telles quelles et les réécrit dans un nouveau PDF — le contenu et l'ordre des pages restantes ne changent pas.",
+    examples: [
+      { label: "Remove a blank scan", input: "12-page PDF, remove page 7", result: "→ clean 11-page PDF" },
+      { label: "Drop an outdated cover", input: "remove page 1", result: "→ document starts at the real content" },
+      { label: "Cut several sections", input: "remove 3-5, 9", result: "→ only the needed pages remain" },
+    ],
+    frExamples: [
+      { label: "Retirer une page scannée vierge", input: "PDF de 12 pages, retirer la page 7", result: "→ PDF propre de 11 pages" },
+      { label: "Supprimer une couverture obsolète", input: "retirer la page 1", result: "→ le document démarre sur le vrai contenu" },
+      { label: "Couper plusieurs sections", input: "retirer 3-5, 9", result: "→ seules les pages utiles restent" },
+    ],
+    faq: [
+      { q: "Can I remove non-consecutive pages in one go?", a: "Yes — list them separated by commas, mixing single pages and ranges, like 2, 5-7, 10." },
+      { q: "Can I remove every page, leaving an empty PDF?", a: "No — at least one page has to remain in the output, so the tool blocks a removal list that would delete the entire document." },
+      { q: "Does this affect the page numbering of the pages that are kept?", a: "The pages keep their original content and order, but a PDF viewer will now number them sequentially starting from 1 in the new file, since the removed pages no longer exist." },
+      { q: "Is the quality of the remaining pages affected?", a: "No — remaining pages are copied exactly as they were, with no recompression or re-rendering." },
+    ],
+    frFaq: [
+      { q: "Puis-je retirer des pages non consécutives en une fois ?", a: "Oui — listez-les séparées par des virgules, en mélangeant pages seules et plages, comme 2, 5-7, 10." },
+      { q: "Puis-je supprimer toutes les pages, pour obtenir un PDF vide ?", a: "Non — au moins une page doit rester dans le fichier final, l'outil bloque donc une liste de suppression qui viderait tout le document." },
+      { q: "Cela change-t-il la numérotation des pages conservées ?", a: "Les pages gardent leur contenu et leur ordre d'origine, mais un lecteur PDF les numérotera désormais séquentiellement à partir de 1 dans le nouveau fichier, les pages supprimées n'existant plus." },
+      { q: "La qualité des pages restantes est-elle affectée ?", a: "Non — les pages restantes sont copiées exactement telles quelles, sans recompression ni nouveau rendu." },
+    ],
+  },
+
+  rearrange: {
+    title: "Rearrange PDF Pages — Reorder Pages Quickly and Easily",
+    frTitle: "Réorganiser les Pages PDF — Changer l'Ordre des Pages Rapidement",
+    what: "Rearranging a PDF lets you change the order its pages appear in — moving a misplaced page, putting a table of contents first, or fixing pages that were scanned out of sequence — without retyping or rescanning anything. The content of every page stays exactly the same; only the order changes.",
+    frWhat: "Réorganiser un PDF permet de changer l'ordre d'apparition des pages — déplacer une page mal placée, mettre une table des matières en premier, ou corriger des pages scannées dans le désordre — sans rien retaper ni rescanner. Le contenu de chaque page reste identique ; seul l'ordre change.",
+    how: "Upload your PDF and you'll see every page listed in its current order. Use the up and down arrows next to each page to move it to where it should be, then save — the tool copies each page into a new PDF in the order you set.",
+    frHow: "Importez votre PDF, chaque page s'affiche dans son ordre actuel. Utilisez les flèches haut/bas à côté de chaque page pour la déplacer à sa place, puis enregistrez — l'outil copie chaque page dans un nouveau PDF selon l'ordre défini.",
+    examples: [
+      { label: "Move the cover to the front", input: "cover was page 5 of 8", result: "→ moved to page 1" },
+      { label: "Fix a scanning mix-up", input: "pages scanned in random order", result: "→ correct reading order restored" },
+      { label: "Put the summary last", input: "summary was page 1", result: "→ moved to the final page" },
+    ],
+    frExamples: [
+      { label: "Mettre la couverture en premier", input: "couverture en page 5 sur 8", result: "→ déplacée en page 1" },
+      { label: "Corriger un scan dans le désordre", input: "pages scannées dans un ordre aléatoire", result: "→ ordre de lecture rétabli" },
+      { label: "Mettre le résumé en dernier", input: "résumé en page 1", result: "→ déplacé à la dernière page" },
+    ],
+    faq: [
+      { q: "Does reordering change the content of any page?", a: "No — each page's content is copied exactly as it was; only its position in the document changes." },
+      { q: "Can I move a page more than one position at a time?", a: "Move it up or down one step at a time using the arrows — for a bigger jump, just click the arrow repeatedly until it reaches the right spot." },
+      { q: "What happens to page rotation or annotations when I reorder?", a: "Anything already applied to a page — rotation, existing annotations — travels with it to its new position; only the order of pages changes." },
+      { q: "Is there a limit to how many pages I can reorder?", a: "No fixed limit — the list scrolls for longer documents, and every page can be repositioned regardless of the total page count." },
+    ],
+    frFaq: [
+      { q: "Réorganiser change-t-il le contenu d'une page ?", a: "Non — le contenu de chaque page est copié exactement tel quel ; seule sa position dans le document change." },
+      { q: "Puis-je déplacer une page de plusieurs rangs à la fois ?", a: "Déplacez-la d'un cran à la fois avec les flèches — pour un plus grand saut, cliquez simplement plusieurs fois sur la flèche jusqu'à la bonne place." },
+      { q: "Qu'advient-il de la rotation ou des annotations lors du réordonnancement ?", a: "Tout ce qui est déjà appliqué à une page — rotation, annotations existantes — la suit à sa nouvelle position ; seul l'ordre des pages change." },
+      { q: "Y a-t-il une limite au nombre de pages réorganisables ?", a: "Aucune limite fixe — la liste défile pour les documents longs, et chaque page peut être repositionnée quel que soit le nombre total de pages." },
+    ],
+  },
+
+  watermark: {
+    title: "Add a Watermark to a PDF — Stamp Text or an Image Over Your Pages",
+    frTitle: "Ajouter un Filigrane à un PDF — Apposer du Texte ou une Image",
+    what: "Adding a watermark stamps text — like \"CONFIDENTIAL\" or \"DRAFT\" — or a logo image over every page of a PDF, at an opacity and position you choose. It's the standard way to mark a document as a draft, brand it with a company logo, or discourage unauthorized copies from being passed off as final.",
+    frWhat: "Ajouter un filigrane appose du texte — comme « CONFIDENTIEL » ou « BROUILLON » — ou une image (logo) sur chaque page d'un PDF, avec une transparence et une position au choix. La façon standard de marquer un document comme brouillon, d'y apposer un logo d'entreprise, ou de dissuader la diffusion de copies non autorisées comme version finale.",
+    how: "Upload your PDF, choose text or image mode, then set the opacity, position, and rotation. The tool stamps your text or image onto every page at those settings and produces a new PDF — the original pages underneath are untouched, only the watermark layer is added on top.",
+    frHow: "Importez votre PDF, choisissez le mode texte ou image, puis réglez la transparence, la position et la rotation. L'outil appose votre texte ou image sur chaque page selon ces réglages et produit un nouveau PDF — les pages d'origine en dessous restent intactes, seule la couche de filigrane est ajoutée par-dessus.",
+    examples: [
+      { label: "Mark a draft", input: "text \"DRAFT\", 30% opacity, center", result: "→ every page stamped diagonally" },
+      { label: "Brand with a logo", input: "logo.png, bottom-right, 15% opacity", result: "→ subtle logo on every page" },
+      { label: "Confidential contract", input: "text \"CONFIDENTIAL\", 45° rotation", result: "→ classic diagonal stamp" },
+    ],
+    frExamples: [
+      { label: "Marquer un brouillon", input: "texte « BROUILLON », opacité 30%, centre", result: "→ chaque page tamponnée en diagonale" },
+      { label: "Apposer un logo", input: "logo.png, bas-droit, opacité 15%", result: "→ logo discret sur chaque page" },
+      { label: "Contrat confidentiel", input: "texte « CONFIDENTIEL », rotation 45°", result: "→ tampon diagonal classique" },
+    ],
+    faq: [
+      { q: "Can I use both text and an image at the same time?", a: "Not in a single pass — choose text or image mode for each run. To apply both, run the tool twice: once for the text watermark, then again on the result for the image." },
+      { q: "Will the watermark cover important content?", a: "Position and opacity are both adjustable — a low opacity (15–30%) keeps the underlying text and images fully readable, and corner positions avoid the page's main content area entirely." },
+      { q: "Does the watermark apply to every page or just one?", a: "Every page of the document gets the same watermark, at the same position, opacity, and rotation." },
+      { q: "Can I remove a watermark after adding it?", a: "Not with this tool — the watermark becomes part of the page content once saved. Keep your original file if you might need an unmarked version later." },
+    ],
+    frFaq: [
+      { q: "Puis-je utiliser du texte et une image en même temps ?", a: "Pas en une seule fois — choisissez le mode texte ou image pour chaque passage. Pour appliquer les deux, lancez l'outil deux fois : une fois pour le texte, puis à nouveau sur le résultat pour l'image." },
+      { q: "Le filigrane va-t-il masquer du contenu important ?", a: "La position et l'opacité sont réglables — une opacité faible (15–30%) garde le texte et les images sous-jacents parfaitement lisibles, et les positions en coin évitent entièrement la zone de contenu principale." },
+      { q: "Le filigrane s'applique-t-il à toutes les pages ou une seule ?", a: "Chaque page du document reçoit le même filigrane, à la même position, opacité et rotation." },
+      { q: "Puis-je retirer un filigrane après l'avoir ajouté ?", a: "Pas avec cet outil — le filigrane fait partie du contenu de la page une fois enregistré. Gardez votre fichier original si vous pourriez avoir besoin d'une version non marquée plus tard." },
+    ],
+  },
+
+  protect: {
+    title: "Protect PDF — Encrypt Your File with a Password",
+    frTitle: "Protéger un PDF — Chiffrer votre Fichier avec un Mot de Passe",
+    what: "Protecting a PDF encrypts it with a password, so anyone who opens the file needs that password before they can view its content. It's the standard way to keep sensitive documents — contracts, financial statements, personal records — confidential when sharing them by email or storing them somewhere others might access.",
+    frWhat: "Protéger un PDF le chiffre avec un mot de passe, de sorte que quiconque ouvre le fichier doit connaître ce mot de passe pour en voir le contenu. La façon standard de garder confidentiels des documents sensibles — contrats, relevés financiers, dossiers personnels — lors d'un envoi par email ou d'un stockage accessible à d'autres.",
+    how: "Upload your PDF and set a password, with confirmation to make sure you typed it correctly. The tool encrypts the document using that password and produces a new, protected file — anyone opening it afterward, including you, will need to enter that exact password first.",
+    frHow: "Importez votre PDF et définissez un mot de passe, avec confirmation pour vérifier la saisie. L'outil chiffre le document avec ce mot de passe et produit un nouveau fichier protégé — quiconque l'ouvre ensuite, vous y compris, devra d'abord saisir ce mot de passe exact.",
+    examples: [
+      { label: "Protect a contract before emailing", input: "contract.pdf + password", result: "→ protected.pdf, opens only with the password" },
+      { label: "Secure financial statements", input: "statement.pdf + password", result: "→ encrypted before upload to shared storage" },
+      { label: "Lock personal records", input: "records.pdf + password", result: "→ safe to store or send" },
+    ],
+    frExamples: [
+      { label: "Protéger un contrat avant envoi", input: "contrat.pdf + mot de passe", result: "→ protected.pdf, s'ouvre uniquement avec le mot de passe" },
+      { label: "Sécuriser des relevés financiers", input: "releve.pdf + mot de passe", result: "→ chiffré avant upload sur un espace partagé" },
+      { label: "Verrouiller des dossiers personnels", input: "dossiers.pdf + mot de passe", result: "→ prêt à stocker ou envoyer" },
+    ],
+    faq: [
+      { q: "What happens if I forget the password?", a: "There's no recovery option — a correctly encrypted PDF cannot be opened without its exact password. Store it somewhere safe, like a password manager, before you close this tab." },
+      { q: "Is my PDF ever sent to a server to be encrypted?", a: "No — the file is loaded and encrypted entirely in your browser; only the finished, protected PDF is downloaded to your device." },
+      { q: "What encryption does this use?", a: "The file is encrypted with AES-256, the same modern standard used by most current PDF-protection software, applied through the Web Crypto API built into your browser." },
+      { q: "Can I still protect a PDF that's already password-protected?", a: "No — this tool needs to read the file's actual content first, which it can't do on an already-encrypted PDF. Unlock it first with the Unlock PDF tool, then protect it with your new password." },
+    ],
+    frFaq: [
+      { q: "Que se passe-t-il si j'oublie le mot de passe ?", a: "Il n'y a aucune récupération possible — un PDF correctement chiffré ne peut pas s'ouvrir sans son mot de passe exact. Conservez-le en lieu sûr, comme un gestionnaire de mots de passe, avant de fermer cet onglet." },
+      { q: "Mon PDF est-il envoyé sur un serveur pour être chiffré ?", a: "Non — le fichier est chargé et chiffré entièrement dans votre navigateur ; seul le PDF final protégé est téléchargé sur votre appareil." },
+      { q: "Quel chiffrement est utilisé ?", a: "Le fichier est chiffré en AES-256, le même standard moderne utilisé par la plupart des logiciels de protection PDF actuels, appliqué via l'API Web Crypto intégrée à votre navigateur." },
+      { q: "Puis-je protéger un PDF déjà protégé par mot de passe ?", a: "Non — cet outil doit d'abord lire le contenu réel du fichier, ce qu'il ne peut pas faire sur un PDF déjà chiffré. Déverrouillez-le d'abord avec l'outil Déverrouiller PDF, puis protégez-le avec votre nouveau mot de passe." },
+    ],
+  },
+
+  unlock: {
+    title: "Unlock PDF — Remove Password Protection",
+    frTitle: "Déverrouiller un PDF — Supprimer la Protection par Mot de Passe",
+    what: "Unlocking a PDF removes its password requirement, producing an ordinary, unencrypted file that opens without typing anything. It's useful once a document no longer needs to be restricted — a contract that's now public, or an old file whose password you still remember but no longer want to re-enter every time.",
+    frWhat: "Déverrouiller un PDF supprime son exigence de mot de passe, produisant un fichier ordinaire et non chiffré qui s'ouvre sans rien taper. Utile lorsqu'un document n'a plus besoin d'être restreint — un contrat désormais public, ou un ancien fichier dont vous connaissez encore le mot de passe mais que vous ne voulez plus ressaisir à chaque ouverture.",
+    how: "Upload the protected PDF and enter its current password. The tool uses that password to decrypt the document, then saves it again without any encryption — the resulting file opens for anyone, with no password prompt.",
+    frHow: "Importez le PDF protégé et saisissez son mot de passe actuel. L'outil utilise ce mot de passe pour déchiffrer le document, puis l'enregistre à nouveau sans aucun chiffrement — le fichier obtenu s'ouvre pour tout le monde, sans demande de mot de passe.",
+    examples: [
+      { label: "Remove an old password", input: "locked.pdf + correct password", result: "→ unlocked.pdf, opens instantly" },
+      { label: "Make a contract public", input: "signed-contract.pdf + password", result: "→ shareable without a password" },
+      { label: "Simplify a shared archive", input: "archive.pdf + password", result: "→ no more re-typing the password" },
+    ],
+    frExamples: [
+      { label: "Retirer un ancien mot de passe", input: "verrouille.pdf + mot de passe correct", result: "→ unlocked.pdf, s'ouvre instantanément" },
+      { label: "Rendre un contrat public", input: "contrat-signe.pdf + mot de passe", result: "→ partageable sans mot de passe" },
+      { label: "Simplifier une archive partagée", input: "archive.pdf + mot de passe", result: "→ plus besoin de le ressaisir" },
+    ],
+    faq: [
+      { q: "Do I need to know the password to unlock the file?", a: "Yes — you must enter the PDF's current, correct password. This tool removes protection for files you already have legitimate access to; it can't recover or guess a forgotten password." },
+      { q: "What happens if I enter the wrong password?", a: "The tool shows an error and doesn't produce a file — try again with the exact password, checking capitalization and any extra spaces." },
+      { q: "Is the password sent anywhere to check it?", a: "No — the password is used entirely inside your browser to decrypt the file locally; it's never transmitted anywhere." },
+      { q: "Can I unlock a PDF I don't know the password for?", a: "No — this tool only removes protection when you supply the correct password. It isn't a password-cracking or recovery tool." },
+    ],
+    frFaq: [
+      { q: "Dois-je connaître le mot de passe pour déverrouiller le fichier ?", a: "Oui — vous devez saisir le mot de passe actuel et correct du PDF. Cet outil retire la protection de fichiers auxquels vous avez déjà légitimement accès ; il ne peut pas récupérer ou deviner un mot de passe oublié." },
+      { q: "Que se passe-t-il si je saisis le mauvais mot de passe ?", a: "L'outil affiche une erreur et ne produit aucun fichier — réessayez avec le mot de passe exact, en vérifiant la casse et les espaces éventuels." },
+      { q: "Le mot de passe est-il envoyé quelque part pour vérification ?", a: "Non — le mot de passe est utilisé entièrement dans votre navigateur pour déchiffrer le fichier localement ; il n'est jamais transmis nulle part." },
+      { q: "Puis-je déverrouiller un PDF dont je ne connais pas le mot de passe ?", a: "Non — cet outil ne retire la protection que si vous fournissez le bon mot de passe. Ce n'est pas un outil de cassage ou de récupération de mot de passe." },
     ],
   },
 

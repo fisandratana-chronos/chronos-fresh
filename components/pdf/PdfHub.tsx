@@ -82,12 +82,45 @@ function useChronosFonts() {
 // Mobile breakpoint rules. Inline styles below have higher specificity than
 // plain selectors, so these use !important to override at ≤880px / ≤560px.
 function buildResponsiveStyle(C: ReturnType<typeof buildPalette>) { return `
+  /* Themed, slim scrollbars for the independently-scrolling sidebar/content
+     panes — otherwise these fall back to the OS's default scrollbar, which
+     on Windows dark mode renders as a stark light-gray thumb that stands
+     out harshly against the dark background. Using C.border keeps it
+     matched to the current theme automatically (light or dark). */
+  .chronos-sidebar, .chronos-main, html, body {
+    scrollbar-width: thin;
+    scrollbar-color: ${C.border} transparent;
+  }
+  .chronos-sidebar::-webkit-scrollbar, .chronos-main::-webkit-scrollbar,
+  html::-webkit-scrollbar, body::-webkit-scrollbar {
+    width: 8px;
+  }
+  .chronos-sidebar::-webkit-scrollbar-track, .chronos-main::-webkit-scrollbar-track,
+  html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .chronos-sidebar::-webkit-scrollbar-thumb, .chronos-main::-webkit-scrollbar-thumb,
+  html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+    background: ${C.border};
+    border-radius: 8px;
+  }
+  .chronos-sidebar::-webkit-scrollbar-thumb:hover, .chronos-main::-webkit-scrollbar-thumb:hover,
+  html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+    background: ${C.muted2};
+  }
+
   @media (max-width: ${BP.tablet}px) {
-    .chronos-shell { grid-template-columns: 1fr !important; }
+    .chronos-shell {
+      grid-template-columns: 1fr !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
     .chronos-sidebar {
       border-right: none !important;
       border-bottom: 1px solid ${C.border};
       padding: 12px !important;
+      height: auto !important;
+      overflow-y: visible !important;
     }
     .chronos-sidebar-groups {
       display: flex !important;
@@ -100,7 +133,7 @@ function buildResponsiveStyle(C: ReturnType<typeof buildPalette>) { return `
     .chronos-sidebar-groups > div { margin-top: 0 !important; flex: 0 0 auto; }
     .chronos-sidebar-groups button { white-space: nowrap; }
     .chronos-privacy-badge { display: none !important; }
-    .chronos-main { width: 100% !important; padding: 16px 16px 40px !important; }
+    .chronos-main { width: 100% !important; padding: 16px 16px 40px !important; height: auto !important; overflow-y: visible !important; }
     .chronos-hero-title { font-size: 34px !important; }
     .chronos-hero-row { flex-wrap: wrap; gap: 10px; }
     .chronos-trust-badges { flex-wrap: wrap !important; gap: 16px !important; }
@@ -1607,7 +1640,7 @@ function PdfHtmlToPdfTab({ lang }: { lang: string }) {
     let container: HTMLDivElement | null = null;
     try {
       const html2canvas = await loadHtml2Canvas();
-      const { jsPDF } = await loadJsPDF();
+      const jsPDF = await loadJsPDF();
 
       const pageWidthPx = 794; // A4 @ 96dpi
       container = document.createElement("div");
@@ -1758,17 +1791,24 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
     }}>
       <style>{responsiveStyle}</style>
 
-      {/* ── Layout: sidebar + content ── */}
-      <div className="chronos-shell" style={{ display: "grid", gridTemplateColumns: "240px 1fr", minHeight: "calc(100vh - 64px)" }}>
+      {/* ── Layout: sidebar + content ──
+          The shell has a fixed height (not minHeight) with overflow hidden,
+          so its two grid children (aside/main) each get their own
+          independent scrollbar via overflowY: auto, instead of the whole
+          page scrolling as one unit. Reset back to normal document flow on
+          mobile below, where the sidebar collapses into a horizontal strip. */}
+      <div className="chronos-shell" style={{ display: "grid", gridTemplateColumns: "240px 1fr", height: "calc(100vh - 64px)", overflow: "hidden" }}>
 
         {/* Sidebar */}
         <aside className="chronos-sidebar" style={{
           borderRight: `1px solid ${C.border}`,
           padding: "20px 16px",
           background: C.sidebarBg,
+          height: "100%",
+          overflowY: "auto",
         }}>
           <div style={{ color: C.accent, fontWeight: 700, fontSize: 13 }}>PDF TOOLS</div>
-          <div style={{ color: C.muted, fontSize: 11, marginTop: 4 }}>8 tools</div>
+          <div style={{ color: C.muted, fontSize: 11, marginTop: 4 }}>{PDF_TABS.length} tools</div>
 
           <div className="chronos-sidebar-groups">
             <SideGroup label={lang === "fr" ? "Populaires" : "Popular"} tabs={POPULAR_TABS}  activeTab={tab} lang={lang} onSelect={setTab} />
@@ -1795,7 +1835,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
         </aside>
 
         {/* Main content */}
-        <main className="chronos-main" style={{ width: "min(1100px, calc(100vw - 280px))", margin: "0 auto", padding: "20px 40px 65px" }}>
+        <main className="chronos-main" style={{ width: "min(1100px, calc(100vw - 280px))", margin: "0 auto", padding: "20px 40px 65px", height: "100%", overflowY: "auto" }}>
 
           {/* Breadcrumb */}
           <div style={{ fontSize: 11, color: C.muted2, marginBottom: 18 }}>
