@@ -7,22 +7,31 @@
 
 import React from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { useDark } from '../../lib/hooks/useDark'
+import { DARK, LIGHT } from '../../lib/theme'
 import { BP } from '../../lib/breakpoints'
 
 // ── Theme ──
 
-const C_ACCENT = '#06B6D4' // cyan — distinct from PDF red
-
-const C_T = {
-  bg:      '#0F172A',
-  card:    '#1E293B',
-  border:  '#334155',
-  accent:  C_ACCENT,
-  text:    '#F1F5F9',
-  muted:   '#94A3B8',
-  success: '#22C55E',
-  err:     '#EF4444',
+// Loko miova arakaraka ny dark/light state — nalaina avy amin'ny
+// DARK/LIGHT ao amin'ny lib/theme.ts (tsy hardcoded intsony).
+function buildPalette(dark: boolean) {
+  const T = dark ? DARK : LIGHT
+  return {
+    bg:      T.bg0,
+    card:    T.bg1,
+    border:  T.border,
+    accent:  T.cyan,
+    text:    T.txt,
+    muted:   T.txt2,
+    success: T.emerald,
+    err:     T.red,
+  }
 }
+
+// Context mizara ny C_T amin'ireo tab/component rehetra (Length, Weight,
+// Currency, RGB↔HEX, sns.) — mameno ny tsy fahampian'ilay C_T hardcoded taloha.
+const ConvThemeCtx = React.createContext(buildPalette(true))
 
 // ── Tab config ──
 
@@ -282,6 +291,7 @@ const CONVERTER_SEO_CONTENT: Record<string, ConverterSeoEntry> = {
 }
 
 function ConvFaqItem({ q, a, last }: { q: string; a: string; last?: boolean }) {
+  const C_T = React.useContext(ConvThemeCtx)
   const [open, setOpen] = React.useState(false)
   return (
     <div style={{ borderBottom: last ? 'none' : `1px solid ${C_T.border}` }}>
@@ -299,6 +309,7 @@ function ConvFaqItem({ q, a, last }: { q: string; a: string; last?: boolean }) {
 }
 
 function ConverterSeoContent({ toolId, lang }: { toolId: string; lang: string }) {
+  const C_T = React.useContext(ConvThemeCtx)
   const content = CONVERTER_SEO_CONTENT[toolId]
   if (!content) return null
   const isFr = lang === 'fr'
@@ -326,7 +337,7 @@ function ConverterSeoContent({ toolId, lang }: { toolId: string; lang: string })
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {content.examples.map((ex, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 14px', background: '#0F172A', borderRadius: 9, border: `1px solid ${C_T.border}` }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 14px', background: C_T.bg, borderRadius: 9, border: `1px solid ${C_T.border}` }}>
                 <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, color: C_T.accent, fontWeight: 700, flexShrink: 0, paddingTop: 2 }}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
@@ -364,6 +375,7 @@ function ConverterSeoContent({ toolId, lang }: { toolId: string; lang: string })
 
 // ── RelatedConverters — internal-linking block ("You might also like") ──
 function RelatedConverters({ currentId, lang, onSelect }: { currentId: string; lang: string; onSelect: (id: string) => void }) {
+  const C_T = React.useContext(ConvThemeCtx)
   const relatedIds = RELATED_CONVERTERS[currentId] || []
   const related = relatedIds.map(id => CONV_TABS.find(t => t.id === id)).filter(Boolean) as typeof CONV_TABS
   if (related.length === 0) return null
@@ -377,7 +389,7 @@ function RelatedConverters({ currentId, lang, onSelect }: { currentId: string; l
         {related.map(t => (
           <button key={t.id} onClick={() => onSelect(t.id)}
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px',
-              background: '#0F172A', border: `1px solid ${C_T.border}`, borderRadius: 10,
+              background: C_T.bg, border: `1px solid ${C_T.border}`, borderRadius: 10,
               color: C_T.text, fontFamily: "'Inter','Segoe UI',sans-serif", fontSize: 13, fontWeight: 600,
               cursor: 'pointer', transition: 'border-color .15s' }}>
             <span>{t.icon}</span>
@@ -392,18 +404,19 @@ function RelatedConverters({ currentId, lang, onSelect }: { currentId: string; l
 
 // ── Shared helpers ──
 
-const inp = (extra: React.CSSProperties = {}): React.CSSProperties => ({
+const inp = (C_T: ReturnType<typeof buildPalette>, extra: React.CSSProperties = {}): React.CSSProperties => ({
   width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 15,
-  border: `1px solid ${C_T.border}`, background: '#0F172A', color: C_T.text,
+  border: `1px solid ${C_T.border}`, background: C_T.bg, color: C_T.text,
   outline: 'none', boxSizing: 'border-box', fontFamily: "'Inter','Segoe UI',sans-serif",
   ...extra,
 })
 
-const sel = (extra: React.CSSProperties = {}): React.CSSProperties => ({
-  ...inp(), cursor: 'pointer', ...extra,
+const sel = (C_T: ReturnType<typeof buildPalette>, extra: React.CSSProperties = {}): React.CSSProperties => ({
+  ...inp(C_T), cursor: 'pointer', ...extra,
 })
 
 function Label({ children }: { children: React.ReactNode }) {
+  const C_T = React.useContext(ConvThemeCtx)
   return (
     <div style={{ fontSize: 12, fontWeight: 700, color: C_T.muted, textTransform: 'uppercase',
       letterSpacing: '0.06em', marginBottom: 6 }}>
@@ -413,6 +426,7 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 function ResultBox({ value, unit, extra }: { value: string; unit: string; extra?: string }) {
+  const C_T = React.useContext(ConvThemeCtx)
   return (
     <div style={{ background: `${C_T.accent}10`, border: `2px solid ${C_T.accent}`, borderRadius: 14,
       padding: '20px 24px', textAlign: 'center' }}>
@@ -430,6 +444,7 @@ function ResultBox({ value, unit, extra }: { value: string; unit: string; extra?
 }
 
 function SwapBtn({ onClick }: { onClick: () => void }) {
+  const C_T = React.useContext(ConvThemeCtx)
   return (
     <button onClick={onClick} style={{ width: 40, height: 40, borderRadius: '50%',
       border: `1px solid ${C_T.border}`, background: C_T.card, color: C_T.text,
@@ -450,6 +465,7 @@ function UnitConverter({
   fromLabel: string
   toLabel: string
 }) {
+  const C_T = React.useContext(ConvThemeCtx)
   const [val, setVal] = React.useState('1')
   const [from, setFrom] = React.useState(units[0].value)
   const [to, setTo]     = React.useState(units[1].value)
@@ -462,19 +478,19 @@ function UnitConverter({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div>
         <Label>{inputLabel}</Label>
-        <input type="number" value={val} onChange={e => setVal(e.target.value)} style={inp()} />
+        <input type="number" value={val} onChange={e => setVal(e.target.value)} style={inp(C_T)} />
       </div>
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
         <div style={{ flex: 1 }}>
           <Label>{fromLabel}</Label>
-          <select value={from} onChange={e => setFrom(e.target.value)} style={sel()}>
+          <select value={from} onChange={e => setFrom(e.target.value)} style={sel(C_T)}>
             {units.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
           </select>
         </div>
         <SwapBtn onClick={() => { setFrom(to); setTo(from) }} />
         <div style={{ flex: 1 }}>
           <Label>{toLabel}</Label>
-          <select value={to} onChange={e => setTo(e.target.value)} style={sel()}>
+          <select value={to} onChange={e => setTo(e.target.value)} style={sel(C_T)}>
             {units.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
           </select>
         </div>
@@ -599,6 +615,7 @@ function SpeedTab({ lang }: { lang: string }) {
 // ── Temperature — special (non-linear) ──
 
 function TemperatureTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(ConvThemeCtx)
   const [val, setVal] = React.useState('0')
   const [from, setFrom] = React.useState('c')
   const [to, setTo]     = React.useState('f')
@@ -620,19 +637,19 @@ function TemperatureTab({ lang }: { lang: string }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div>
         <Label>{lang === 'fr' ? 'Valeur' : 'Value'}</Label>
-        <input type="number" value={val} onChange={e => setVal(e.target.value)} style={inp()} />
+        <input type="number" value={val} onChange={e => setVal(e.target.value)} style={inp(C_T)} />
       </div>
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
         <div style={{ flex: 1 }}>
           <Label>{lang === 'fr' ? 'De' : 'From'}</Label>
-          <select value={from} onChange={e => setFrom(e.target.value)} style={sel()}>
+          <select value={from} onChange={e => setFrom(e.target.value)} style={sel(C_T)}>
             {units.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
           </select>
         </div>
         <SwapBtn onClick={() => { setFrom(to); setTo(from) }} />
         <div style={{ flex: 1 }}>
           <Label>{lang === 'fr' ? 'Vers' : 'To'}</Label>
-          <select value={to} onChange={e => setTo(e.target.value)} style={sel()}>
+          <select value={to} onChange={e => setTo(e.target.value)} style={sel(C_T)}>
             {units.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
           </select>
         </div>
@@ -651,6 +668,7 @@ function TemperatureTab({ lang }: { lang: string }) {
 // ── Currency ──
 
 function CurrencyTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(ConvThemeCtx)
   const CURRENCIES = [
     { code: 'USD', label: 'USD — US Dollar' },
     { code: 'EUR', label: 'EUR — Euro' },
@@ -690,19 +708,19 @@ function CurrencyTab({ lang }: { lang: string }) {
       </div>
       <div>
         <Label>{lang === 'fr' ? 'Montant' : 'Amount'}</Label>
-        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} style={inp()} />
+        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} style={inp(C_T)} />
       </div>
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
         <div style={{ flex: 1 }}>
           <Label>{lang === 'fr' ? 'De' : 'From'}</Label>
-          <select value={from} onChange={e => setFrom(e.target.value)} style={sel()}>
+          <select value={from} onChange={e => setFrom(e.target.value)} style={sel(C_T)}>
             {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
           </select>
         </div>
         <SwapBtn onClick={() => { setFrom(to); setTo(from) }} />
         <div style={{ flex: 1 }}>
           <Label>{lang === 'fr' ? 'Vers' : 'To'}</Label>
-          <select value={to} onChange={e => setTo(e.target.value)} style={sel()}>
+          <select value={to} onChange={e => setTo(e.target.value)} style={sel(C_T)}>
             {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
           </select>
         </div>
@@ -721,6 +739,7 @@ function CurrencyTab({ lang }: { lang: string }) {
 // ── RGB → HEX ──
 
 function RgbToHexTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(ConvThemeCtx)
   const [r, setR] = React.useState('255')
   const [g, setG] = React.useState('99')
   const [b, setB] = React.useState('71')
@@ -736,8 +755,8 @@ function RgbToHexTab({ lang }: { lang: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {[
-        { label: 'R — Red',   val: r, set: setR, color: '#EF4444', max: 255 },
-        { label: 'G — Green', val: g, set: setG, color: '#22C55E', max: 255 },
+        { label: 'R — Red',   val: r, set: setR, color: C_T.err, max: 255 },
+        { label: 'G — Green', val: g, set: setG, color: C_T.success, max: 255 },
         { label: 'B — Blue',  val: b, set: setB, color: '#3B82F6', max: 255 },
       ].map(({ label, val, set, color, max }) => (
         <div key={label}>
@@ -748,7 +767,7 @@ function RgbToHexTab({ lang }: { lang: string }) {
           <input type="range" min={0} max={max} value={clamp(val)}
             onChange={e => set(e.target.value)} style={sliderStyle(color)} />
           <input type="number" min={0} max={max} value={val}
-            onChange={e => set(e.target.value)} style={inp({ marginTop: 6, width: 90 })} />
+            onChange={e => set(e.target.value)} style={inp(C_T, { marginTop: 6, width: 90 })} />
         </div>
       ))}
       <div style={{ background: `${C_T.accent}10`, border: `2px solid ${C_T.accent}`, borderRadius: 14,
@@ -774,6 +793,7 @@ function RgbToHexTab({ lang }: { lang: string }) {
 // ── HEX → RGB ──
 
 function HexToRgbTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(ConvThemeCtx)
   const [hex, setHex] = React.useState('#FF6347')
 
   const parse = (h: string) => {
@@ -804,7 +824,7 @@ function HexToRgbTab({ lang }: { lang: string }) {
             style={{ width: 48, height: 44, borderRadius: 8, border: `1px solid ${C_T.border}`,
               background: 'transparent', cursor: 'pointer', padding: 2 }} />
           <input type="text" value={hex} onChange={e => setHex(e.target.value)}
-            placeholder="#FF6347" style={inp({ flex: '1' })} />
+            placeholder="#FF6347" style={inp(C_T, { flex: '1' })} />
         </div>
       </div>
       {valid ? (
@@ -837,6 +857,7 @@ function HexToRgbTab({ lang }: { lang: string }) {
 // ── Text Case ──
 
 function TextCaseTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(ConvThemeCtx)
   const [text, setText] = React.useState(lang === 'fr' ? 'Bonjour le monde' : 'Hello World')
   const [mode, setMode] = React.useState('upper')
 
@@ -871,7 +892,7 @@ function TextCaseTab({ lang }: { lang: string }) {
       <div>
         <Label>{lang === 'fr' ? 'Texte' : 'Text'}</Label>
         <textarea value={text} onChange={e => setText(e.target.value)} rows={4}
-          style={{ ...inp(), resize: 'vertical', fontFamily: 'inherit' }} />
+          style={{ ...inp(C_T), resize: 'vertical', fontFamily: 'inherit' }} />
       </div>
       <div>
         <Label>{lang === 'fr' ? 'Format' : 'Case format'}</Label>
@@ -906,6 +927,8 @@ function TextCaseTab({ lang }: { lang: string }) {
 
 function TConvertersHub({ onBack }: { onBack?: () => void }) {
   const { lang } = useLang()
+  const { dark } = useDark()
+  const C_T = React.useMemo(() => buildPalette(dark), [dark])
   const [tab, setTab] = React.useState('length')
   const cur = CONV_TABS.find(t => t.id === tab)
 
@@ -940,7 +963,8 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
   } : null
 
   return (
-    <div style={{ minHeight: '100vh', background: C_T.bg, fontFamily: "'Inter','Segoe UI',sans-serif", color: C_T.text }}>
+    <ConvThemeCtx.Provider value={C_T}>
+    <div suppressHydrationWarning style={{ minHeight: '100vh', background: C_T.bg, fontFamily: "'Inter','Segoe UI',sans-serif", color: C_T.text }}>
 
       {schemaFAQ && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaFAQ) }} />
@@ -961,7 +985,7 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
       <header style={{ background: C_T.card, borderBottom: `1px solid ${C_T.border}`, padding: '0 24px',
         height: 60, display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 100 }}>
         {onBack && (
-          <button onClick={onBack} style={{ background: '#10B981', color: '#fff', border: 'none',
+          <button onClick={onBack} style={{ background: C_T.success, color: '#fff', border: 'none',
             borderRadius: 10, padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
             ← CHRONOS
           </button>
@@ -974,8 +998,8 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
           borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700, letterSpacing: '0.5px' }}>
           10 TOOLS
         </span>
-        <span style={{ marginLeft: 'auto', background: '#22C55E22', color: '#22C55E',
-          border: '1px solid #22C55E44', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
+        <span style={{ marginLeft: 'auto', background: `${C_T.success}22`, color: C_T.success,
+          border: `1px solid ${C_T.success}44`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
           🔒 100% In-Browser
         </span>
       </header>
@@ -1025,6 +1049,7 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
       </main>
 
     </div>
+    </ConvThemeCtx.Provider>
   )
 }
 

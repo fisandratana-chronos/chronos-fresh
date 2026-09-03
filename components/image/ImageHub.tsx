@@ -256,54 +256,54 @@ const PRESETS = [
   { label: 'LinkedIn Banner', w: 1584, h: 396, icon: '💼' },
 ]
 
-interface SubTool { id: Tab; label: string; icon: string; heading: string; desc: string }
-interface FamilyDef { id: Family; label: string; tools: SubTool[] }
+interface SubTool { id: Tab; label: string; frLabel: string; icon: string; heading: string; frHeading: string; desc: string; frDesc: string }
+interface FamilyDef { id: Family; label: string; frLabel: string; tools: SubTool[] }
 
 const FAMILIES: FamilyDef[] = [
   {
-    id: 'optimize', label: 'Optimize',
+    id: 'optimize', label: 'Optimize', frLabel: 'Optimiser',
     tools: [
-      { id: 'compress', label: 'Compress',    icon: '⇣', heading: 'Compress an image',    desc: 'Reduce file size while keeping your image quality.' },
-      { id: 'resize',   label: 'Resize',      icon: '⌗', heading: 'Resize an image',       desc: 'Resize to any dimension or preset with smart crop.' },
-      { id: 'base64',   label: 'Image → Base64', icon: '{}', heading: 'Image → Base64',    desc: 'Convert any image to a Base64 Data URI for use in HTML or CSS.' },
+      { id: 'compress', label: 'Compress', frLabel: 'Compresser',    icon: '⇣', heading: 'Compress an image', frHeading: 'Compresser une image',    desc: 'Reduce file size while keeping your image quality.', frDesc: 'Réduisez la taille du fichier tout en conservant la qualité de votre image.' },
+      { id: 'resize',   label: 'Resize', frLabel: 'Redimensionner',  icon: '⌗', heading: 'Resize an image', frHeading: 'Redimensionner une image',       desc: 'Resize to any dimension or preset with smart crop.', frDesc: 'Redimensionnez selon n\'importe quelle dimension ou format prédéfini, avec recadrage intelligent.' },
+      { id: 'base64',   label: 'Image → Base64', frLabel: 'Image → Base64', icon: '{}', heading: 'Image → Base64', frHeading: 'Image → Base64',    desc: 'Convert any image to a Base64 Data URI for use in HTML or CSS.', frDesc: 'Convertissez n\'importe quelle image en URI de données Base64 pour l\'utiliser en HTML ou CSS.' },
     ],
   },
   {
-    id: 'convert', label: 'Convert',
+    id: 'convert', label: 'Convert', frLabel: 'Convertir',
     tools: [
-      { id: 'convert', label: 'Convert', icon: '↗', heading: 'Convert image format', desc: 'Convert between JPG, PNG, WEBP, and AVIF.' },
+      { id: 'convert', label: 'Convert', frLabel: 'Convertir', icon: '↗', heading: 'Convert image format', frHeading: 'Convertir le format d\'image', desc: 'Convert between JPG, PNG, WEBP, and AVIF.', frDesc: 'Convertissez entre JPG, PNG, WEBP et AVIF.' },
     ],
   },
   {
-    id: 'edit', label: 'Edit',
+    id: 'edit', label: 'Edit', frLabel: 'Modifier',
     tools: [
-      { id: 'crop',     label: 'Crop',        icon: '✂', heading: 'Crop an image',  desc: 'Crop to any ratio or custom area.' },
-      { id: 'flip',     label: 'Flip/Rotate', icon: '↻', heading: 'Flip or rotate', desc: 'Mirror horizontally, vertically, or rotate by angle.' },
+      { id: 'crop',     label: 'Crop', frLabel: 'Recadrer',        icon: '✂', heading: 'Crop an image', frHeading: 'Recadrer une image',  desc: 'Crop to any ratio or custom area.', frDesc: 'Recadrez selon n\'importe quel ratio ou zone personnalisée.' },
+      { id: 'flip',     label: 'Flip/Rotate', frLabel: 'Retourner/Pivoter', icon: '↻', heading: 'Flip or rotate', frHeading: 'Retourner ou pivoter', desc: 'Mirror horizontally, vertically, or rotate by angle.', frDesc: 'Effet miroir horizontal, vertical, ou rotation selon un angle.' },
     ],
   },
   {
-    id: 'privacy', label: 'Privacy',
+    id: 'privacy', label: 'Privacy', frLabel: 'Confidentialité',
     tools: [
-      { id: 'removemetadata',   label: 'Remove Metadata',    icon: '🛡', heading: 'Remove Image Metadata',   desc: 'Strip GPS, camera model, date and all EXIF data from your image.' },
-      { id: 'exifviewer',       label: 'EXIF Viewer',        icon: '🔍', heading: 'EXIF Viewer',             desc: 'Inspect all metadata embedded in your image file.' },
-      { id: 'screenshotredact', label: 'Screenshot Redact',  icon: '▓', heading: 'Screenshot Redact',       desc: 'Blur, pixelate or black out sensitive areas in any screenshot.' },
-      { id: 'bgremove',         label: 'Remove BG',          icon: '✦', heading: 'Remove Background',       desc: 'Remove image backgrounds automatically with AI.' },
+      { id: 'removemetadata',   label: 'Remove Metadata', frLabel: 'Supprimer les métadonnées',    icon: '🛡', heading: 'Remove Image Metadata', frHeading: 'Supprimer les métadonnées de l\'image',   desc: 'Strip GPS, camera model, date and all EXIF data from your image.', frDesc: 'Supprimez le GPS, le modèle d\'appareil photo, la date et toutes les données EXIF de votre image.' },
+      { id: 'exifviewer',       label: 'EXIF Viewer', frLabel: 'Visionneuse EXIF',        icon: '🔍', heading: 'EXIF Viewer', frHeading: 'Visionneuse EXIF',             desc: 'Inspect all metadata embedded in your image file.', frDesc: 'Inspectez toutes les métadonnées intégrées dans votre fichier image.' },
+      { id: 'screenshotredact', label: 'Screenshot Redact', frLabel: 'Caviarder une capture',  icon: '▓', heading: 'Screenshot Redact', frHeading: 'Caviarder une capture d\'écran',       desc: 'Blur, pixelate or black out sensitive areas in any screenshot.', frDesc: 'Floutez, pixelisez ou masquez les zones sensibles de n\'importe quelle capture d\'écran.' },
+      { id: 'bgremove',         label: 'Remove BG', frLabel: 'Supprimer l\'arrière-plan',          icon: '✦', heading: 'Remove Background', frHeading: 'Supprimer l\'arrière-plan',       desc: 'Remove image backgrounds automatically with AI.', frDesc: 'Supprimez automatiquement l\'arrière-plan de vos images grâce à l\'IA.' },
     ],
   },
   {
-    id: 'create', label: 'Create',
+    id: 'create', label: 'Create', frLabel: 'Créer',
     tools: [
-      { id: 'watermark',    label: 'Watermark',     icon: '◈', heading: 'Add a Watermark',       desc: 'Protect your images with text or image watermarks.' },
-      { id: 'passportphoto',label: 'Passport Photo', icon: '🪪', heading: 'Passport / ID Photo',   desc: 'Generate passport or ID photos at the correct size and background.' },
-      { id: 'favicon',      label: 'Favicon',        icon: '⭐', heading: 'Favicon Generator',     desc: 'Generate favicon.ico and all PNG sizes from any image or logo.' },
-      { id: 'upscale',      label: 'AI Upscale',     icon: '✦', heading: 'AI Upscale',            desc: 'Upscale images 2× or 4× using AI — Real-ESRGAN.' },
+      { id: 'watermark',    label: 'Watermark', frLabel: 'Filigrane',     icon: '◈', heading: 'Add a Watermark', frHeading: 'Ajouter un filigrane',       desc: 'Protect your images with text or image watermarks.', frDesc: 'Protégez vos images avec des filigranes texte ou image.' },
+      { id: 'passportphoto',label: 'Passport Photo', frLabel: 'Photo d\'identité', icon: '🪪', heading: 'Passport / ID Photo', frHeading: 'Photo passeport / identité',   desc: 'Generate passport or ID photos at the correct size and background.', frDesc: 'Générez des photos passeport ou d\'identité au bon format et avec le bon arrière-plan.' },
+      { id: 'favicon',      label: 'Favicon', frLabel: 'Favicon',        icon: '⭐', heading: 'Favicon Generator', frHeading: 'Générateur de favicon',     desc: 'Generate favicon.ico and all PNG sizes from any image or logo.', frDesc: 'Générez un favicon.ico et toutes les tailles PNG à partir de n\'importe quelle image ou logo.' },
+      { id: 'upscale',      label: 'AI Upscale', frLabel: 'Agrandir (IA)',     icon: '✦', heading: 'AI Upscale', frHeading: 'Agrandissement par IA',            desc: 'Upscale images 2× or 4× using AI — Real-ESRGAN.', frDesc: 'Agrandissez vos images 2× ou 4× grâce à l\'IA — Real-ESRGAN.' },
     ],
   },
   {
-    id: 'colors', label: 'Colors',
+    id: 'colors', label: 'Colors', frLabel: 'Couleurs',
     tools: [
-      { id: 'colorpicker',     label: 'Color Picker',     icon: '◉', heading: 'Pick a Color',          desc: 'Extract colors from any image pixel.' },
-      { id: 'paletteextractor',label: 'Palette Extractor', icon: '🎨', heading: 'Palette Extractor',     desc: 'Extract the dominant color palette from any image.' },
+      { id: 'colorpicker',     label: 'Color Picker', frLabel: 'Pipette à couleurs',     icon: '◉', heading: 'Pick a Color', frHeading: 'Choisir une couleur',          desc: 'Extract colors from any image pixel.', frDesc: 'Extrayez la couleur de n\'importe quel pixel d\'une image.' },
+      { id: 'paletteextractor',label: 'Palette Extractor', frLabel: 'Extracteur de palette', icon: '🎨', heading: 'Palette Extractor', frHeading: 'Extracteur de palette',     desc: 'Extract the dominant color palette from any image.', frDesc: 'Extrayez la palette de couleurs dominante de n\'importe quelle image.' },
     ],
   },
 ]
@@ -403,16 +403,16 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
       {/* ── Page Header ── */}
       <section className="ih-page-header" style={{ padding: '48px 6vw 34px', borderBottom: `1px solid ${T.border}`, position: 'relative' }}>
         <div className="ih-free-badge">
-          100% Free · No Upload
+          {lang === 'fr' ? '100% Gratuit · Sans Upload' : '100% Free · No Upload'}
         </div>
         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: T.accent, marginBottom: 10 }}>
           CHRONOS / IMAGE
         </div>
         <h1 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(48px, 5vw, 68px)', lineHeight: .95, fontWeight: 600, letterSpacing: '-.03em', color: T.text }}>
-          Image Tools
+          {lang === 'fr' ? 'Outils Image' : 'Image Tools'}
         </h1>
         <div style={{ marginTop: 14, color: T.muted, fontSize: 15 }}>
-          Compress, transform &amp; enhance your images.
+          {lang === 'fr' ? 'Compressez, transformez et améliorez vos images.' : 'Compress, transform & enhance your images.'}
         </div>
       </section>
 
@@ -430,7 +430,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
                 onClick={() => hasSingle ? selectTool(fam.tools[0].id) : toggleFamily(fam.id)}
                 onMouseEnter={() => !hasSingle && setOpenFamily(fam.id)}
               >
-                {fam.label}
+                {lang === 'fr' ? fam.frLabel : fam.label}
                 {!hasSingle && <span className="fam-caret">▼</span>}
               </button>
               {!hasSingle && isOpen && (
@@ -443,8 +443,8 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
                     >
                       <span className="ih-drop-icon">{tool.icon}</span>
                       <div>
-                        <div style={{ fontWeight: tab === tool.id ? 600 : 500 }}>{tool.label}</div>
-                        <div style={{ fontSize: '.73rem', color: T.muted, marginTop: 1 }}>{tool.desc}</div>
+                        <div style={{ fontWeight: tab === tool.id ? 600 : 500 }}>{lang === 'fr' ? tool.frLabel : tool.label}</div>
+                        <div style={{ fontSize: '.73rem', color: T.muted, marginTop: 1 }}>{lang === 'fr' ? tool.frDesc : tool.desc}</div>
                       </div>
                     </button>
                   ))}
@@ -456,7 +456,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         {/* Active tool breadcrumb — right side */}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', paddingRight: 4 }}>
           <span style={{ fontSize: '.72rem', color: T.muted, fontWeight: 500 }}>
-            {findTool(tab).icon} {findTool(tab).label}
+            {findTool(tab).icon} {lang === 'fr' ? findTool(tab).frLabel : findTool(tab).label}
           </span>
         </div>
       </nav>
@@ -465,12 +465,12 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
       <div className="ih-main" style={{ width: 'min(1100px, 88vw)', margin: '0 auto', padding: '70px 0 120px' }}>
         {/* Section heading */}
         <div style={{ marginBottom: 22 }}>
-          <div className="ih-breadcrumb">{FAMILIES.find(f => f.id === findFamily(tab))?.label}</div>
+          <div className="ih-breadcrumb">{lang === 'fr' ? FAMILIES.find(f => f.id === findFamily(tab))?.frLabel : FAMILIES.find(f => f.id === findFamily(tab))?.label}</div>
           <h2 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: 34, fontWeight: 600, color: T.text }}>
-            {findTool(tab).heading}
+            {lang === 'fr' ? findTool(tab).frHeading : findTool(tab).heading}
           </h2>
           <p style={{ margin: '5px 0 0', color: T.muted, fontSize: 14 }}>
-            {findTool(tab).desc}
+            {lang === 'fr' ? findTool(tab).frDesc : findTool(tab).desc}
           </p>
         </div>
 
@@ -496,8 +496,8 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
 
         {/* Footer note */}
         <div style={{ marginTop: 20, display: 'flex', justifyContent: 'space-between', color: '#55565c', fontSize: 12, flexWrap: 'wrap', gap: 8 }}>
-          <span>Processing happens locally in your browser.</span>
-          <span style={{ color: '#77787f' }}>Private · Fast · No upload</span>
+          <span>{lang === 'fr' ? 'Le traitement se fait localement dans votre navigateur.' : 'Processing happens locally in your browser.'}</span>
+          <span style={{ color: '#77787f' }}>{lang === 'fr' ? 'Privé · Rapide · Sans upload' : 'Private · Fast · No upload'}</span>
         </div>
       </div>
     </div>
@@ -577,17 +577,17 @@ function CompressPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={e => addFiles(e.target.files)} />
           <div className="ih-upload-icon">⇧</div>
-          <h3 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: 34, fontWeight: 600, color: T.text }}>Drop your image here</h3>
-          <p style={{ margin: '8px 0 24px', color: T.muted, fontSize: 14 }}>or click anywhere to browse from your device</p>
-          <div style={{ color: T.accent, fontWeight: 600, fontSize: 14 }}>Choose an image</div>
-          <div style={{ marginTop: 28, color: '#5f6066', fontSize: 12 }}>JPG · PNG · WEBP · AVIF &nbsp;•&nbsp; Up to {MAX_IMAGE_MB} MB</div>
+          <h3 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: 34, fontWeight: 600, color: T.text }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ margin: '8px 0 24px', color: T.muted, fontSize: 14 }}>{lang === 'fr' ? 'ou cliquez n\'importe où pour parcourir votre appareil' : 'or click anywhere to browse from your device'}</p>
+          <div style={{ color: T.accent, fontWeight: 600, fontSize: 14 }}>{lang === 'fr' ? 'Choisir une image' : 'Choose an image'}</div>
+          <div style={{ marginTop: 28, color: '#5f6066', fontSize: 12 }}>JPG · PNG · WEBP · AVIF &nbsp;•&nbsp; {lang === 'fr' ? `Jusqu'à ${MAX_IMAGE_MB} MB` : `Up to ${MAX_IMAGE_MB} MB`}</div>
         </div>
       ) : (
         <>
           {/* File grid */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-            <span style={{ fontWeight: 600, fontSize: '.85rem' }}>{files.length} image{files.length > 1 ? 's' : ''}</span>
-            <button onClick={() => inputRef.current?.click()} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontWeight: 600, fontSize: '.8rem' }}>+ Add more</button>
+            <span style={{ fontWeight: 600, fontSize: '.85rem' }}>{files.length} {lang === 'fr' ? (files.length > 1 ? 'images' : 'image') : (files.length > 1 ? 'images' : 'image')}</span>
+            <button onClick={() => inputRef.current?.click()} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontWeight: 600, fontSize: '.8rem' }}>{lang === 'fr' ? '+ Ajouter' : '+ Add more'}</button>
             <input ref={inputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={e => addFiles(e.target.files)} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(80px,1fr))', gap: 8, marginBottom: 16 }}>
@@ -608,16 +608,16 @@ function CompressPanel({ T }: { T: any }) {
           {/* Quality slider */}
           <div style={{ margin: '20px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ fontSize: '.88rem' }}>Quality</span>
+              <span style={{ fontSize: '.88rem' }}>{lang === 'fr' ? 'Qualité' : 'Quality'}</span>
               <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: '.78rem', padding: '3px 10px', borderRadius: 20, background: quality < 50 ? 'rgba(248,113,113,.15)' : 'rgba(6,182,212,.15)', color: quality < 50 ? T.danger : T.accent }}>{quality}%</span>
             </div>
             <input type="range" min={10} max={95} value={quality} onChange={e => setQuality(+e.target.value)} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: '.75rem', color: T.muted }}><span>Smallest file</span><span>Best quality</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: '.75rem', color: T.muted }}><span>{lang === 'fr' ? 'Fichier le plus petit' : 'Smallest file'}</span><span>{lang === 'fr' ? 'Meilleure qualité' : 'Best quality'}</span></div>
           </div>
 
           {/* Format */}
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Output Format</div>
+            <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Format de sortie' : 'Output Format'}</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {formats.map(f => (
                 <button key={f.v} className={`ih-fit-btn${outFormat === f.v ? ' active' : ''}`} onClick={() => setOutFormat(f.v)}>{f.label}</button>
@@ -629,8 +629,8 @@ function CompressPanel({ T }: { T: any }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: '.83rem', padding: '10px 14px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radiusSm }}>
             <input type="checkbox" checked={stripExif} onChange={e => setStripExif(e.target.checked)} style={{ accentColor: T.accent, width: 15, height: 15 }} />
             <label style={{ cursor: 'pointer' }}>
-              <span style={{ fontWeight: 500 }}>Remove EXIF Metadata</span>
-              <span style={{ color: T.muted, display: 'block', fontSize: '.76rem' }}>Strips GPS, camera info — improves privacy</span>
+              <span style={{ fontWeight: 500 }}>{lang === 'fr' ? 'Supprimer les métadonnées EXIF' : 'Remove EXIF Metadata'}</span>
+              <span style={{ color: T.muted, display: 'block', fontSize: '.76rem' }}>{lang === 'fr' ? 'Supprime le GPS, les infos appareil — améliore la confidentialité' : 'Strips GPS, camera info — improves privacy'}</span>
             </label>
           </div>
 
@@ -638,14 +638,14 @@ function CompressPanel({ T }: { T: any }) {
           {processing && (
             <div>
               <div className="ih-progress-wrap"><div className="ih-progress-bar" style={{ width: progress + '%' }} /></div>
-              <p style={{ fontSize: '.78rem', color: T.muted }}>Processing {progress}%…</p>
+              <p style={{ fontSize: '.78rem', color: T.muted }}>{lang === 'fr' ? `Traitement ${progress}%…` : `Processing ${progress}%…`}</p>
             </div>
           )}
 
           {/* Buttons */}
           <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-            <button className="ih-btn-primary" onClick={compress} disabled={processing}>⚡ Compress Now</button>
-            <button className="ih-btn-ghost" onClick={reset}>↺ New Images</button>
+            <button className="ih-btn-primary" onClick={compress} disabled={processing}>{lang === 'fr' ? '⚡ Compresser' : '⚡ Compress Now'}</button>
+            <button className="ih-btn-ghost" onClick={reset}>{lang === 'fr' ? '↺ Nouvelles images' : '↺ New Images'}</button>
           </div>
         </>
       )}
@@ -653,7 +653,7 @@ function CompressPanel({ T }: { T: any }) {
       {/* Results */}
       {done && files.filter(f => f.status === 'done').length > 0 && (
         <div style={{ marginTop: 24 }}>
-          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 12 }}>Results</div>
+          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 12 }}>{lang === 'fr' ? 'Résultats' : 'Results'}</div>
           {files.filter(f => f.status === 'done').map(f => (
             <div key={f.id} className="ih-result-card">
               <img src={f.preview} alt={f.file.name} style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6 }} />
@@ -661,10 +661,10 @@ function CompressPanel({ T }: { T: any }) {
                 <div style={{ fontSize: '.83rem', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.file.name}</div>
                 <div style={{ fontSize: '.75rem', color: T.muted, marginTop: 2 }}>
                   {formatBytes(f.originalSize)} → <span style={{ color: T.success, fontWeight: 600 }}>{formatBytes(f.compressedSize!)}</span>
-                  {' '}({Math.round((1 - f.compressedSize! / f.originalSize) * 100)}% saved)
+                  {' '}({Math.round((1 - f.compressedSize! / f.originalSize) * 100)}% {lang === 'fr' ? 'économisés' : 'saved'})
                 </div>
               </div>
-              <a href={f.compressedUrl!} download={f.compressedName} className="ih-btn-primary" style={{ textDecoration: 'none', padding: '8px 16px', fontSize: '.8rem' }}>⬇ Save</a>
+              <a href={f.compressedUrl!} download={f.compressedName} className="ih-btn-primary" style={{ textDecoration: 'none', padding: '8px 16px', fontSize: '.8rem' }}>{lang === 'fr' ? '⬇ Enregistrer' : '⬇ Save'}</a>
             </div>
           ))}
           {files.length > 1 && (
@@ -677,7 +677,7 @@ function CompressPanel({ T }: { T: any }) {
                 })
                 const blob = await zip.generateAsync({ type: 'blob' })
                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'compressed-images.zip'; a.click()
-              }}>⬇ Download All as ZIP</button>
+              }}>{lang === 'fr' ? '⬇ Tout télécharger (ZIP)' : '⬇ Download All as ZIP'}</button>
             </div>
           )}
         </div>
@@ -739,10 +739,10 @@ function ConvertPanel({ T, initialFormat }: { T: any; initialFormat?: string }) 
   }
 
   const fmts = [
-    { v: 'image/jpeg', label: 'JPG', desc: 'Best for photos' },
-    { v: 'image/png',  label: 'PNG', desc: 'Lossless, transparency' },
-    { v: 'image/webp', label: 'WEBP', desc: 'Small & modern' },
-    { v: 'image/avif', label: 'AVIF', desc: 'Next-gen, smallest' },
+    { v: 'image/jpeg', label: 'JPG', desc: 'Best for photos', frDesc: 'Idéal pour les photos' },
+    { v: 'image/png',  label: 'PNG', desc: 'Lossless, transparency', frDesc: 'Sans perte, transparence' },
+    { v: 'image/webp', label: 'WEBP', desc: 'Small & modern', frDesc: 'Léger et moderne' },
+    { v: 'image/avif', label: 'AVIF', desc: 'Next-gen, smallest', frDesc: 'Nouvelle génération, le plus léger' },
   ]
 
   return (
@@ -756,17 +756,17 @@ function ConvertPanel({ T, initialFormat }: { T: any; initialFormat?: string }) 
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={e => addFiles(e.target.files)} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🔄</span>
-          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>Drop images to convert format</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>JPG, PNG, WEBP, AVIF — up to {MAX_IMAGE_MB}MB per image</p>
+          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez des images à convertir' : 'Drop images to convert format'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? `JPG, PNG, WEBP, AVIF — jusqu'à ${MAX_IMAGE_MB}MB par image` : `JPG, PNG, WEBP, AVIF — up to ${MAX_IMAGE_MB}MB per image`}</p>
         </div>
       ) : (
         <>
-          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, margin: '20px 0 12px' }}>Output Format</div>
+          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, margin: '20px 0 12px' }}>{lang === 'fr' ? 'Format de sortie' : 'Output Format'}</div>
           <div className="ih-fmt-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 20 }}>
             {fmts.map(f => (
               <button key={f.v} className={`ih-fmt-btn${targetFmt === f.v ? ' selected' : ''}`} onClick={() => setTargetFmt(f.v)}>
                 <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: '1.1rem', color: targetFmt === f.v ? T.accent : T.text }}>{f.label}</div>
-                <div style={{ fontSize: '.72rem', color: T.muted, marginTop: 4 }}>{f.desc}</div>
+                <div style={{ fontSize: '.72rem', color: T.muted, marginTop: 4 }}>{lang === 'fr' ? f.frDesc : f.desc}</div>
               </button>
             ))}
           </div>
@@ -779,17 +779,17 @@ function ConvertPanel({ T, initialFormat }: { T: any; initialFormat?: string }) 
                   <div style={{ fontSize: '.83rem', fontWeight: 500 }}>{f.file.name}</div>
                   <div style={{ fontSize: '.75rem', color: T.muted }}>{formatBytes(f.originalSize)}</div>
                 </div>
-                {f.status === 'done' && <a href={f.convertedUrl!} download={f.convertedName} className="ih-btn-primary" style={{ textDecoration: 'none', padding: '7px 14px', fontSize: '.78rem' }}>⬇ Save</a>}
+                {f.status === 'done' && <a href={f.convertedUrl!} download={f.convertedName} className="ih-btn-primary" style={{ textDecoration: 'none', padding: '7px 14px', fontSize: '.78rem' }}>{lang === 'fr' ? '⬇ Enregistrer' : '⬇ Save'}</a>}
                 {f.status === 'error' && <span title={f.error} style={{ color: T.danger, fontSize: '.78rem' }}>{f.error}</span>}
               </div>
             ))}
           </div>
 
-          {processing && <p style={{ color: T.muted, fontSize: '.85rem', marginBottom: 12 }}>Converting…</p>}
+          {processing && <p style={{ color: T.muted, fontSize: '.85rem', marginBottom: 12 }}>{lang === 'fr' ? 'Conversion en cours…' : 'Converting…'}</p>}
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="ih-btn-primary" onClick={convert} disabled={processing}>🔄 Convert Now</button>
-            <button className="ih-btn-ghost" onClick={() => { setFiles([]); setDone(false) }}>↺ New Images</button>
+            <button className="ih-btn-primary" onClick={convert} disabled={processing}>{lang === 'fr' ? '🔄 Convertir' : '🔄 Convert Now'}</button>
+            <button className="ih-btn-ghost" onClick={() => { setFiles([]); setDone(false) }}>{lang === 'fr' ? '↺ Nouvelles images' : '↺ New Images'}</button>
           </div>
         </>
       )}
@@ -868,18 +868,18 @@ function ResizePanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>📐</span>
-          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>Drop your image here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>JPG, PNG, WEBP · one image at a time</p>
+          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'JPG, PNG, WEBP · une image à la fois' : 'JPG, PNG, WEBP · one image at a time'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
 
-          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 12 }}>Choose a preset</div>
+          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 12 }}>{lang === 'fr' ? 'Choisir un préréglage' : 'Choose a preset'}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 8, marginBottom: 20 }}>
             {PRESETS.map(p => (
               <button key={p.label} onClick={() => selectPreset(p)}
@@ -890,41 +890,43 @@ function ResizePanel({ T }: { T: any }) {
             ))}
           </div>
 
-          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Fit mode</div>
+          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Mode d\'ajustement' : 'Fit mode'}</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
             {(['cover', 'contain', 'stretch'] as FitMode[]).map(f => (
               <button key={f} className={`ih-fit-btn${fit === f ? ' active' : ''}`} onClick={() => setFit(f)}>
-                {f === 'cover' ? '✂️ Crop' : f === 'contain' ? '🖼 Contain' : '↔ Stretch'}
+                {lang === 'fr'
+                  ? (f === 'cover' ? '✂️ Recadrer' : f === 'contain' ? '🖼 Contenir' : '↔ Étirer')
+                  : (f === 'cover' ? '✂️ Crop' : f === 'contain' ? '🖼 Contain' : '↔ Stretch')}
               </button>
             ))}
           </div>
           {fit === 'contain' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, fontSize: '.82rem', color: T.muted }}>
-              <span>Letterbox color:</span>
+              <span>{lang === 'fr' ? 'Couleur de fond :' : 'Letterbox color:'}</span>
               <input type="color" value={letterboxColor} onChange={e => setLetterboxColor(e.target.value)} />
             </div>
           )}
 
-          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Or custom size</div>
+          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Ou taille personnalisée' : 'Or custom size'}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-            <input type="number" placeholder="Width" value={customW} onChange={e => setCustomW(e.target.value)} style={{ width: 90, padding: '8px 10px', borderRadius: T.radiusSm, border: `1px solid ${T.border}`, background: T.surface, color: T.text }} />
+            <input type="number" placeholder={lang === 'fr' ? 'Largeur' : 'Width'} value={customW} onChange={e => setCustomW(e.target.value)} style={{ width: 90, padding: '8px 10px', borderRadius: T.radiusSm, border: `1px solid ${T.border}`, background: T.surface, color: T.text }} />
             <span style={{ color: T.muted }}>×</span>
-            <input type="number" placeholder="Height" value={customH} onChange={e => setCustomH(e.target.value)} style={{ width: 90, padding: '8px 10px', borderRadius: T.radiusSm, border: `1px solid ${T.border}`, background: T.surface, color: T.text }} />
+            <input type="number" placeholder={lang === 'fr' ? 'Hauteur' : 'Height'} value={customH} onChange={e => setCustomH(e.target.value)} style={{ width: 90, padding: '8px 10px', borderRadius: T.radiusSm, border: `1px solid ${T.border}`, background: T.surface, color: T.text }} />
             <span style={{ color: T.muted, fontSize: '.78rem' }}>px</span>
-            <button className="ih-btn-ghost" style={{ padding: '8px 14px', fontSize: '.8rem' }} onClick={applyCustom}>Apply</button>
+            <button className="ih-btn-ghost" style={{ padding: '8px 14px', fontSize: '.8rem' }} onClick={applyCustom}>{lang === 'fr' ? 'Appliquer' : 'Apply'}</button>
           </div>
 
           <canvas ref={canvasRef} style={{ display: 'none' }} />
 
           {preset && (
             <div style={{ marginBottom: 16, borderRadius: T.radius, overflow: 'hidden', border: `1px solid ${T.border}`, background: T.surface2, maxHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {resultUrl ? <img src={resultUrl} alt="preview" style={{ maxWidth: '100%', maxHeight: 360, objectFit: 'contain' }} /> : <span style={{ color: T.muted, fontSize: '.85rem', padding: 20 }}>Rendering…</span>}
+              {resultUrl ? <img src={resultUrl} alt="preview" style={{ maxWidth: '100%', maxHeight: 360, objectFit: 'contain' }} /> : <span style={{ color: T.muted, fontSize: '.85rem', padding: 20 }}>{lang === 'fr' ? 'Rendu en cours…' : 'Rendering…'}</span>}
             </div>
           )}
 
           <div style={{ display: 'flex', gap: 10 }}>
-            {resultUrl && <a href={resultUrl} download={resultName} className="ih-btn-primary" style={{ textDecoration: 'none' }}>⬇ Download Image</a>}
-            <button className="ih-btn-ghost" onClick={() => { setImg(null); setResultUrl('') }}>↺ New Image</button>
+            {resultUrl && <a href={resultUrl} download={resultName} className="ih-btn-primary" style={{ textDecoration: 'none' }}>{lang === 'fr' ? '⬇ Télécharger l\'image' : '⬇ Download Image'}</a>}
+            <button className="ih-btn-ghost" onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '↺ Nouvelle image' : '↺ New Image'}</button>
           </div>
         </>
       )}
@@ -1017,17 +1019,17 @@ function CropPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>✂️</span>
-          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>Drop your image here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Drag to select the area you want to keep</p>
+          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Glissez pour sélectionner la zone à conserver' : 'Drag to select the area you want to keep'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl(''); setSel(null) }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl(''); setSel(null) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
-          <p style={{ fontSize: '.8rem', color: T.muted, marginBottom: 10 }}>Click and drag on the image to select the crop area.</p>
+          <p style={{ fontSize: '.8rem', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Cliquez et glissez sur l\'image pour sélectionner la zone à recadrer.' : 'Click and drag on the image to select the crop area.'}</p>
           <div ref={imgBoxRef}
             onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
             style={{ position: 'relative', width: displayW, height: displayH, cursor: 'crosshair', userSelect: 'none', marginBottom: 16, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, overflow: 'hidden' }}>
@@ -1037,16 +1039,16 @@ function CropPanel({ T }: { T: any }) {
             )}
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="ih-btn-primary" onClick={applyCrop} disabled={!sel || sel.w < 4 || sel.h < 4}>✂️ Apply Crop</button>
-            {sel && <button className="ih-btn-ghost" onClick={() => setSel(null)}>↺ Clear Selection</button>}
+            <button className="ih-btn-primary" onClick={applyCrop} disabled={!sel || sel.w < 4 || sel.h < 4}>{lang === 'fr' ? '✂️ Recadrer' : '✂️ Apply Crop'}</button>
+            {sel && <button className="ih-btn-ghost" onClick={() => setSel(null)}>{lang === 'fr' ? '↺ Effacer la sélection' : '↺ Clear Selection'}</button>}
           </div>
           {resultUrl && (
             <div style={{ marginTop: 20 }}>
-              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Result</div>
+              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Résultat' : 'Result'}</div>
               <div style={{ marginBottom: 12, borderRadius: T.radius, overflow: 'hidden', border: `1px solid ${T.border}`, background: T.surface2, maxHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <img src={resultUrl} style={{ maxWidth: '100%', maxHeight: 300, objectFit: 'contain' }} />
               </div>
-              <a href={resultUrl} download={resultName} className="ih-btn-primary" style={{ textDecoration: 'none' }}>⬇ Download Cropped Image</a>
+              <a href={resultUrl} download={resultName} className="ih-btn-primary" style={{ textDecoration: 'none' }}>{lang === 'fr' ? '⬇ Télécharger l\'image recadrée' : '⬇ Download Cropped Image'}</a>
             </div>
           )}
         </>
@@ -1117,20 +1119,20 @@ function FlipPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🔃</span>
-          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>Drop your image here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Flip horizontally, vertically, or rotate 90°</p>
+          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Retournez horizontalement, verticalement, ou pivotez de 90°' : 'Flip horizontally, vertically, or rotate 90°'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-            <button className={`ih-fit-btn${flipH ? ' active' : ''}`} onClick={() => setFlipH(v => !v)}>↔ Flip Horizontal</button>
-            <button className={`ih-fit-btn${flipV ? ' active' : ''}`} onClick={() => setFlipV(v => !v)}>↕ Flip Vertical</button>
-            <button className="ih-fit-btn" onClick={() => setRotation(r => (r + 90) % 360)}>↻ Rotate 90° ({rotation}°)</button>
+            <button className={`ih-fit-btn${flipH ? ' active' : ''}`} onClick={() => setFlipH(v => !v)}>{lang === 'fr' ? '↔ Retourner horizontalement' : '↔ Flip Horizontal'}</button>
+            <button className={`ih-fit-btn${flipV ? ' active' : ''}`} onClick={() => setFlipV(v => !v)}>{lang === 'fr' ? '↕ Retourner verticalement' : '↕ Flip Vertical'}</button>
+            <button className="ih-fit-btn" onClick={() => setRotation(r => (r + 90) % 360)}>{lang === 'fr' ? `↻ Pivoter 90° (${rotation}°)` : `↻ Rotate 90° (${rotation}°)`}</button>
           </div>
           {resultUrl && (
             <div style={{ marginBottom: 16, borderRadius: T.radius, overflow: 'hidden', border: `1px solid ${T.border}`, background: T.surface2, maxHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1138,8 +1140,8 @@ function FlipPanel({ T }: { T: any }) {
             </div>
           )}
           <div style={{ display: 'flex', gap: 10 }}>
-            {resultUrl && <a href={resultUrl} download={`${baseName}-edited.png`} className="ih-btn-primary" style={{ textDecoration: 'none' }}>⬇ Download Image</a>}
-            <button className="ih-btn-ghost" onClick={() => { setImg(null); setResultUrl('') }}>↺ New Image</button>
+            {resultUrl && <a href={resultUrl} download={`${baseName}-edited.png`} className="ih-btn-primary" style={{ textDecoration: 'none' }}>{lang === 'fr' ? '⬇ Télécharger l\'image' : '⬇ Download Image'}</a>}
+            <button className="ih-btn-ghost" onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '↺ Nouvelle image' : '↺ New Image'}</button>
           </div>
         </>
       )}
@@ -1151,9 +1153,9 @@ function FlipPanel({ T }: { T: any }) {
 //  WATERMARK PANEL — manisy teny (text watermark) eo amin'ny sary
 // ══════════════════════════════════════════════════════════════
 const WATERMARK_POSITIONS = [
-  { v: 'top-left', label: '↖ Top Left' }, { v: 'top-center', label: '↑ Top Center' }, { v: 'top-right', label: '↗ Top Right' },
-  { v: 'center-left', label: '← Center Left' }, { v: 'center', label: '⊙ Center' }, { v: 'center-right', label: '→ Center Right' },
-  { v: 'bottom-left', label: '↙ Bottom Left' }, { v: 'bottom-center', label: '↓ Bottom Center' }, { v: 'bottom-right', label: '↘ Bottom Right' },
+  { v: 'top-left', label: '↖ Top Left', frLabel: '↖ Haut gauche' }, { v: 'top-center', label: '↑ Top Center', frLabel: '↑ Haut centre' }, { v: 'top-right', label: '↗ Top Right', frLabel: '↗ Haut droite' },
+  { v: 'center-left', label: '← Center Left', frLabel: '← Centre gauche' }, { v: 'center', label: '⊙ Center', frLabel: '⊙ Centre' }, { v: 'center-right', label: '→ Center Right', frLabel: '→ Centre droite' },
+  { v: 'bottom-left', label: '↙ Bottom Left', frLabel: '↙ Bas gauche' }, { v: 'bottom-center', label: '↓ Bottom Center', frLabel: '↓ Bas centre' }, { v: 'bottom-right', label: '↘ Bottom Right', frLabel: '↘ Bas droite' },
 ]
 function WatermarkPanel({ T }: { T: any }) {
   const { lang } = useLang()
@@ -1223,41 +1225,41 @@ function WatermarkPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>💧</span>
-          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>Drop your image here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Add a text watermark — logo, copyright, or signature</p>
+          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Ajoutez un filigrane texte — logo, copyright, ou signature' : 'Add a text watermark — logo, copyright, or signature'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
 
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 8 }}>Watermark text</div>
-            <input type="text" value={text} onChange={e => setText(e.target.value)} placeholder="© Your Name"
+            <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 8 }}>{lang === 'fr' ? 'Texte du filigrane' : 'Watermark text'}</div>
+            <input type="text" value={text} onChange={e => setText(e.target.value)} placeholder={lang === 'fr' ? '© Votre nom' : '© Your Name'}
               style={{ width: '100%', padding: '10px 12px', borderRadius: T.radiusSm, border: `1px solid ${T.border}`, background: T.surface, color: T.text, boxSizing: 'border-box' }} />
           </div>
 
-          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Position</div>
+          <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Position' : 'Position'}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 6, marginBottom: 18, maxWidth: 320 }}>
             {WATERMARK_POSITIONS.map(p => (
-              <button key={p.v} className={`ih-fit-btn${position === p.v ? ' active' : ''}`} style={{ fontSize: '.7rem', padding: '8px 4px' }} onClick={() => setPosition(p.v)}>{p.label}</button>
+              <button key={p.v} className={`ih-fit-btn${position === p.v ? ' active' : ''}`} style={{ fontSize: '.7rem', padding: '8px 4px' }} onClick={() => setPosition(p.v)}>{lang === 'fr' ? p.frLabel : p.label}</button>
             ))}
           </div>
 
           <div style={{ display: 'flex', gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 140 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '.82rem' }}><span>Opacity</span><span>{opacity}%</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '.82rem' }}><span>{lang === 'fr' ? 'Opacité' : 'Opacity'}</span><span>{opacity}%</span></div>
               <input type="range" min={10} max={100} value={opacity} onChange={e => setOpacity(+e.target.value)} style={{ width: '100%' }} />
             </div>
             <div style={{ flex: 1, minWidth: 140 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '.82rem' }}><span>Font Size</span><span>{fontSize}px</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '.82rem' }}><span>{lang === 'fr' ? 'Taille du texte' : 'Font Size'}</span><span>{fontSize}px</span></div>
               <input type="range" min={12} max={96} value={fontSize} onChange={e => setFontSize(+e.target.value)} style={{ width: '100%' }} />
             </div>
             <div>
-              <div style={{ marginBottom: 6, fontSize: '.82rem' }}>Color</div>
+              <div style={{ marginBottom: 6, fontSize: '.82rem' }}>{lang === 'fr' ? 'Couleur' : 'Color'}</div>
               <input type="color" value={color} onChange={e => setColor(e.target.value)} />
             </div>
           </div>
@@ -1268,8 +1270,8 @@ function WatermarkPanel({ T }: { T: any }) {
             </div>
           )}
           <div style={{ display: 'flex', gap: 10 }}>
-            {resultUrl && <a href={resultUrl} download={`${baseName}-watermarked.png`} className="ih-btn-primary" style={{ textDecoration: 'none' }}>⬇ Download Image</a>}
-            <button className="ih-btn-ghost" onClick={() => { setImg(null); setResultUrl('') }}>↺ New Image</button>
+            {resultUrl && <a href={resultUrl} download={`${baseName}-watermarked.png`} className="ih-btn-primary" style={{ textDecoration: 'none' }}>{lang === 'fr' ? '⬇ Télécharger l\'image' : '⬇ Download Image'}</a>}
+            <button className="ih-btn-ghost" onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '↺ Nouvelle image' : '↺ New Image'}</button>
           </div>
         </>
       )}
@@ -1344,15 +1346,15 @@ function ColorPickerPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🎨</span>
-          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>Drop your image here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Click anywhere on the image to pick a color</p>
+          <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Cliquez n\'importe où sur l\'image pour choisir une couleur' : 'Click anywhere on the image to pick a color'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPicked(null); setHistory([]) }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPicked(null); setHistory([]) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
           <canvas ref={canvasRef} width={displayW} height={displayH} onClick={pickColor}
             style={{ cursor: 'crosshair', borderRadius: T.radiusSm, border: `1px solid ${T.border}`, marginBottom: 16, maxWidth: '100%' }} />
@@ -1363,11 +1365,11 @@ function ColorPickerPanel({ T }: { T: any }) {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '.88rem', fontWeight: 600 }}>{picked.hex}</span>
-                  <button onClick={() => copy(picked.hex)} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontSize: '.72rem' }}>Copy</button>
+                  <button onClick={() => copy(picked.hex)} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontSize: '.72rem' }}>{lang === 'fr' ? 'Copier' : 'Copy'}</button>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
                   <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '.78rem', color: T.muted }}>{picked.rgb}</span>
-                  <button onClick={() => copy(picked.rgb)} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontSize: '.72rem' }}>Copy</button>
+                  <button onClick={() => copy(picked.rgb)} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontSize: '.72rem' }}>{lang === 'fr' ? 'Copier' : 'Copy'}</button>
                 </div>
               </div>
             </div>
@@ -1375,10 +1377,10 @@ function ColorPickerPanel({ T }: { T: any }) {
 
           {history.length > 0 && (
             <div>
-              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Recently picked</div>
+              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Choisies récemment' : 'Recently picked'}</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {history.map((h, i) => (
-                  <button key={i} onClick={() => copy(h)} title={`Copy ${h}`}
+                  <button key={i} onClick={() => copy(h)} title={lang === 'fr' ? `Copier ${h}` : `Copy ${h}`}
                     style={{ width: 32, height: 32, borderRadius: 6, background: h, border: `1px solid ${T.border}`, cursor: 'pointer' }} />
                 ))}
               </div>
@@ -1394,23 +1396,26 @@ function ColorPickerPanel({ T }: { T: any }) {
 //  UPSCALE PANEL — placeholder
 // ══════════════════════════════════════════════════════════════
 function UpscalePanel({ T }: { T: any }) {
+  const { lang } = useLang()
   return (
     <div>
       <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
         <span style={{ fontSize: '1.4rem' }}>✨</span>
         <div>
-          <div style={{ fontSize: '.88rem', fontWeight: 500 }}>AI Upscaler — Powered by Real-ESRGAN</div>
-          <div style={{ fontSize: '.75rem', color: T.muted, marginTop: 3 }}>Upscale images 2× or 4× using AI · No account needed</div>
+          <div style={{ fontSize: '.88rem', fontWeight: 500 }}>{lang === 'fr' ? 'AI Upscaler — Propulsé par Real-ESRGAN' : 'AI Upscaler — Powered by Real-ESRGAN'}</div>
+          <div style={{ fontSize: '.75rem', color: T.muted, marginTop: 3 }}>{lang === 'fr' ? 'Agrandissez vos images 2× ou 4× grâce à l\'IA · Sans compte' : 'Upscale images 2× or 4× using AI · No account needed'}</div>
         </div>
       </div>
       <div style={{ background: `rgba(6,182,212,.06)`, border: `1.5px dashed ${T.accent}`, borderRadius: T.radius, padding: '40px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: '3rem', marginBottom: 16 }}>🔬</div>
-        <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 8, color: T.accent }}>Coming Soon</h3>
+        <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 8, color: T.accent }}>{lang === 'fr' ? 'Bientôt disponible' : 'Coming Soon'}</h3>
         <p style={{ fontSize: '.88rem', color: T.muted, maxWidth: 400, margin: '0 auto' }}>
-          AI Upscale mitaky API connection amin'ny Real-ESRGAN. Hisy amin'ny version manaraka.
+          {lang === 'fr'
+            ? "L'agrandissement par IA nécessite une connexion à l'API Real-ESRGAN. Disponible dans une prochaine version."
+            : "AI Upscale requires an API connection to Real-ESRGAN. Coming in a future version."}
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20, fontSize: '.82rem', color: T.muted }}>
-          <span>✓ 2× upscale</span><span>✓ 4× upscale</span><span>✓ 3 free/day</span>
+          <span>✓ {lang === 'fr' ? 'Agrandissement 2×' : '2× upscale'}</span><span>✓ {lang === 'fr' ? 'Agrandissement 4×' : '4× upscale'}</span><span>✓ {lang === 'fr' ? '3 gratuits/jour' : '3 free/day'}</span>
         </div>
       </div>
     </div>
@@ -1421,16 +1426,19 @@ function UpscalePanel({ T }: { T: any }) {
 //  BG REMOVE PANEL — placeholder
 // ══════════════════════════════════════════════════════════════
 function BgRemovePanel({ T }: { T: any }) {
+  const { lang } = useLang()
   return (
     <div>
       <div style={{ background: `rgba(6,182,212,.06)`, border: `1.5px dashed ${T.accent}`, borderRadius: T.radius, padding: '40px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: '3rem', marginBottom: 16 }}>🪄</div>
-        <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 8, color: T.accent }}>Coming Soon</h3>
+        <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 8, color: T.accent }}>{lang === 'fr' ? 'Bientôt disponible' : 'Coming Soon'}</h3>
         <p style={{ fontSize: '.88rem', color: T.muted, maxWidth: 400, margin: '0 auto' }}>
-          Background Remover mitaky AI model (REMBG/BRIA). Hisy amin'ny version manaraka.
+          {lang === 'fr'
+            ? "Le suppresseur d'arrière-plan nécessite un modèle IA (REMBG/BRIA). Disponible dans une prochaine version."
+            : 'Background Remover requires an AI model (REMBG/BRIA). Coming in a future version.'}
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20, fontSize: '.82rem', color: T.muted }}>
-          <span>✓ Transparent PNG</span><span>✓ Custom background</span><span>✓ In-browser</span>
+          <span>✓ {lang === 'fr' ? 'PNG transparent' : 'Transparent PNG'}</span><span>✓ {lang === 'fr' ? 'Arrière-plan personnalisé' : 'Custom background'}</span><span>✓ {lang === 'fr' ? 'Dans le navigateur' : 'In-browser'}</span>
         </div>
       </div>
     </div>
@@ -1456,7 +1464,13 @@ function RemoveMetadataPanel({ T }: { T: any }) {
     setSizeError(null)
     setFile(f); setDone(false); setResultUrl(''); setResultName('')
     // Simulate EXIF hints from file type / name (real EXIF needs a lib; canvas redraw strips it)
-    const hints = [
+    const hints = lang === 'fr' ? [
+      { label: 'Appareil photo', value: f.name.toLowerCase().includes('img') ? 'Apple iPhone' : 'Appareil inconnu' },
+      { label: 'GPS', value: 'Disponible' },
+      { label: 'Date de prise', value: new Date(f.lastModified).toLocaleDateString() },
+      { label: 'Logiciel', value: 'Inconnu' },
+      { label: 'Orientation', value: 'Normale' },
+    ] : [
       { label: 'Camera', value: f.name.toLowerCase().includes('img') ? 'Apple iPhone' : 'Unknown device' },
       { label: 'GPS', value: 'Available' },
       { label: 'Date taken', value: new Date(f.lastModified).toLocaleDateString() },
@@ -1492,8 +1506,8 @@ function RemoveMetadataPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🛡</span>
-          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>Drop your image here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>GPS · Camera · Date · EXIF — all will be removed</p>
+          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'GPS · Appareil photo · Date · EXIF — tout sera supprimé' : 'GPS · Camera · Date · EXIF — all will be removed'}</p>
         </div>
       ) : (
         <>
@@ -1501,13 +1515,13 @@ function RemoveMetadataPanel({ T }: { T: any }) {
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{file.name}</span>
             <span style={{ fontSize: '.78rem', color: T.muted, marginLeft: 4 }}>{formatBytes(file.size)}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setFile(null); setDone(false) }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setFile(null); setDone(false) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
 
           {/* EXIF preview */}
           <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, marginBottom: 20, overflow: 'hidden' }}>
             <div style={{ padding: '10px 16px', borderBottom: `1px solid ${T.border}`, fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted }}>
-              Detected Metadata
+              {lang === 'fr' ? 'Métadonnées détectées' : 'Detected Metadata'}
             </div>
             {exifPreview.map(row => (
               <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 16px', borderBottom: `1px solid ${T.border}`, fontSize: '.83rem' }}>
@@ -1518,19 +1532,19 @@ function RemoveMetadataPanel({ T }: { T: any }) {
           </div>
 
           {!done ? (
-            <button className="ih-btn-primary" onClick={strip}>🛡 Remove All Metadata</button>
+            <button className="ih-btn-primary" onClick={strip}>{lang === 'fr' ? '🛡 Supprimer toutes les métadonnées' : '🛡 Remove All Metadata'}</button>
           ) : (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', background: 'rgba(52,211,153,.08)', border: `1px solid rgba(52,211,153,.3)`, borderRadius: T.radiusSm, marginBottom: 16 }}>
                 <span style={{ fontSize: '1.2rem' }}>✅</span>
                 <div>
-                  <div style={{ fontSize: '.85rem', fontWeight: 600, color: T.success }}>Metadata removed</div>
-                  <div style={{ fontSize: '.75rem', color: T.muted, marginTop: 2 }}>GPS · Camera · EXIF — all stripped · {formatBytes(resultSize)}</div>
+                  <div style={{ fontSize: '.85rem', fontWeight: 600, color: T.success }}>{lang === 'fr' ? 'Métadonnées supprimées' : 'Metadata removed'}</div>
+                  <div style={{ fontSize: '.75rem', color: T.muted, marginTop: 2 }}>{lang === 'fr' ? `GPS · Appareil photo · EXIF — tout supprimé · ${formatBytes(resultSize)}` : `GPS · Camera · EXIF — all stripped · ${formatBytes(resultSize)}`}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
-                <a href={resultUrl} download={resultName} className="ih-btn-primary" style={{ textDecoration: 'none' }}>⬇ Download Clean Image</a>
-                <button className="ih-btn-ghost" onClick={() => { setFile(null); setDone(false) }}>↺ New Image</button>
+                <a href={resultUrl} download={resultName} className="ih-btn-primary" style={{ textDecoration: 'none' }}>{lang === 'fr' ? '⬇ Télécharger l\'image propre' : '⬇ Download Clean Image'}</a>
+                <button className="ih-btn-ghost" onClick={() => { setFile(null); setDone(false) }}>{lang === 'fr' ? '↺ Nouvelle image' : '↺ New Image'}</button>
               </div>
             </div>
           )}
@@ -1559,7 +1573,17 @@ function ExifViewerPanel({ T }: { T: any }) {
     setDims(d)
   }
 
-  const rows = file && dims ? [
+  const rows = file && dims ? (lang === 'fr' ? [
+    { label: 'Nom du fichier',  value: file.name },
+    { label: 'Taille du fichier',  value: formatBytes(file.size) },
+    { label: 'Dimensions', value: `${dims.w} × ${dims.h} px` },
+    { label: 'Type',       value: file.type || 'Inconnu' },
+    { label: 'Dernière modification', value: new Date(file.lastModified).toLocaleString() },
+    { label: 'GPS',        value: 'Disponible (supprimé à l\'export)' },
+    { label: 'Appareil photo',     value: file.name.toLowerCase().includes('img') ? 'Apple iPhone' : 'Inconnu' },
+    { label: 'Logiciel',   value: 'Inconnu' },
+    { label: 'Orientation',value: 'Normale (1)' },
+  ] : [
     { label: 'File name',  value: file.name },
     { label: 'File size',  value: formatBytes(file.size) },
     { label: 'Dimensions', value: `${dims.w} × ${dims.h} px` },
@@ -1569,7 +1593,7 @@ function ExifViewerPanel({ T }: { T: any }) {
     { label: 'Camera',     value: file.name.toLowerCase().includes('img') ? 'Apple iPhone' : 'Unknown' },
     { label: 'Software',   value: 'Unknown' },
     { label: 'Orientation',value: 'Normal (1)' },
-  ] : []
+  ]) : []
 
   return (
     <div>
@@ -1582,20 +1606,20 @@ function ExifViewerPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🔍</span>
-          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>Drop your image here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Inspect all embedded metadata</p>
+          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Inspectez toutes les métadonnées intégrées' : 'Inspect all embedded metadata'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{file.name}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => setFile(null)}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => setFile(null)}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
 
           <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, overflow: 'hidden', marginBottom: 20 }}>
             <div style={{ padding: '10px 16px', borderBottom: `1px solid ${T.border}`, fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted }}>
-              EXIF / File Info
+              {lang === 'fr' ? 'EXIF / Infos fichier' : 'EXIF / File Info'}
             </div>
             {rows.map(row => (
               <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 16px', borderBottom: `1px solid ${T.border}`, fontSize: '.83rem', gap: 12 }}>
@@ -1614,8 +1638,8 @@ function ExifViewerPanel({ T }: { T: any }) {
                 a.download = file.name.replace(/\.[^.]+$/, '') + '-clean.' + getExt(file.type || 'image/jpeg')
                 a.click()
               })
-            }}>🛡 Remove Metadata & Download</button>
-            <button className="ih-btn-ghost" onClick={() => setFile(null)}>↺ New Image</button>
+            }}>{lang === 'fr' ? '🛡 Supprimer les métadonnées et télécharger' : '🛡 Remove Metadata & Download'}</button>
+            <button className="ih-btn-ghost" onClick={() => setFile(null)}>{lang === 'fr' ? '↺ Nouvelle image' : '↺ New Image'}</button>
           </div>
         </>
       )}
@@ -1724,10 +1748,10 @@ function ScreenshotRedactPanel({ T }: { T: any }) {
     }
   }
 
-  const MODES: { v: RedactMode; label: string; icon: string }[] = [
-    { v: 'blur',     label: 'Blur',     icon: '🌫' },
-    { v: 'pixelate', label: 'Pixelate', icon: '▦' },
-    { v: 'blackout', label: 'Blackout', icon: '■' },
+  const MODES: { v: RedactMode; label: string; frLabel: string; icon: string }[] = [
+    { v: 'blur',     label: 'Blur',     frLabel: 'Flouter',    icon: '🌫' },
+    { v: 'pixelate', label: 'Pixelate', frLabel: 'Pixeliser',  icon: '▦' },
+    { v: 'blackout', label: 'Blackout', frLabel: 'Masquer',    icon: '■' },
   ]
 
   return (
@@ -1741,30 +1765,30 @@ function ScreenshotRedactPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>▓</span>
-          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>Drop your screenshot here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Blur, pixelate or black out sensitive information</p>
+          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre capture d\'écran ici' : 'Drop your screenshot here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Floutez, pixelisez ou masquez les informations sensibles' : 'Blur, pixelate or black out sensitive information'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setZones([]); setResultUrl('') }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setZones([]); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
 
           {/* Mode selector */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
             {MODES.map(m => (
               <button key={m.v} className={`ih-fit-btn${mode === m.v ? ' active' : ''}`} onClick={() => setMode(m.v)}>
-                {m.icon} {m.label}
+                {m.icon} {lang === 'fr' ? m.frLabel : m.label}
               </button>
             ))}
             {zones.length > 0 && (
-              <button className="ih-btn-ghost" style={{ padding: '8px 14px', fontSize: '.8rem', marginLeft: 'auto' }} onClick={() => { setZones([]); setResultUrl('') }}>↺ Clear All</button>
+              <button className="ih-btn-ghost" style={{ padding: '8px 14px', fontSize: '.8rem', marginLeft: 'auto' }} onClick={() => { setZones([]); setResultUrl('') }}>{lang === 'fr' ? '↺ Tout effacer' : '↺ Clear All'}</button>
             )}
           </div>
 
-          <p style={{ fontSize: '.78rem', color: T.muted, marginBottom: 10 }}>Click and drag on the image to mark areas to redact. Add as many zones as needed.</p>
+          <p style={{ fontSize: '.78rem', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Cliquez et glissez sur l\'image pour marquer les zones à masquer. Ajoutez autant de zones que nécessaire.' : 'Click and drag on the image to mark areas to redact. Add as many zones as needed.'}</p>
 
           {/* Canvas area */}
           <div ref={boxRef}
@@ -1780,20 +1804,20 @@ function ScreenshotRedactPanel({ T }: { T: any }) {
           </div>
 
           {zones.length > 0 && (
-            <div style={{ fontSize: '.78rem', color: T.muted, marginBottom: 12 }}>{zones.length} zone{zones.length > 1 ? 's' : ''} marked</div>
+            <div style={{ fontSize: '.78rem', color: T.muted, marginBottom: 12 }}>{lang === 'fr' ? `${zones.length} zone${zones.length > 1 ? 's' : ''} marquée${zones.length > 1 ? 's' : ''}` : `${zones.length} zone${zones.length > 1 ? 's' : ''} marked`}</div>
           )}
 
           <div style={{ display: 'flex', gap: 10, marginBottom: resultUrl ? 16 : 0 }}>
-            <button className="ih-btn-primary" onClick={applyRedact} disabled={zones.length === 0}>▓ Apply Redaction</button>
+            <button className="ih-btn-primary" onClick={applyRedact} disabled={zones.length === 0}>{lang === 'fr' ? '▓ Appliquer le masquage' : '▓ Apply Redaction'}</button>
           </div>
 
           {resultUrl && (
             <div style={{ marginTop: 16 }}>
-              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Result</div>
+              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Résultat' : 'Result'}</div>
               <div style={{ marginBottom: 12, borderRadius: T.radius, overflow: 'hidden', border: `1px solid ${T.border}`, background: T.surface2, maxHeight: 320, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <img src={resultUrl} style={{ maxWidth: '100%', maxHeight: 320, objectFit: 'contain' }} />
               </div>
-              <a href={resultUrl} download={fileName.replace(/\.[^.]+$/, '') + '-redacted.png'} className="ih-btn-primary" style={{ textDecoration: 'none' }}>⬇ Download Redacted Image</a>
+              <a href={resultUrl} download={fileName.replace(/\.[^.]+$/, '') + '-redacted.png'} className="ih-btn-primary" style={{ textDecoration: 'none' }}>{lang === 'fr' ? '⬇ Télécharger l\'image masquée' : '⬇ Download Redacted Image'}</a>
             </div>
           )}
         </>
@@ -1878,19 +1902,19 @@ function PaletteExtractorPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🎨</span>
-          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>Drop your image here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Extract the dominant color palette</p>
+          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Extrayez la palette de couleurs dominante' : 'Extract the dominant color palette'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPalette([]) }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPalette([]) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-            <span style={{ fontSize: '.83rem', color: T.muted }}>Colors:</span>
+            <span style={{ fontSize: '.83rem', color: T.muted }}>{lang === 'fr' ? 'Couleurs :' : 'Colors:'}</span>
             {[4, 6, 8, 10].map(n => (
               <button key={n} className={`ih-fit-btn${count === n ? ' active' : ''}`} style={{ padding: '6px 14px' }} onClick={() => setCount(n)}>{n}</button>
             ))}
@@ -1899,7 +1923,7 @@ function PaletteExtractorPanel({ T }: { T: any }) {
           {/* Palette swatches */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
             {palette.map((hex, i) => (
-              <div key={i} onClick={() => copy(hex)} title={`Copy ${hex}`}
+              <div key={i} onClick={() => copy(hex)} title={lang === 'fr' ? `Copier ${hex}` : `Copy ${hex}`}
                 style={{ cursor: 'pointer', borderRadius: T.radiusSm, overflow: 'hidden', border: `1px solid ${T.border}`, flexShrink: 0 }}>
                 <div style={{ width: 72, height: 72, background: hex }} />
                 <div style={{ padding: '5px 8px', background: T.surface, fontSize: '.7rem', fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, textAlign: 'center' }}>{hex}</div>
@@ -1910,14 +1934,14 @@ function PaletteExtractorPanel({ T }: { T: any }) {
           {/* Export */}
           <div className="ih-export-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 8 }}>CSS Variables</div>
+              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 8 }}>{lang === 'fr' ? 'Variables CSS' : 'CSS Variables'}</div>
               <pre style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: '12px 14px', fontSize: '.75rem', overflow: 'auto', margin: 0 }}>{`:root {\n${cssVars}\n}`}</pre>
-              <button className="ih-btn-ghost" style={{ marginTop: 8, padding: '7px 14px', fontSize: '.78rem' }} onClick={() => copy(`:root {\n${cssVars}\n}`)}>Copy CSS</button>
+              <button className="ih-btn-ghost" style={{ marginTop: 8, padding: '7px 14px', fontSize: '.78rem' }} onClick={() => copy(`:root {\n${cssVars}\n}`)}>{lang === 'fr' ? 'Copier le CSS' : 'Copy CSS'}</button>
             </div>
             <div>
               <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 8 }}>JSON</div>
               <pre style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: '12px 14px', fontSize: '.75rem', overflow: 'auto', margin: 0 }}>{jsonStr}</pre>
-              <button className="ih-btn-ghost" style={{ marginTop: 8, padding: '7px 14px', fontSize: '.78rem' }} onClick={() => copy(jsonStr)}>Copy JSON</button>
+              <button className="ih-btn-ghost" style={{ marginTop: 8, padding: '7px 14px', fontSize: '.78rem' }} onClick={() => copy(jsonStr)}>{lang === 'fr' ? 'Copier le JSON' : 'Copy JSON'}</button>
             </div>
           </div>
         </>
@@ -1930,17 +1954,17 @@ function PaletteExtractorPanel({ T }: { T: any }) {
 //  PASSPORT PHOTO PANEL — resize + crop + background color
 // ══════════════════════════════════════════════════════════════
 const PASSPORT_FORMATS = [
-  { label: 'Passport (35×45mm)',   w: 413,  h: 531,  copies: 6 },
-  { label: 'Passport US (2×2in)', w: 600,  h: 600,  copies: 4 },
-  { label: 'ID Card (25×35mm)',   w: 295,  h: 413,  copies: 8 },
-  { label: 'Visa (35×45mm)',      w: 413,  h: 531,  copies: 6 },
-  { label: 'CV / Profile (1:1)',  w: 800,  h: 800,  copies: 1 },
+  { label: 'Passport (35×45mm)',   frLabel: 'Passeport (35×45mm)',    w: 413,  h: 531,  copies: 6 },
+  { label: 'Passport US (2×2in)', frLabel: 'Passeport US (2×2po)',    w: 600,  h: 600,  copies: 4 },
+  { label: 'ID Card (25×35mm)',   frLabel: 'Carte d\'identité (25×35mm)', w: 295,  h: 413,  copies: 8 },
+  { label: 'Visa (35×45mm)',      frLabel: 'Visa (35×45mm)',          w: 413,  h: 531,  copies: 6 },
+  { label: 'CV / Profile (1:1)',  frLabel: 'CV / Profil (1:1)',       w: 800,  h: 800,  copies: 1 },
 ]
 const BG_COLORS = [
-  { label: 'White',      value: '#ffffff' },
-  { label: 'Light gray', value: '#f0f0f0' },
-  { label: 'Light blue', value: '#c8d8e8' },
-  { label: 'Custom',     value: '' },
+  { label: 'White',      frLabel: 'Blanc',       value: '#ffffff' },
+  { label: 'Light gray', frLabel: 'Gris clair',  value: '#f0f0f0' },
+  { label: 'Light blue', frLabel: 'Bleu clair',  value: '#c8d8e8' },
+  { label: 'Custom',     frLabel: 'Personnalisé', value: '' },
 ]
 
 function PassportPhotoPanel({ T }: { T: any }) {
@@ -2015,36 +2039,36 @@ function PassportPhotoPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🪪</span>
-          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>Drop your photo here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Generate passport or ID photos at the correct dimensions</p>
+          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre photo ici' : 'Drop your photo here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Générez des photos passeport ou d\'identité aux bonnes dimensions' : 'Generate passport or ID photos at the correct dimensions'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
 
           <div className="ih-passport-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
             <div>
-              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Format</div>
+              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Format' : 'Format'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {PASSPORT_FORMATS.map(f => (
                   <button key={f.label} className={`ih-fit-btn${format.label === f.label ? ' active' : ''}`} style={{ textAlign: 'left', padding: '8px 12px' }} onClick={() => setFormat(f)}>
-                    <span style={{ fontSize: '.83rem' }}>{f.label}</span>
+                    <span style={{ fontSize: '.83rem' }}>{lang === 'fr' ? f.frLabel : f.label}</span>
                     <span style={{ fontSize: '.7rem', color: T.muted, marginLeft: 8 }}>×{f.copies}</span>
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Background</div>
+              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Arrière-plan' : 'Background'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
                 {BG_COLORS.map(b => (
                   <button key={b.label} className={`ih-fit-btn${bgPreset.label === b.label ? ' active' : ''}`} style={{ textAlign: 'left', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setBgPreset(b)}>
                     {b.value && <span style={{ width: 16, height: 16, borderRadius: 4, background: b.value, border: `1px solid ${T.border}`, display: 'inline-block' }} />}
-                    <span style={{ fontSize: '.83rem' }}>{b.label}</span>
+                    <span style={{ fontSize: '.83rem' }}>{lang === 'fr' ? b.frLabel : b.label}</span>
                   </button>
                 ))}
               </div>
@@ -2056,7 +2080,7 @@ function PassportPhotoPanel({ T }: { T: any }) {
 
           {resultUrl && (
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>Preview — {format.copies} photos</div>
+              <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? `Aperçu — ${format.copies} photos` : `Preview — ${format.copies} photos`}</div>
               <div style={{ borderRadius: T.radius, overflow: 'hidden', border: `1px solid ${T.border}`, background: '#fff', maxHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <img src={resultUrl} style={{ maxWidth: '100%', maxHeight: 360, objectFit: 'contain' }} />
               </div>
@@ -2064,8 +2088,8 @@ function PassportPhotoPanel({ T }: { T: any }) {
           )}
 
           <div style={{ display: 'flex', gap: 10 }}>
-            {resultUrl && <a href={resultUrl} download={fileName.replace(/\.[^.]+$/, '') + '-passport.jpg'} className="ih-btn-primary" style={{ textDecoration: 'none' }}>⬇ Download Sheet</a>}
-            <button className="ih-btn-ghost" onClick={() => { setImg(null); setResultUrl('') }}>↺ New Photo</button>
+            {resultUrl && <a href={resultUrl} download={fileName.replace(/\.[^.]+$/, '') + '-passport.jpg'} className="ih-btn-primary" style={{ textDecoration: 'none' }}>{lang === 'fr' ? '⬇ Télécharger la planche' : '⬇ Download Sheet'}</a>}
+            <button className="ih-btn-ghost" onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '↺ Nouvelle photo' : '↺ New Photo'}</button>
           </div>
         </>
       )}
@@ -2077,12 +2101,12 @@ function PassportPhotoPanel({ T }: { T: any }) {
 //  FAVICON GENERATOR PANEL — multi-size PNG + .ico hint
 // ══════════════════════════════════════════════════════════════
 const FAVICON_SIZES = [
-  { size: 16,  label: 'favicon-16.png',       use: 'Browser tab (small)' },
-  { size: 32,  label: 'favicon-32.png',       use: 'Browser tab (retina)' },
-  { size: 48,  label: 'favicon-48.png',       use: 'Windows shortcut' },
-  { size: 180, label: 'apple-touch-icon.png', use: 'iOS home screen' },
-  { size: 192, label: 'icon-192.png',         use: 'Android / PWA' },
-  { size: 512, label: 'icon-512.png',         use: 'Splash screen / PWA' },
+  { size: 16,  label: 'favicon-16.png',       use: 'Browser tab (small)', frUse: 'Onglet navigateur (petit)' },
+  { size: 32,  label: 'favicon-32.png',       use: 'Browser tab (retina)', frUse: 'Onglet navigateur (retina)' },
+  { size: 48,  label: 'favicon-48.png',       use: 'Windows shortcut', frUse: 'Raccourci Windows' },
+  { size: 180, label: 'apple-touch-icon.png', use: 'iOS home screen', frUse: 'Écran d\'accueil iOS' },
+  { size: 192, label: 'icon-192.png',         use: 'Android / PWA', frUse: 'Android / PWA' },
+  { size: 512, label: 'icon-512.png',         use: 'Splash screen / PWA', frUse: 'Écran de démarrage / PWA' },
 ]
 
 function FaviconPanel({ T }: { T: any }) {
@@ -2108,12 +2132,12 @@ function FaviconPanel({ T }: { T: any }) {
     try {
       const results: typeof previews = []
       let done = 0
-      FAVICON_SIZES.forEach(({ size, label, use }) => {
+      FAVICON_SIZES.forEach(({ size, label, use, frUse }) => {
         const c = document.createElement('canvas')
         c.width = size; c.height = size
         c.getContext('2d')!.drawImage(image, 0, 0, size, size)
         c.toBlob(blob => {
-          if (blob) results.push({ size, url: URL.createObjectURL(blob), label, use })
+          if (blob) results.push({ size, url: URL.createObjectURL(blob), label, use: lang === 'fr' ? frUse : use })
           done++
           if (done === FAVICON_SIZES.length) {
             if (!results.length) { setSizeError(processErrorMsg(lang)); return }
@@ -2156,15 +2180,15 @@ function FaviconPanel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*,image/svg+xml" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>⭐</span>
-          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>Drop your logo here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Generates all favicon sizes — PNG + HTML snippet</p>
+          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre logo ici' : 'Drop your logo here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Génère toutes les tailles de favicon — PNG + extrait HTML' : 'Generates all favicon sizes — PNG + HTML snippet'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
             <span style={{ fontSize: '1.2rem' }}>🖼</span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPreviews([]) }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPreviews([]) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
 
           {previews.length > 0 && (
@@ -2185,7 +2209,7 @@ function FaviconPanel({ T }: { T: any }) {
               </div>
 
               <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: '12px 16px', marginBottom: 20 }}>
-                <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 8 }}>HTML — paste in {'<head>'}</div>
+                <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 8 }}>{lang === 'fr' ? 'HTML — à coller dans' : 'HTML — paste in'} {'<head>'}</div>
                 <pre style={{ margin: 0, fontSize: '.73rem', overflowX: 'auto', color: T.text }}>{FAVICON_SIZES.map(({ size, label }) =>
                   size === 180
                     ? `<link rel="apple-touch-icon" href="/${label}">`
@@ -2194,8 +2218,8 @@ function FaviconPanel({ T }: { T: any }) {
               </div>
 
               <div style={{ display: 'flex', gap: 10 }}>
-                <button className="ih-btn-primary" onClick={downloadAll}>⬇ Download All as ZIP</button>
-                <button className="ih-btn-ghost" onClick={() => { setImg(null); setPreviews([]) }}>↺ New Logo</button>
+                <button className="ih-btn-primary" onClick={downloadAll}>{lang === 'fr' ? '⬇ Tout télécharger (ZIP)' : '⬇ Download All as ZIP'}</button>
+                <button className="ih-btn-ghost" onClick={() => { setImg(null); setPreviews([]) }}>{lang === 'fr' ? '↺ Nouveau logo' : '↺ New Logo'}</button>
               </div>
             </>
           )}
@@ -2234,7 +2258,12 @@ function Base64Panel({ T }: { T: any }) {
   const htmlSnippet = dataUri ? `<img src="${dataUri.slice(0, 60)}..." alt="${file?.name}" />` : ''
   const cssSnippet = dataUri ? `background-image: url("${dataUri.slice(0, 60)}...");` : ''
 
-  const snippets = [
+  const snippets = lang === 'fr' ? [
+    { label: 'Data URI', value: dataUri, copyLabel: 'Copier la Data URI' },
+    { label: 'Base64 seul', value: base64Only, copyLabel: 'Copier le Base64' },
+    { label: 'HTML <img>', value: dataUri ? `<img src="${dataUri}" alt="${file?.name}" />` : '', copyLabel: 'Copier le HTML' },
+    { label: 'CSS background', value: dataUri ? `background-image: url("${dataUri}");` : '', copyLabel: 'Copier le CSS' },
+  ] : [
     { label: 'Data URI', value: dataUri, copyLabel: 'Copy Data URI' },
     { label: 'Base64 only', value: base64Only, copyLabel: 'Copy Base64' },
     { label: 'HTML <img>', value: dataUri ? `<img src="${dataUri}" alt="${file?.name}" />` : '', copyLabel: 'Copy HTML' },
@@ -2252,8 +2281,8 @@ function Base64Panel({ T }: { T: any }) {
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
           <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>{'{}'}</span>
-          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>Drop your image here</h3>
-          <p style={{ fontSize: '.85rem', color: T.muted }}>Convert to Base64 Data URI — for HTML, CSS, or JS</p>
+          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
+          <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Convertissez en Data URI Base64 — pour HTML, CSS ou JS' : 'Convert to Base64 Data URI — for HTML, CSS, or JS'}</p>
         </div>
       ) : (
         <>
@@ -2266,11 +2295,11 @@ function Base64Panel({ T }: { T: any }) {
                 {dataUri && <> · Base64: <span style={{ color: T.accent, fontWeight: 600 }}>{formatBytes(dataUri.length)}</span></>}
               </div>
             </div>
-            <button className="ih-btn-ghost" style={{ padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setFile(null); setDataUri('') }}>✕ Change</button>
+            <button className="ih-btn-ghost" style={{ padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setFile(null); setDataUri('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
           </div>
 
           {!dataUri ? (
-            <p style={{ color: T.muted, fontSize: '.85rem' }}>Converting…</p>
+            <p style={{ color: T.muted, fontSize: '.85rem' }}>{lang === 'fr' ? 'Conversion en cours…' : 'Converting…'}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {snippets.map(s => (

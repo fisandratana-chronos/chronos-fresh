@@ -458,7 +458,10 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                 fontSize:13,transition:"all .12s"}}>
               <span style={{fontSize:14}}>{cat.icon}</span>
               <span>{cat.label}</span>
-              <span style={{marginLeft:"auto",fontSize:10,color:activeCat===cat.id?T.amberL:T.txt4}}>
+              <span style={{marginLeft:"auto",fontSize:10,fontWeight:600,
+                padding:"1px 7px",borderRadius:10,
+                background:activeCat===cat.id?`${T.amber}22`:T.bg3,
+                color:activeCat===cat.id?T.amber:T.txt3}}>
                 {cat.id==="all"?TOOLS.length
                   :cat.id==="favorites"?favorites.length
                   :cat.id==="recent"?recent.length
@@ -530,10 +533,20 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                 ? <NativeAdCard key="native-ad"/>
                 : (
                   <div key={item.data.id}
+                    onMouseEnter={e=>{
+                      e.currentTarget.style.transform="translateY(-2px)";
+                      e.currentTarget.style.boxShadow="0 8px 20px rgba(0,0,0,0.12)";
+                      e.currentTarget.style.borderColor=activeTool===item.data.id?T.amber:`${T.amber}60`;
+                    }}
+                    onMouseLeave={e=>{
+                      e.currentTarget.style.transform="none";
+                      e.currentTarget.style.boxShadow="none";
+                      e.currentTarget.style.borderColor=activeTool===item.data.id?T.amber:T.border;
+                    }}
                     style={{display:"flex",flexDirection:"column",position:"relative",
                       border:`1px solid ${activeTool===item.data.id?T.amber:T.border}`,
                       background:activeTool===item.data.id?`${T.amber}08`:T.bg1,
-                      borderRadius:12,overflow:"hidden",transition:"all .15s",
+                      borderRadius:12,overflow:"hidden",transition:"transform .15s, box-shadow .15s, border-color .15s",
                       cursor:"pointer"}}
                     onClick={() => {
                       const slug = ID_TO_SLUG[item.data.id];
@@ -558,7 +571,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                       <div style={{width:52,height:52,borderRadius:"50%",
                         background:activeTool===item.data.id?`${T.amber}20`:`${T.bg3}`,
                         display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>
-                        {item.data.icon}
+                        {item.data.icon || "🧮"}
                       </div>
                       <div style={{textAlign:"center"}}>
                         <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,fontSize:13,
@@ -575,8 +588,11 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                     </div>
                     {/* Open tool button */}
                     <div style={{padding:"0 16px 14px"}}>
-                      <div style={{display:"flex",alignItems:"center",gap:4,
-                        color:T.blue,fontFamily:"Inter,sans-serif",fontSize:12,fontWeight:600}}>
+                      <div style={{display:"inline-flex",alignItems:"center",gap:4,
+                        padding:"5px 10px",borderRadius:20,
+                        background:activeTool===item.data.id?`${T.amber}18`:`${T.blue}12`,
+                        color:activeTool===item.data.id?T.amber:T.blue,
+                        fontFamily:"Inter,sans-serif",fontSize:12,fontWeight:600}}>
                         Open tool <span style={{fontSize:14}}>→</span>
                       </div>
                     </div>
@@ -1159,11 +1175,14 @@ function AdSlot({ size="728×90", label="Advertisement", slot=ADSENSE_CONFIG.slo
   if(ADSENSE_CONFIG.placeholderMode) return (
     <div style={{
       border:`1px dashed ${T.border}`,borderRadius:10,
-      minHeight:minH, display:"flex", alignItems:"center", justifyContent:"center",
-      opacity: 0.35,
+      minHeight:minH, display:"flex", flexDirection:"column", gap:4,
+      alignItems:"center", justifyContent:"center",
+      background:T.bg2,
     }}>
-      <span style={{fontFamily:"Inter,sans-serif",fontSize:10,letterSpacing:"0.12em",
-        color:T.txt4,textTransform:"uppercase"}}>{label} · {size}</span>
+      <span style={{fontSize:14,opacity:0.5}}>📢</span>
+      <span style={{fontFamily:"Inter,sans-serif",fontSize:10,letterSpacing:"0.08em",
+        color:T.txt3,textTransform:"uppercase",fontWeight:600}}>{label}</span>
+      <span style={{fontFamily:"Inter,sans-serif",fontSize:9,color:T.txt4}}>{size}</span>
     </div>
   );
 

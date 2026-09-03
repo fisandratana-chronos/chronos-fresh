@@ -9,6 +9,7 @@
 // tool string in EN + FR lives in DICT below.
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 
 type Lang = 'en' | 'fr'
 
@@ -850,6 +851,7 @@ export function LangProvider({
   // vakiana) intsony.
   initialLang?: Lang
 }) {
+  const router = useRouter()
   const [lang, setLangState] = useState<Lang>(initialLang ?? 'en')
 
   // Restore saved language on mount (client-only — localStorage isn't
@@ -872,7 +874,14 @@ export function LangProvider({
     try {
       document.cookie = `ch-lang=${l}; path=/; max-age=31536000; SameSite=Lax`
     } catch {}
-  }, [])
+    // Manery an'i Next.js hamerina maka ny votoaty server (RSC
+    // payload, metadata) mifanaraka amin'ny cookie vaovao — raha
+    // tsy izao, ny "router cache" ao amin'ny client dia mitazona
+    // ilay votoaty taloha (tamin'ny teny teo aloha) rehefa
+    // mifindra pejy amin'ny alalan'ny navigation client-side, na
+    // dia efa niova aza ny cookie sy ilay state client.
+    router.refresh()
+  }, [router])
 
   const t = useCallback((key: string): string => {
     const dict = DICT[lang] as Record<string, string>

@@ -3,7 +3,9 @@
 // task (simple, avoids message-routing bugs for a UI where one
 // operation runs at a time) and terminates it when done.
 
-export type PdfWorkerType = 'merge' | 'split' | 'compress' | 'rotate' | 'jpgToPdf' | 'pdfToJpg';
+export type PdfWorkerType =
+  | 'merge' | 'split' | 'compress' | 'rotate' | 'jpgToPdf' | 'pdfToJpg'
+  | 'removePages' | 'rearrangePages' | 'watermark' | 'protect' | 'unlock';
 
 export function runPdfWorkerTask<T = any>(
   type: PdfWorkerType,

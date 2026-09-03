@@ -12,35 +12,76 @@
 import React from 'react'
 import * as PDFLib from 'pdf-lib'
 import { useLang } from '../../lib/hooks/useLang'
+import { useDark } from '../../lib/hooks/useDark'
+import { DARK, LIGHT } from '../../lib/theme'
 import { BP } from '../../lib/breakpoints'
 import { PDF_SEO_CONTENT } from '../../lib/pdfSeoContent'
-import { compressPdfImages, COMPRESS_PRESETS } from '../../lib/pdf/compressImages'
+import { COMPRESS_PRESETS, type CompressResult } from '../../lib/pdf/compressImages'
 import { runPdfWorkerTask } from '../../lib/pdf/usePdfWorker';
 
 // ── Theme tokens — CHRONOS design system ──
 
-const C = {
-  bg:      "#090b0f",
-  panel:   "#11161d",
-  panel2:  "#171d26",
-  border:  "#28313d",
-  text:    "#f5f2eb",
-  muted:   "#8b94a1",
-  accent:  "#06B6D4",   // cyan — itovizana amin'ny Converters/Calculators (CHRONOS brand accent)
-  hot:     "#ff6b55",   // coral/red
-  green:   "#63d39b",
-  err:     "#ff6b55",
-  warn:    "#f2a63b",
-};
+// Loko (palette) miova arakaraka ny dark/light state — nalaina avy
+// amin'ny DARK/LIGHT ao amin'ny lib/theme.ts mba hifanaraka amin'ny
+// toggle any amin'ny Nav (tsy hardcoded intsony).
+function buildPalette(dark: boolean) {
+  const T = dark ? DARK : LIGHT
+  return {
+    bg:      T.bg0,
+    panel:   T.bg1,
+    panel2:  T.bg2,
+    border:  T.border,
+    text:    T.txt,
+    muted:   T.txt2,
+    accent:  T.cyan,
+    hot:     T.red,
+    green:   T.emerald,
+    err:     T.red,
+    warn:    dark ? "#f2a63b" : "#B45309",
+    muted2:      T.txt3,   // softer secondary text (labels, footer, breadcrumbs)
+    surfaceAlt:  T.bg3,    // inputs / icon boxes — distinct from panel/panel2
+    borderSoft:  T.borderHov,
+    cardGradFrom: T.bg2,   // gradient start for cards/tool-panel (was hardcoded dark)
+    sidebarBg:   dark ? "rgba(12,15,21,.72)" : "rgba(255,255,255,.82)",
+    tipBorder:   dark ? "#3b3427" : "#FCD34D66",
+    tipText:     dark ? "#9f9887" : "#92400E",
+    greenBorder: `${T.emerald}40`,
+  }
+}
 
-// Fonts injected once via a <style> tag inside the component
-const FONT_STYLE = `
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
-`;
+// Fonts — loaded via <link>, not @import.
+// @import inside an injected <style> tag forces the browser to discover the
+// font stylesheet only after that inline <style> is parsed: an extra,
+// serialized round-trip before the font request can even start.
+// <link rel="preconnect"> + <link rel="stylesheet"> let the browser open the
+// connection to fonts.googleapis.com immediately, in parallel with the rest
+// of the page. (If this app has a root document/layout you control — e.g.
+// a Next.js app/layout.tsx — moving these two <link> tags there is even
+// better than injecting them from a client component.)
+const FONT_HREF =
+  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap";
+
+function useChronosFonts() {
+  React.useEffect(() => {
+    if (document.getElementById("chronos-fonts")) return;
+    const pre1 = document.createElement("link");
+    pre1.rel = "preconnect";
+    pre1.href = "https://fonts.googleapis.com";
+    const pre2 = document.createElement("link");
+    pre2.rel = "preconnect";
+    pre2.href = "https://fonts.gstatic.com";
+    pre2.crossOrigin = "anonymous";
+    const sheet = document.createElement("link");
+    sheet.id = "chronos-fonts";
+    sheet.rel = "stylesheet";
+    sheet.href = FONT_HREF;
+    document.head.append(pre1, pre2, sheet);
+  }, []);
+}
 
 // Mobile breakpoint rules. Inline styles below have higher specificity than
 // plain selectors, so these use !important to override at ≤880px / ≤560px.
-const RESPONSIVE_STYLE = `
+function buildResponsiveStyle(C: ReturnType<typeof buildPalette>) { return `
   @media (max-width: ${BP.tablet}px) {
     .chronos-shell { grid-template-columns: 1fr !important; }
     .chronos-sidebar {
@@ -70,7 +111,7 @@ const RESPONSIVE_STYLE = `
     .chronos-related-grid { grid-template-columns: 1fr !important; }
     .chronos-hero-title { font-size: 28px !important; }
   }
-`;
+` }
 
 // ── Tab configuration ──
 
@@ -82,18 +123,35 @@ const PDF_TABS = [
   { id: "pdf2jpg",   icon: "▤",  en: "PDF → JPG",    fr: "PDF → JPG",        group: "convert",  enDesc: "Convert PDF pages to images",           frDesc: "Convertir les pages PDF en images" },
   { id: "pdf2word",  icon: "W",  en: "PDF → Word",   fr: "PDF → Word",       group: "convert",  enDesc: "Extract text content from PDF",         frDesc: "Extraire le contenu texte d'un PDF" },
   { id: "pdf2excel", icon: "X",  en: "PDF → Excel",  fr: "PDF → Excel",      group: "convert",  enDesc: "Extract tables from PDF",               frDesc: "Extraire les tableaux d'un PDF" },
+  { id: "html2pdf",  icon: "◫",  en: "HTML → PDF",   fr: "HTML → PDF",       group: "convert",  enDesc: "Convert HTML content to a PDF document", frDesc: "Convertir du contenu HTML en document PDF" },
   { id: "rotate",    icon: "↻",  en: "Rotate PDF",   fr: "Pivoter PDF",      group: "other",    enDesc: "Rotate pages 90°, 180° or 270°",       frDesc: "Faire pivoter les pages 90°, 180° ou 270°" },
+  { id: "removepages", icon: "🗑", en: "Remove pages", fr: "Supprimer des pages", group: "other", enDesc: "Delete the pages you don't need",     frDesc: "Supprimer les pages dont vous n'avez pas besoin" },
+  { id: "rearrange", icon: "⇅",  en: "Rearrange pages", fr: "Réorganiser les pages", group: "other", enDesc: "Reorder the pages of a PDF",        frDesc: "Réorganiser les pages d'un PDF" },
+  { id: "watermark", icon: "◈",  en: "Add watermark", fr: "Ajouter un filigrane", group: "other",  enDesc: "Stamp text or an image over your PDF", frDesc: "Apposer du texte ou une image sur votre PDF" },
+  { id: "protect",   icon: "🔒", en: "Protect PDF",  fr: "Protéger PDF",     group: "security", enDesc: "Encrypt your PDF with a password",      frDesc: "Chiffrer votre PDF avec un mot de passe" },
+  { id: "unlock",    icon: "🔓", en: "Unlock PDF",   fr: "Déverrouiller PDF", group: "security", enDesc: "Remove PDF password security",         frDesc: "Supprimer la protection par mot de passe" },
 ];
 
 const GROUPS = [
-  { key: "popular", en: "Popular",  fr: "Populaires" },
-  { key: "convert", en: "Convert",  fr: "Convertir"  },
-  { key: "other",   en: "Other",    fr: "Autres"     },
+  { key: "popular",  en: "Popular",  fr: "Populaires" },
+  { key: "convert",  en: "Convert",  fr: "Convertir"  },
+  { key: "security", en: "Security", fr: "Sécurité"   },
+  { key: "other",    en: "Other",    fr: "Autres"     },
 ];
+
+// PDF_TABS never changes at runtime, so these derived lists are computed
+// once at module load instead of with `.filter()` on every PdfHub render.
+const POPULAR_TABS  = PDF_TABS.filter(t => t.group === "popular");
+const CONVERT_TABS  = PDF_TABS.filter(t => t.group === "convert");
+const SECURITY_TABS = PDF_TABS.filter(t => t.group === "security");
+const OTHER_TABS    = PDF_TABS.filter(t => t.group === "other");
 
 // ── Shared style helpers ──
 
-const s = {
+// Style helpers — atao FONCTION mandray ny C ankehitriny (dark/light)
+// mba tsy ho "frozen" amin'ny loko maizina hatrany (izay olana taloha).
+function buildStyles(C: ReturnType<typeof buildPalette>) {
+  return {
   // File row inside the queue
   fileRow: {
     display: "grid",
@@ -118,7 +176,7 @@ const s = {
   cta: (disabled = false) => ({
     width: "100%", height: 42, border: 0, borderRadius: 9,
     background: disabled
-      ? "#2a3040"
+      ? C.surfaceAlt
       : `linear-gradient(135deg, #22D3EE, ${C.accent})`,
     color: disabled ? C.muted : "#17110b",
     fontWeight: 700, fontSize: 13, cursor: disabled ? "not-allowed" : "pointer",
@@ -145,8 +203,8 @@ const s = {
 
   input: {
     width: "100%", height: 38,
-    border: `1px solid #303946`, borderRadius: 8,
-    background: "#0e1319", color: C.text,
+    border: `1px solid ${C.border}`, borderRadius: 8,
+    background: C.surfaceAlt, color: C.text,
     padding: "0 10px", fontSize: 13,
     fontFamily: "'DM Sans', sans-serif",
     outline: "none",
@@ -158,7 +216,13 @@ const s = {
     letterSpacing: "0.1em", textTransform: "uppercase" as const,
     marginBottom: 5,
   } as React.CSSProperties,
-};
+  }
+}
+
+// Context izay mamindra ny {C, s} amin'ireo tab/component rehetra
+// (Merge, Split, Compress, ...) — izy ity no mameno ilay tsy
+// fahampian'ny C/s hardcoded taloha.
+const PdfThemeCtx = React.createContext({ C: buildPalette(true), s: buildStyles(buildPalette(true)) })
 
 // ── Shared UI components ──
 
@@ -168,6 +232,7 @@ function PdfDropZone({ accept, multiple, onFiles, label, hint, maxSizeMB = 100, 
   label: string, hint: string,
   maxSizeMB?: number, lang?: string,
 }) {
+  const { C } = React.useContext(PdfThemeCtx)
   const [drag, setDrag] = React.useState(false);
   const [sizeError, setSizeError] = React.useState<string | null>(null);
   const ref = React.useRef<HTMLInputElement>(null);
@@ -200,11 +265,11 @@ function PdfDropZone({ accept, multiple, onFiles, label, hint, maxSizeMB = 100, 
       onDrop={e => { e.preventDefault(); setDrag(false); handle(e.dataTransfer.files); }}
       style={{
         height: 220,
-        border: `1px dashed ${drag ? C.accent : "#3a4655"}`,
+        border: `1px dashed ${drag ? C.accent : C.border}`,
         borderRadius: 16,
         background: drag
           ? `radial-gradient(circle at center,${C.accent}10,transparent 60%),${C.panel}`
-          : `radial-gradient(circle at center,${C.accent}07,transparent 58%),#11161e`,
+          : `radial-gradient(circle at center,${C.accent}07,transparent 58%),${C.panel}`,
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
         textAlign: "center", cursor: "pointer",
@@ -214,8 +279,8 @@ function PdfDropZone({ accept, multiple, onFiles, label, hint, maxSizeMB = 100, 
       <input ref={ref} type="file" accept={accept?.join(",")} multiple={multiple}
         style={{ display: "none" }} onChange={e => handle(e.target.files!)} />
       <div style={{
-        width: 50, height: 50, border: `1px solid #3a4653`,
-        borderRadius: 14, background: "#1a2029",
+        width: 50, height: 50, border: `1px solid ${C.borderSoft}`,
+        borderRadius: 14, background: C.surfaceAlt,
         display: "grid", placeItems: "center",
         color: C.accent, fontSize: 22, marginBottom: 12,
       }}>↥</div>
@@ -233,7 +298,7 @@ function PdfDropZone({ accept, multiple, onFiles, label, hint, maxSizeMB = 100, 
         }}>
         ▱ &nbsp; Choose files
       </button>
-      <small style={{ fontSize: 9, color: "#626d79", marginTop: 10 }}>
+      <small style={{ fontSize: 9, color: C.muted2, marginTop: 10 }}>
         {accept?.join(" · ").toUpperCase()} · {lang === "fr" ? `Jusqu'à ${maxSizeMB} MB chacun` : `Up to ${maxSizeMB} MB each`}
       </small>
     </div>
@@ -257,6 +322,7 @@ function PdfFileList({ files, onRemove, onMoveUp, onMoveDown }: {
   onMoveUp?: (i: number) => void,
   onMoveDown?: (i: number) => void,
 }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
   const fmtSize = (b: number) => b < 1048576 ? (b / 1024).toFixed(1) + " KB" : (b / 1048576).toFixed(2) + " MB";
   return (
     <div>
@@ -271,7 +337,7 @@ function PdfFileList({ files, onRemove, onMoveUp, onMoveDown }: {
       </div>
       {files.map((f, i) => (
         <div key={i} style={s.fileRow} draggable>
-          <span style={{ color: "#697381", fontSize: 14, cursor: "grab" }}>⋮⋮</span>
+          <span style={{ color: C.muted2, fontSize: 14, cursor: "grab" }}>⋮⋮</span>
           <div style={s.pdfBadge}>PDF</div>
           <div>
             <div style={{ fontSize: 11, color: C.text }}>{f.name}</div>
@@ -298,6 +364,7 @@ function PdfFileList({ files, onRemove, onMoveUp, onMoveDown }: {
 }
 
 function SingleFileRow({ file, onClear }: { file: File, onClear: () => void }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
   const fmtSize = (b: number) => (b / 1048576).toFixed(2) + " MB";
   return (
     <div style={{ ...s.fileRow, gridTemplateColumns: "35px 1fr auto" }}>
@@ -312,6 +379,7 @@ function SingleFileRow({ file, onClear }: { file: File, onClear: () => void }) {
 }
 
 function PdfStatus({ status, message }: { status: string | null, message: string }) {
+  const { C } = React.useContext(PdfThemeCtx)
   if (!status) return null;
   const color = status === "ok" ? C.green : status === "err" ? C.hot : C.accent;
   const icon = status === "ok" ? "✓" : status === "err" ? "✕" : "⏳";
@@ -351,6 +419,16 @@ async function loadJSZip() {
   const { default: JSZip } = await import('jszip');
   return JSZip;
 }
+// Dynamically imported the same way as pdfjs-dist/jszip above — only loaded
+// when the HTML→PDF tab is actually used.
+async function loadHtml2Canvas() {
+  const { default: html2canvas } = await import('html2canvas');
+  return html2canvas;
+}
+async function loadJsPDF() {
+  const { jsPDF } = await import('jspdf');
+  return jsPDF;
+}
 
 // Map raw pdf-lib / pdfjs error text to a friendly, on-brand, bilingual message.
 function friendlyError(e: any, lang: string): string {
@@ -376,6 +454,21 @@ function friendlyError(e: any, lang: string): string {
     : "Something went wrong. Check the file and try again.";
 }
 
+// friendlyError()'s "password" branch says "remove the protection before
+// continuing" — correct advice for every other tab, but backwards for the
+// Unlock tab, whose entire job is entering that password. A failed unlock
+// almost always just means the password was wrong, so this overrides that
+// one branch instead of reusing friendlyError() directly.
+function unlockError(e: any, lang: string): string {
+  const raw = String(e?.message || e || "").toLowerCase();
+  if (raw.includes("password") || raw.includes("decrypt")) {
+    return lang === "fr"
+      ? "Mot de passe incorrect — vérifiez et réessayez."
+      : "Incorrect password — please check and try again.";
+  }
+  return friendlyError(e, lang);
+}
+
 // ── How it works card ──
 
 function HowItWorksCard({ steps, tip, lang }: {
@@ -383,10 +476,11 @@ function HowItWorksCard({ steps, tip, lang }: {
   tip?: { en: string, fr: string },
   lang: string,
 }) {
+  const { C } = React.useContext(PdfThemeCtx)
   return (
     <div style={{
       border: `1px solid ${C.border}`, borderRadius: 14,
-      background: `linear-gradient(#151a22, #11161d)`, overflow: "hidden",
+      background: `linear-gradient(${C.cardGradFrom}, ${C.panel})`, overflow: "hidden",
     }}>
       <div style={{
         padding: "12px 16px", borderBottom: `1px solid ${C.border}`,
@@ -402,7 +496,7 @@ function HowItWorksCard({ steps, tip, lang }: {
           <div key={i} style={{ display: "flex", gap: 10, padding: "11px 0" }}>
             <span style={{
               width: 23, height: 23, flexShrink: 0,
-              border: `1px solid #4b5664`, borderRadius: "50%",
+              border: `1px solid ${C.borderSoft}`, borderRadius: "50%",
               display: "grid", placeItems: "center",
               color: C.accent, fontSize: 10,
             }}>{i + 1}</span>
@@ -410,7 +504,7 @@ function HowItWorksCard({ steps, tip, lang }: {
               <div style={{ fontSize: 11, fontWeight: 700, color: C.text }}>
                 {lang === "fr" ? step.fr : step.en}
               </div>
-              <div style={{ fontSize: 9, color: "#747e8a", marginTop: 3 }}>
+              <div style={{ fontSize: 9, color: C.muted2, marginTop: 3 }}>
                 {lang === "fr" ? step.descFr : step.descEn}
               </div>
             </div>
@@ -418,9 +512,9 @@ function HowItWorksCard({ steps, tip, lang }: {
         ))}
         {tip && (
           <div style={{
-            padding: "10px 11px", border: `1px solid #3b3427`,
+            padding: "10px 11px", border: `1px solid ${C.tipBorder}`,
             background: `${C.accent}06`, borderRadius: 9,
-            color: "#9f9887", fontSize: 9,
+            color: C.tipText, fontSize: 9,
           }}>
             <span style={{ color: C.accent, fontWeight: 700, display: "block", marginBottom: 3 }}>
               💡 {lang === "fr" ? "Conseil" : "Tip"}
@@ -441,6 +535,7 @@ function HowItWorksCard({ steps, tip, lang }: {
 // rest of this component.
 
 function PdfFaqItem({ q, a, last }: { q: string, a: string, last?: boolean }) {
+  const { C } = React.useContext(PdfThemeCtx)
   const [open, setOpen] = React.useState(false);
   return (
     <div style={{ borderBottom: last ? "none" : `1px solid ${C.border}` }}>
@@ -456,7 +551,7 @@ function PdfFaqItem({ q, a, last }: { q: string, a: string, last?: boolean }) {
         }}>▾</span>
       </button>
       {open && (
-        <p style={{ fontSize: 12.5, color: "#9aa3ae", lineHeight: 1.7, margin: "0 0 15px", fontFamily: "'DM Sans', sans-serif" }}>
+        <p style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, margin: "0 0 15px", fontFamily: "'DM Sans', sans-serif" }}>
           {a}
         </p>
       )}
@@ -464,7 +559,33 @@ function PdfFaqItem({ q, a, last }: { q: string, a: string, last?: boolean }) {
   );
 }
 
+// SeoH2 / SeoP are top-level components (not defined inside PdfSeoContent's
+// render body) so React keeps treating them as the same component type
+// across renders and can diff their DOM instead of remounting it. They pull
+// C from context themselves since they're always rendered under
+// PdfThemeCtx.Provider anyway.
+function SeoH2({ children }: { children: React.ReactNode }) {
+  const { C } = React.useContext(PdfThemeCtx)
+  return (
+    <h2 style={{
+      fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 22,
+      color: C.text, marginBottom: 10, marginTop: 26, lineHeight: 1.3,
+    }}>
+      {children}
+    </h2>
+  );
+}
+function SeoP({ children }: { children: React.ReactNode }) {
+  const { C } = React.useContext(PdfThemeCtx)
+  return (
+    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13.5, color: C.muted, lineHeight: 1.75, margin: 0 }}>
+      {children}
+    </p>
+  );
+}
+
 function PdfSeoContent({ toolId, lang }: { toolId: string, lang: string }) {
+  const { C } = React.useContext(PdfThemeCtx)
   const content = PDF_SEO_CONTENT[toolId];
   if (!content) return null;
 
@@ -473,25 +594,11 @@ function PdfSeoContent({ toolId, lang }: { toolId: string, lang: string }) {
   const examples = lang === "fr" ? content.frExamples : content.examples;
   const faq = lang === "fr" ? content.frFaq : content.faq;
 
-  const H2 = ({ children }: { children: React.ReactNode }) => (
-    <h2 style={{
-      fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 22,
-      color: C.text, marginBottom: 10, marginTop: 26, lineHeight: 1.3,
-    }}>
-      {children}
-    </h2>
-  );
-  const P = ({ children }: { children: React.ReactNode }) => (
-    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13.5, color: C.muted, lineHeight: 1.75, margin: 0 }}>
-      {children}
-    </p>
-  );
-
   return (
     <article style={{
       marginTop: 26, padding: "26px 24px",
       border: `1px solid ${C.border}`, borderRadius: 16,
-      background: `linear-gradient(#131820, ${C.panel})`,
+      background: `linear-gradient(${C.cardGradFrom}, ${C.panel})`,
     }}>
       <h1 style={{
         fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 27,
@@ -500,15 +607,15 @@ function PdfSeoContent({ toolId, lang }: { toolId: string, lang: string }) {
         {getText("title")}
       </h1>
 
-      <H2>{lang === "fr" ? "Qu'est-ce que c'est ?" : "What is it?"}</H2>
-      <P>{getText("what")}</P>
+      <SeoH2>{lang === "fr" ? "Qu'est-ce que c'est ?" : "What is it?"}</SeoH2>
+      <SeoP>{getText("what")}</SeoP>
 
-      <H2>{lang === "fr" ? "Comment ça marche" : "How it works"}</H2>
-      <P>{getText("how")}</P>
+      <SeoH2>{lang === "fr" ? "Comment ça marche" : "How it works"}</SeoH2>
+      <SeoP>{getText("how")}</SeoP>
 
       {examples?.length > 0 && (
         <>
-          <H2>{lang === "fr" ? "Exemples" : "Examples"}</H2>
+          <SeoH2>{lang === "fr" ? "Exemples" : "Examples"}</SeoH2>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {examples.map((ex, i) => (
               <div key={i} style={{
@@ -523,7 +630,7 @@ function PdfSeoContent({ toolId, lang }: { toolId: string, lang: string }) {
                   <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 12, color: C.text, display: "block", marginBottom: 2 }}>
                     {ex.label}
                   </span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "#9aa3ae" }}>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted }}>
                     {ex.input}
                     <span style={{ margin: "0 6px" }}>→</span>
                     <span style={{ color: C.green, fontWeight: 500 }}>{ex.result}</span>
@@ -537,7 +644,7 @@ function PdfSeoContent({ toolId, lang }: { toolId: string, lang: string }) {
 
       {faq?.length > 0 && (
         <>
-          <H2>{lang === "fr" ? "Questions fréquentes" : "Frequently asked questions"}</H2>
+          <SeoH2>{lang === "fr" ? "Questions fréquentes" : "Frequently asked questions"}</SeoH2>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {faq.map((item, i) => (
               <PdfFaqItem key={i} q={item.q} a={item.a} last={i === faq.length - 1} />
@@ -552,6 +659,7 @@ function PdfSeoContent({ toolId, lang }: { toolId: string, lang: string }) {
 // ── Tool tabs (logic unchanged, UI refreshed) ──
 
 function PdfMergeTab({ lang }: { lang: string }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
   const [files, setFiles] = React.useState<File[]>([]);
   const [outName, setOutName] = React.useState("merged.pdf");
   const [st, setSt] = React.useState<string | null>(null);
@@ -560,18 +668,17 @@ function PdfMergeTab({ lang }: { lang: string }) {
   const remove = (i: number) => setFiles(p => p.filter((_, j) => j !== i));
   const up = (i: number) => setFiles(p => { const a = [...p]; [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a; });
   const dn = (i: number) => setFiles(p => { const a = [...p]; [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a; });
+  // Runs the actual pdf-lib merge in the dedicated worker (lib/pdf/pdfWorker.ts,
+  // task 'merge') instead of the main thread — large/many files no longer
+  // freeze the tab. The ArrayBuffers are transferred (not copied) to the
+  // worker, which is why `buffers` is unusable on this side afterward.
   const run = async () => {
     if (files.length < 2) return;
     setSt("loading"); setMsg(lang === "fr" ? "Fusion en cours…" : "Merging PDFs…");
     try {
-      const { PDFDocument } = PDFLib;
-      const merged = await PDFDocument.create();
-      for (const f of files) {
-        const src = await PDFDocument.load(await f.arrayBuffer());
-        const pages = await merged.copyPages(src, src.getPageIndices());
-        pages.forEach(p => merged.addPage(p));
-      }
-      pdfDownload(await merged.save(), outName || "merged.pdf");
+      const buffers = await Promise.all(files.map(f => f.arrayBuffer()));
+      const { bytes } = await runPdfWorkerTask<{ bytes: Uint8Array }>('merge', { files: buffers }, buffers);
+      pdfDownload(bytes, outName || "merged.pdf");
       setSt("ok"); setMsg(lang === "fr" ? `${files.length} fichiers fusionnés !` : `Merged ${files.length} files!`);
     } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
   };
@@ -607,7 +714,7 @@ function PdfMergeTab({ lang }: { lang: string }) {
         {/* Output card */}
         <div style={{
           border: `1px solid ${C.border}`, borderRadius: 14,
-          background: `linear-gradient(#151a22, #11161d)`, overflow: "hidden",
+          background: `linear-gradient(${C.cardGradFrom}, ${C.panel})`, overflow: "hidden",
         }}>
           <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}` }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: C.text }}>Output</span>
@@ -628,6 +735,7 @@ function PdfMergeTab({ lang }: { lang: string }) {
 }
 
 function PdfSplitTab({ lang }: { lang: string }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
   const [file, setFile] = React.useState<File | null>(null);
   const [count, setCount] = React.useState(0);
   const [mode, setMode] = React.useState("all");
@@ -640,12 +748,14 @@ function PdfSplitTab({ lang }: { lang: string }) {
     const doc = await PDFDocument.load(await f.arrayBuffer());
     setCount(doc.getPageCount()); setSt(null);
   };
+  // Same fix as merge/rotate/jpgToPdf: 'split' is already fully supported by
+  // the worker with a matching payload/result shape, so this offloads the
+  // per-page copyPages/save loop too instead of leaving it half-fixed.
   const run = async () => {
     setSt("loading"); setMsg(lang === "fr" ? "Division en cours…" : "Splitting…");
     try {
-      const { PDFDocument } = PDFLib;
-      const src = await PDFDocument.load(await file!.arrayBuffer());
-      const total = src.getPageCount();
+      const buf = await file!.arrayBuffer();
+      const total = count;
       let sets: number[][] = mode === "all"
         ? Array.from({ length: total }, (_, i) => [i])
         : ranges.split(",").map(p => {
@@ -654,14 +764,10 @@ function PdfSplitTab({ lang }: { lang: string }) {
           return [parseInt(p) - 1];
         });
 
-      const outputs: { name: string; bytes: Uint8Array }[] = [];
-      for (let i = 0; i < sets.length; i++) {
-        setMsg(lang === "fr" ? `Traitement ${i + 1}/${sets.length}…` : `Processing ${i + 1}/${sets.length}…`);
-        const out = await PDFDocument.create();
-        const cp = await out.copyPages(src, sets[i]); cp.forEach(p => out.addPage(p));
-        const name = sets.length === total ? `page_${sets[i][0] + 1}.pdf` : `part_${i + 1}.pdf`;
-        outputs.push({ name, bytes: await out.save() });
-      }
+      const { outputs } = await runPdfWorkerTask<{ outputs: { name: string; bytes: Uint8Array }[] }>(
+        'split', { file: buf, sets, total }, [buf],
+        (done, totalSets) => setMsg(lang === "fr" ? `Traitement ${done + 1}/${totalSets}…` : `Processing ${done + 1}/${totalSets}…`)
+      );
 
       if (outputs.length === 1) {
         pdfDownload(outputs[0].bytes, outputs[0].name);
@@ -714,30 +820,29 @@ function PdfSplitTab({ lang }: { lang: string }) {
   );
 }
 
-// ── Replacement for PdfCompressTab in components/pdf/PdfHub.tsx ──
-// 1. Add this import near the top of PdfHub.tsx, alongside the existing
-//    `import * as PDFLib from 'pdf-lib'`:
-//
-//      import { compressPdfImages, COMPRESS_PRESETS } from '../../lib/pdf/compressImages';
-//
-// 2. Replace the existing `function PdfCompressTab(...) { ... }` block
-//    (around line 692) with this entire function.
-
 function PdfCompressTab({ lang }: { lang: string }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
   const [file, setFile] = React.useState<File | null>(null);
   const [level, setLevel] = React.useState<"low" | "medium" | "high">("medium");
   const [st, setSt] = React.useState<string | null>(null);
   const [msg, setMsg] = React.useState("");
   const fmtSize = (b: number) => (b / 1048576).toFixed(2) + " MB";
 
+  // Recompression (JPEG decode/re-encode across every image) now runs in
+  // the worker via the 'compress' task, which calls this same
+  // compressPdfImages() function internally — same options shape
+  // ({ quality, maxDimension }), same CompressResult shape back.
   const run = async () => {
     setSt("loading");
     setMsg(lang === "fr" ? "Compression en cours…" : "Compressing…");
     try {
-      const buf = new Uint8Array(await file!.arrayBuffer());
-      const result = await compressPdfImages(buf, {
-        ...COMPRESS_PRESETS[level],
-        onProgress: (done, total) => {
+      const buf = await file!.arrayBuffer();
+      const { quality, maxDimension } = COMPRESS_PRESETS[level];
+      const result = await runPdfWorkerTask<CompressResult>(
+        'compress',
+        { file: buf, quality, maxDimension },
+        [buf],
+        (done, total) => {
           if (total > 0) {
             setMsg(
               lang === "fr"
@@ -745,8 +850,8 @@ function PdfCompressTab({ lang }: { lang: string }) {
                 : `Compressing images ${done}/${total}…`
             );
           }
-        },
-      });
+        }
+      );
 
       pdfDownload(result.bytes, "compressed.pdf");
 
@@ -821,6 +926,7 @@ function PdfCompressTab({ lang }: { lang: string }) {
 }
 
 function PdfRotateTab({ lang }: { lang: string }) {
+  const { s } = React.useContext(PdfThemeCtx)
   const [file, setFile] = React.useState<File | null>(null);
   const [count, setCount] = React.useState(0);
   const [angle, setAngle] = React.useState(90);
@@ -834,12 +940,16 @@ function PdfRotateTab({ lang }: { lang: string }) {
     const doc = await PDFDocument.load(await f.arrayBuffer());
     setCount(doc.getPageCount()); setSt(null);
   };
+  // Computes which page indices to rotate using the already-known `count`
+  // (from `load` above) and sends only { file, idxs, angle } to the worker's
+  // 'rotate' task — the actual PDFDocument.load/setRotation/save now happens
+  // off the main thread, and we no longer re-parse the file a second time
+  // just to recompute `total` (the old code parsed it once in `load` and
+  // again at the top of `run`).
   const run = async () => {
     setSt("loading"); setMsg(lang === "fr" ? "Rotation en cours…" : "Rotating…");
     try {
-      const { PDFDocument, degrees } = PDFLib;
-      const doc = await PDFDocument.load(await file!.arrayBuffer());
-      const total = doc.getPageCount();
+      const total = count;
       let idxs: number[] = target === "all" ? Array.from({ length: total }, (_, i) => i)
         : target === "odd" ? Array.from({ length: total }, (_, i) => i).filter(i => i % 2 === 0)
         : target === "even" ? Array.from({ length: total }, (_, i) => i).filter(i => i % 2 !== 0)
@@ -848,9 +958,12 @@ function PdfRotateTab({ lang }: { lang: string }) {
           if (p.includes("-")) { const [a, b] = p.split("-").map(n => parseInt(n) - 1); return Array.from({ length: b - a + 1 }, (_, i) => a + i); }
           return [parseInt(p) - 1];
         }).filter(i => i >= 0 && i < total);
-      idxs.forEach(i => { const pg = doc.getPage(i); pg.setRotation(degrees((pg.getRotation().angle + angle) % 360)); });
-      pdfDownload(await doc.save(), "rotated.pdf");
-      setSt("ok"); setMsg(lang === "fr" ? `${idxs.length} page(s) pivotées de ${angle}°` : `Rotated ${idxs.length} page(s) by ${angle}°`);
+      const buf = await file!.arrayBuffer();
+      const { bytes, rotatedCount } = await runPdfWorkerTask<{ bytes: Uint8Array; rotatedCount: number }>(
+        'rotate', { file: buf, idxs, angle }, [buf]
+      );
+      pdfDownload(bytes, "rotated.pdf");
+      setSt("ok"); setMsg(lang === "fr" ? `${rotatedCount} page(s) pivotées de ${angle}°` : `Rotated ${rotatedCount} page(s) by ${angle}°`);
     } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
   };
   const targets = [
@@ -899,6 +1012,7 @@ function PdfRotateTab({ lang }: { lang: string }) {
 }
 
 function PdfJpg2PdfTab({ lang }: { lang: string }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
   const [files, setFiles] = React.useState<File[]>([]);
   const [st, setSt] = React.useState<string | null>(null);
   const [msg, setMsg] = React.useState("");
@@ -906,21 +1020,20 @@ function PdfJpg2PdfTab({ lang }: { lang: string }) {
   const remove = (i: number) => setFiles(p => p.filter((_, j) => j !== i));
   const up = (i: number) => setFiles(p => { const a = [...p]; [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a; });
   const dn = (i: number) => setFiles(p => { const a = [...p]; [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a; });
+  // Embedding/drawing images into the PDF now happens in the worker
+  // ('jpgToPdf' task) instead of on the main thread.
   const run = async () => {
     if (!files.length) return;
     setSt("loading"); setMsg(lang === "fr" ? "Création du PDF…" : "Creating PDF…");
     try {
-      const { PDFDocument } = PDFLib;
-      const doc = await PDFDocument.create();
-      for (const f of files) {
-        const buf = await f.arrayBuffer();
-        const ext = f.name.split(".").pop()?.toLowerCase();
-        const img = ext === "png" ? await doc.embedPng(buf) : await doc.embedJpg(buf);
-        const { width, height } = img.scale(1);
-        const page = doc.addPage([width, height]);
-        page.drawImage(img, { x: 0, y: 0, width, height });
-      }
-      pdfDownload(await doc.save(), "images.pdf");
+      const images = await Promise.all(files.map(async f => ({
+        ext: f.name.split(".").pop()?.toLowerCase() || "jpg",
+        buffer: await f.arrayBuffer(),
+      })));
+      const { bytes } = await runPdfWorkerTask<{ bytes: Uint8Array }>(
+        'jpgToPdf', { images }, images.map(i => i.buffer)
+      );
+      pdfDownload(bytes, "images.pdf");
       setSt("ok"); setMsg(lang === "fr" ? `PDF créé avec ${files.length} page(s) !` : `Created PDF with ${files.length} page(s)!`);
     } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
   };
@@ -945,6 +1058,7 @@ function PdfJpg2PdfTab({ lang }: { lang: string }) {
 }
 
 function PdfToJpgTab({ lang }: { lang: string }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
   const [file, setFile] = React.useState<File | null>(null);
   const [count, setCount] = React.useState(0);
   const [scale, setScale] = React.useState(2);
@@ -1025,6 +1139,7 @@ function PdfToJpgTab({ lang }: { lang: string }) {
 }
 
 function PdfToWordTab({ lang }: { lang: string }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
   const [file, setFile] = React.useState<File | null>(null);
   const [st, setSt] = React.useState<string | null>(null);
   const [msg, setMsg] = React.useState("");
@@ -1034,7 +1149,10 @@ function PdfToWordTab({ lang }: { lang: string }) {
     try {
       const pdfjsLib = await loadPdfJs();
       const doc = await pdfjsLib.getDocument({ data: await file!.arrayBuffer() }).promise;
-      let bodyHtml = "";
+      // Accumulate into an array and join once at the end instead of
+      // repeated `+=` — keeps this linear time even on huge documents,
+      // rather than relying on the JS engine's string-rope optimizations.
+      const parts: string[] = [];
       for (let i = 1; i <= doc.numPages; i++) {
         setMsg(lang === "fr" ? `Lecture page ${i} sur ${doc.numPages}…` : `Reading page ${i} of ${doc.numPages}…`);
         const page = await doc.getPage(i);
@@ -1049,10 +1167,11 @@ function PdfToWordTab({ lang }: { lang: string }) {
         const sortedY = [...lines.keys()].sort((a, b) => b - a);
         for (const y of sortedY) {
           const text = lines.get(y)!.sort((a, b) => a.transform[4] - b.transform[4]).map((it: any) => it.str).join(" ").trim();
-          if (text) bodyHtml += `<p>${escapeHtml(text)}</p>\n`;
+          if (text) parts.push(`<p>${escapeHtml(text)}</p>\n`);
         }
-        if (i < doc.numPages) bodyHtml += `<br clear="all" style="page-break-before:always" />\n`;
+        if (i < doc.numPages) parts.push(`<br clear="all" style="page-break-before:always" />\n`);
       }
+      const bodyHtml = parts.join("");
       const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head><meta charset="utf-8"><title>${escapeHtml(file!.name)}</title></head>
 <body>${bodyHtml || "<p></p>"}</body></html>`;
@@ -1083,6 +1202,7 @@ function PdfToWordTab({ lang }: { lang: string }) {
 }
 
 function PdfToExcelTab({ lang }: { lang: string }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
   const [file, setFile] = React.useState<File | null>(null);
   const [st, setSt] = React.useState<string | null>(null);
   const [msg, setMsg] = React.useState("");
@@ -1092,7 +1212,8 @@ function PdfToExcelTab({ lang }: { lang: string }) {
     try {
       const pdfjsLib = await loadPdfJs();
       const doc = await pdfjsLib.getDocument({ data: await file!.arrayBuffer() }).promise;
-      let csv = "";
+      // Same fix as PdfToWordTab: array + join instead of `+=` in a loop.
+      const csvParts: string[] = [];
       for (let i = 1; i <= doc.numPages; i++) {
         setMsg(lang === "fr" ? `Lecture page ${i} sur ${doc.numPages}…` : `Reading page ${i} of ${doc.numPages}…`);
         const page = await doc.getPage(i);
@@ -1105,12 +1226,13 @@ function PdfToExcelTab({ lang }: { lang: string }) {
           rows.get(y)!.push(item);
         }
         const sortedY = [...rows.keys()].sort((a, b) => b - a);
-        if (doc.numPages > 1) csv += `Page ${i}\n`;
+        if (doc.numPages > 1) csvParts.push(`Page ${i}\n`);
         for (const y of sortedY) {
           const cells = rows.get(y)!.sort((a: any, b: any) => a.transform[4] - b.transform[4]).map((it: any) => it.str.trim()).filter(Boolean);
-          if (cells.length) csv += cells.map(csvCell).join(",") + "\n";
+          if (cells.length) csvParts.push(cells.map(csvCell).join(",") + "\n");
         }
       }
+      const csv = csvParts.join("");
       fileDownload("\uFEFF" + csv, file!.name.replace(/\.pdf$/i, "") + ".csv", "text/csv;charset=utf-8");
       setSt("ok"); setMsg(lang === "fr" ? `${doc.numPages} page(s) exportées en CSV !` : `Extracted ${doc.numPages} page(s) as CSV!`);
     } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
@@ -1137,72 +1259,504 @@ function PdfToExcelTab({ lang }: { lang: string }) {
   );
 }
 
+function PdfRemovePagesTab({ lang }: { lang: string }) {
+  const { s } = React.useContext(PdfThemeCtx)
+  const [file, setFile] = React.useState<File | null>(null);
+  const [count, setCount] = React.useState(0);
+  const [pages, setPages] = React.useState("");
+  const [st, setSt] = React.useState<string | null>(null);
+  const [msg, setMsg] = React.useState("");
+  const load = async ([f]: File[]) => {
+    setFile(f);
+    const { PDFDocument } = PDFLib;
+    const doc = await PDFDocument.load(await f.arrayBuffer());
+    setCount(doc.getPageCount()); setSt(null);
+  };
+  const run = async () => {
+    if (!pages.trim()) return;
+    setSt("loading"); setMsg(lang === "fr" ? "Suppression en cours…" : "Removing pages…");
+    try {
+      const removeIdxs = pages.split(",").flatMap(p => {
+        p = p.trim();
+        if (p.includes("-")) { const [a, b] = p.split("-").map(n => parseInt(n) - 1); return Array.from({ length: b - a + 1 }, (_, i) => a + i); }
+        return [parseInt(p) - 1];
+      }).filter(i => i >= 0 && i < count);
+      if (!removeIdxs.length) return;
+      if (removeIdxs.length >= count) {
+        setSt("err"); setMsg(lang === "fr" ? "Impossible de supprimer toutes les pages." : "Can't remove every page."); return;
+      }
+      const buf = await file!.arrayBuffer();
+      const { bytes, remainingCount } = await runPdfWorkerTask<{ bytes: Uint8Array; remainingCount: number }>(
+        'removePages', { file: buf, removeIdxs }, [buf]
+      );
+      pdfDownload(bytes, "pages_removed.pdf");
+      setSt("ok"); setMsg(lang === "fr" ? `${remainingCount} page(s) restante(s)` : `${remainingCount} page(s) remaining`);
+    } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
+  };
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {!file
+        ? <PdfDropZone accept={[".pdf"]} multiple={false} onFiles={load} lang={lang}
+            label={lang === "fr" ? "Déposez un fichier PDF" : "Drop a PDF file here"}
+            hint={lang === "fr" ? "Sélectionnez le PDF à modifier" : "Select a PDF to edit"} />
+        : <SingleFileRow file={file} onClear={() => { setFile(null); setCount(0); setSt(null); }} />}
+      {file && (
+        <>
+          <div>
+            <label style={s.label}>{lang === "fr" ? `PAGES À SUPPRIMER (sur ${count})` : `PAGES TO REMOVE (of ${count})`}</label>
+            <input value={pages} onChange={e => setPages(e.target.value)} placeholder="e.g. 2, 4-6" style={s.input} />
+          </div>
+          <button onClick={run} style={s.cta(!pages.trim())} disabled={!pages.trim()}>
+            🗑 &nbsp; {lang === "fr" ? "Supprimer les pages" : "Remove pages"}
+          </button>
+        </>
+      )}
+      <PdfStatus status={st} message={msg} />
+    </div>
+  );
+}
+
+function PdfRearrangeTab({ lang }: { lang: string }) {
+  const { C, s } = React.useContext(PdfThemeCtx)
+  const [file, setFile] = React.useState<File | null>(null);
+  const [order, setOrder] = React.useState<number[]>([]);
+  const [st, setSt] = React.useState<string | null>(null);
+  const [msg, setMsg] = React.useState("");
+  const load = async ([f]: File[]) => {
+    setFile(f);
+    const { PDFDocument } = PDFLib;
+    const doc = await PDFDocument.load(await f.arrayBuffer());
+    setOrder(Array.from({ length: doc.getPageCount() }, (_, i) => i));
+    setSt(null);
+  };
+  const up = (i: number) => setOrder(p => { const a = [...p]; [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a; });
+  const dn = (i: number) => setOrder(p => { const a = [...p]; [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a; });
+  const run = async () => {
+    setSt("loading"); setMsg(lang === "fr" ? "Réorganisation…" : "Reordering…");
+    try {
+      const buf = await file!.arrayBuffer();
+      const { bytes } = await runPdfWorkerTask<{ bytes: Uint8Array }>(
+        'rearrangePages', { file: buf, order }, [buf]
+      );
+      pdfDownload(bytes, "rearranged.pdf");
+      setSt("ok"); setMsg(lang === "fr" ? "PDF réorganisé !" : "PDF reordered!");
+    } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
+  };
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {!file
+        ? <PdfDropZone accept={[".pdf"]} multiple={false} onFiles={load} lang={lang}
+            label={lang === "fr" ? "Déposez un fichier PDF" : "Drop a PDF file here"}
+            hint={lang === "fr" ? "Sélectionnez le PDF à réorganiser" : "Select a PDF to reorder"} />
+        : <SingleFileRow file={file} onClear={() => { setFile(null); setOrder([]); setSt(null); }} />}
+      {file && order.length > 0 && (
+        <>
+          <div>
+            <label style={s.label}>{lang === "fr" ? "ORDRE DES PAGES" : "PAGE ORDER"}</label>
+            <div style={{ border: `1px solid ${C.border}`, borderRadius: 14, background: C.panel, padding: 13, maxHeight: 320, overflowY: "auto" }}>
+              {order.map((pageIdx, i) => (
+                <div key={pageIdx} style={{ ...s.fileRow, gridTemplateColumns: "35px 1fr auto" }}>
+                  <div style={s.pdfBadge}>{pageIdx + 1}</div>
+                  <div style={{ fontSize: 12, color: C.text }}>{lang === "fr" ? `Page ${pageIdx + 1}` : `Page ${pageIdx + 1}`}</div>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {i > 0 && <button onClick={() => up(i)} style={s.outline}>↑</button>}
+                    {i < order.length - 1 && <button onClick={() => dn(i)} style={s.outline}>↓</button>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <button onClick={run} style={s.cta()}>
+            ⇅ &nbsp; {lang === "fr" ? "Enregistrer l'ordre" : "Save new order"}
+          </button>
+        </>
+      )}
+      <PdfStatus status={st} message={msg} />
+    </div>
+  );
+}
+
+function PdfWatermarkTab({ lang }: { lang: string }) {
+  const { s } = React.useContext(PdfThemeCtx)
+  const [file, setFile] = React.useState<File | null>(null);
+  const [mode, setMode] = React.useState<"text" | "image">("text");
+  const [text, setText] = React.useState(lang === "fr" ? "CONFIDENTIEL" : "CONFIDENTIAL");
+  const [image, setImage] = React.useState<File | null>(null);
+  const [opacity, setOpacity] = React.useState(0.3);
+  const [position, setPosition] = React.useState<"center" | "top-left" | "top-right" | "bottom-left" | "bottom-right">("center");
+  const [rotation, setRotation] = React.useState(45);
+  const [st, setSt] = React.useState<string | null>(null);
+  const [msg, setMsg] = React.useState("");
+
+  const positions: { k: typeof position, en: string, fr: string }[] = [
+    { k: "center", en: "Center", fr: "Centre" },
+    { k: "top-left", en: "Top left", fr: "Haut gauche" },
+    { k: "top-right", en: "Top right", fr: "Haut droit" },
+    { k: "bottom-left", en: "Bottom left", fr: "Bas gauche" },
+    { k: "bottom-right", en: "Bottom right", fr: "Bas droit" },
+  ];
+  const opacities = [0.15, 0.3, 0.5, 0.8];
+
+  const run = async () => {
+    if (!file) return;
+    if (mode === "text" && !text.trim()) return;
+    if (mode === "image" && !image) return;
+    setSt("loading"); setMsg(lang === "fr" ? "Ajout du filigrane…" : "Adding watermark…");
+    try {
+      const buf = await file.arrayBuffer();
+      const transfer: ArrayBuffer[] = [buf];
+      let imagePayload: { ext: string; buffer: ArrayBuffer } | undefined;
+      if (mode === "image" && image) {
+        const imgBuf = await image.arrayBuffer();
+        imagePayload = { ext: image.name.split(".").pop()?.toLowerCase() || "jpg", buffer: imgBuf };
+        transfer.push(imgBuf);
+      }
+      const { bytes } = await runPdfWorkerTask<{ bytes: Uint8Array }>(
+        'watermark',
+        { file: buf, mode, text: mode === "text" ? text : undefined, image: imagePayload, opacity, position, rotation },
+        transfer
+      );
+      pdfDownload(bytes, "watermarked.pdf");
+      setSt("ok"); setMsg(lang === "fr" ? "Filigrane ajouté !" : "Watermark added!");
+    } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {!file
+        ? <PdfDropZone accept={[".pdf"]} multiple={false} onFiles={([f]) => { setFile(f); setSt(null); }} lang={lang}
+            label={lang === "fr" ? "Déposez un fichier PDF" : "Drop a PDF file here"}
+            hint={lang === "fr" ? "Sélectionnez le PDF à marquer" : "Select a PDF to stamp"} />
+        : <SingleFileRow file={file} onClear={() => { setFile(null); setSt(null); }} />}
+      {file && (
+        <>
+          <div>
+            <label style={s.label}>{lang === "fr" ? "TYPE DE FILIGRANE" : "WATERMARK TYPE"}</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => setMode("text")} style={s.pill(mode === "text")}>{lang === "fr" ? "Texte" : "Text"}</button>
+              <button onClick={() => setMode("image")} style={s.pill(mode === "image")}>{lang === "fr" ? "Image" : "Image"}</button>
+            </div>
+          </div>
+
+          {mode === "text" ? (
+            <div>
+              <label style={s.label}>{lang === "fr" ? "TEXTE" : "TEXT"}</label>
+              <input value={text} onChange={e => setText(e.target.value)} style={s.input} />
+            </div>
+          ) : (
+            <div>
+              <label style={s.label}>{lang === "fr" ? "IMAGE" : "IMAGE"}</label>
+              {!image
+                ? <PdfDropZone accept={[".jpg", ".jpeg", ".png"]} multiple={false} onFiles={([f]) => setImage(f)} lang={lang}
+                    label={lang === "fr" ? "Déposez une image" : "Drop an image"} hint="JPG, PNG" />
+                : <SingleFileRow file={image} onClear={() => setImage(null)} />}
+            </div>
+          )}
+
+          <div>
+            <label style={s.label}>{lang === "fr" ? "TRANSPARENCE" : "OPACITY"}</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {opacities.map(o => (
+                <button key={o} onClick={() => setOpacity(o)} style={s.pill(opacity === o)}>{Math.round(o * 100)}%</button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label style={s.label}>{lang === "fr" ? "POSITION" : "POSITION"}</label>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {positions.map(p => (
+                <button key={p.k} onClick={() => setPosition(p.k)} style={s.pill(position === p.k)}>
+                  {lang === "fr" ? p.fr : p.en}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label style={s.label}>{lang === "fr" ? "ROTATION (°)" : "ROTATION (°)"}</label>
+            <input type="number" value={rotation} onChange={e => setRotation(parseInt(e.target.value) || 0)} style={s.input} />
+          </div>
+
+          <button onClick={run} style={s.cta()}>
+            ◈ &nbsp; {lang === "fr" ? "Ajouter le filigrane" : "Add watermark"}
+          </button>
+        </>
+      )}
+      <PdfStatus status={st} message={msg} />
+    </div>
+  );
+}
+
+function PdfProtectTab({ lang }: { lang: string }) {
+  const { s } = React.useContext(PdfThemeCtx)
+  const [file, setFile] = React.useState<File | null>(null);
+  const [password, setPassword] = React.useState("");
+  const [confirm, setConfirm] = React.useState("");
+  const [st, setSt] = React.useState<string | null>(null);
+  const [msg, setMsg] = React.useState("");
+
+  const run = async () => {
+    if (!file || !password) return;
+    if (password !== confirm) {
+      setSt("err"); setMsg(lang === "fr" ? "Les mots de passe ne correspondent pas." : "Passwords don't match.");
+      return;
+    }
+    setSt("loading"); setMsg(lang === "fr" ? "Chiffrement en cours…" : "Encrypting…");
+    try {
+      const buf = await file.arrayBuffer();
+      const { bytes } = await runPdfWorkerTask<{ bytes: Uint8Array }>(
+        'protect', { file: buf, userPassword: password }, [buf]
+      );
+      pdfDownload(bytes, "protected.pdf");
+      setSt("ok"); setMsg(lang === "fr" ? "PDF protégé !" : "PDF protected!");
+    } catch (e: any) { setSt("err"); setMsg(friendlyError(e, lang)); }
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {!file
+        ? <PdfDropZone accept={[".pdf"]} multiple={false} onFiles={([f]) => { setFile(f); setSt(null); }} lang={lang}
+            label={lang === "fr" ? "Déposez un fichier PDF" : "Drop a PDF file here"}
+            hint={lang === "fr" ? "Sélectionnez le PDF à protéger" : "Select a PDF to protect"} />
+        : <SingleFileRow file={file} onClear={() => { setFile(null); setSt(null); }} />}
+      {file && (
+        <>
+          <div>
+            <label style={s.label}>{lang === "fr" ? "MOT DE PASSE" : "PASSWORD"}</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={s.input} />
+          </div>
+          <div>
+            <label style={s.label}>{lang === "fr" ? "CONFIRMER LE MOT DE PASSE" : "CONFIRM PASSWORD"}</label>
+            <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} style={s.input} />
+          </div>
+          <button onClick={run} style={s.cta(!password)} disabled={!password}>
+            🔒 &nbsp; {lang === "fr" ? "Protéger le PDF" : "Protect PDF"}
+          </button>
+        </>
+      )}
+      <PdfStatus status={st} message={msg} />
+    </div>
+  );
+}
+
+function PdfUnlockTab({ lang }: { lang: string }) {
+  const { s } = React.useContext(PdfThemeCtx)
+  const [file, setFile] = React.useState<File | null>(null);
+  const [password, setPassword] = React.useState("");
+  const [st, setSt] = React.useState<string | null>(null);
+  const [msg, setMsg] = React.useState("");
+
+  const run = async () => {
+    if (!file) return;
+    setSt("loading"); setMsg(lang === "fr" ? "Suppression du mot de passe…" : "Removing password…");
+    try {
+      const buf = await file.arrayBuffer();
+      const { bytes } = await runPdfWorkerTask<{ bytes: Uint8Array }>(
+        'unlock', { file: buf, password }, [buf]
+      );
+      pdfDownload(bytes, "unlocked.pdf");
+      setSt("ok"); setMsg(lang === "fr" ? "PDF déverrouillé !" : "PDF unlocked!");
+    } catch (e: any) { setSt("err"); setMsg(unlockError(e, lang)); }
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {!file
+        ? <PdfDropZone accept={[".pdf"]} multiple={false} onFiles={([f]) => { setFile(f); setSt(null); }} lang={lang}
+            label={lang === "fr" ? "Déposez un fichier PDF" : "Drop a PDF file here"}
+            hint={lang === "fr" ? "Sélectionnez le PDF protégé" : "Select the protected PDF"} />
+        : <SingleFileRow file={file} onClear={() => { setFile(null); setSt(null); }} />}
+      {file && (
+        <>
+          <div>
+            <label style={s.label}>{lang === "fr" ? "MOT DE PASSE ACTUEL" : "CURRENT PASSWORD"}</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={s.input} />
+          </div>
+          <button onClick={run} style={s.cta()}>
+            🔓 &nbsp; {lang === "fr" ? "Déverrouiller le PDF" : "Unlock PDF"}
+          </button>
+        </>
+      )}
+      <PdfStatus status={st} message={msg} />
+    </div>
+  );
+}
+
+function PdfHtmlToPdfTab({ lang }: { lang: string }) {
+  const { s } = React.useContext(PdfThemeCtx)
+  const [html, setHtml] = React.useState("");
+  const [st, setSt] = React.useState<string | null>(null);
+  const [msg, setMsg] = React.useState("");
+
+  const loadFile = async ([f]: File[]) => {
+    setHtml(await f.text());
+    setSt(null);
+  };
+
+  // Runs on the MAIN THREAD, not the worker: html2canvas needs a real DOM
+  // (computed styles, layout, fonts) to rasterize, and that doesn't exist
+  // inside a Web Worker. Also scoped to HTML the user pastes/uploads
+  // directly — rendering an arbitrary external URL faithfully would need a
+  // server-side headless browser (e.g. Puppeteer), since the browser blocks
+  // the cross-origin script/style/font access needed to render someone
+  // else's page accurately from client-side JS.
+  const run = async () => {
+    if (!html.trim()) return;
+    setSt("loading"); setMsg(lang === "fr" ? "Rendu en cours…" : "Rendering…");
+    let container: HTMLDivElement | null = null;
+    try {
+      const html2canvas = await loadHtml2Canvas();
+      const { jsPDF } = await loadJsPDF();
+
+      const pageWidthPx = 794; // A4 @ 96dpi
+      container = document.createElement("div");
+      container.style.cssText = `position:fixed; left:-99999px; top:0; width:${pageWidthPx}px; background:#fff; color:#000; padding:32px; box-sizing:border-box;`;
+      container.innerHTML = html;
+      document.body.appendChild(container);
+
+      const canvas = await html2canvas(container, { backgroundColor: "#ffffff", scale: 2, useCORS: true });
+      const pageHeightPx = Math.round(canvas.width * 1.4142); // A4 aspect ratio, in the canvas's own pixel space
+      const totalPages = Math.max(1, Math.ceil(canvas.height / pageHeightPx));
+
+      const pdf = new jsPDF({ unit: "px", format: [canvas.width, pageHeightPx] });
+      for (let p = 0; p < totalPages; p++) {
+        if (p > 0) pdf.addPage([canvas.width, pageHeightPx]);
+        const sliceHeight = Math.min(pageHeightPx, canvas.height - p * pageHeightPx);
+        const sliceCanvas = document.createElement("canvas");
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sliceHeight;
+        const ctx = sliceCanvas.getContext("2d")!;
+        ctx.drawImage(canvas, 0, -p * pageHeightPx);
+        pdf.addImage(sliceCanvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, canvas.width, sliceHeight);
+      }
+
+      pdf.save("document.pdf");
+      setSt("ok"); setMsg(lang === "fr" ? `PDF généré (${totalPages} page(s))` : `PDF generated (${totalPages} page(s))`);
+    } catch (e: any) {
+      setSt("err"); setMsg(friendlyError(e, lang));
+    } finally {
+      container?.remove();
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div>
+        <label style={s.label}>{lang === "fr" ? "COLLEZ VOTRE HTML" : "PASTE YOUR HTML"}</label>
+        <textarea value={html} onChange={e => setHtml(e.target.value)} rows={10}
+          placeholder="<h1>Hello</h1><p>...</p>"
+          style={{ ...s.input, height: 200, fontFamily: "monospace", resize: "vertical" }} />
+      </div>
+      <PdfDropZone accept={[".html", ".htm"]} multiple={false} onFiles={loadFile} lang={lang}
+        label={lang === "fr" ? "Déposez un fichier .html" : "Drop an .html file"}
+        hint={lang === "fr" ? "Ou importez un fichier .html — les URL externes ne sont pas prises en charge" : "Or upload an .html file — external URLs aren't supported"} />
+      <button onClick={run} style={s.cta(!html.trim())} disabled={!html.trim()}>
+        ◫ &nbsp; {lang === "fr" ? "Générer le PDF" : "Generate PDF"}
+      </button>
+      <PdfStatus status={st} message={msg} />
+    </div>
+  );
+}
+
+// Renders the active tab's panel. A plain switch avoids allocating a React
+// element for all 8 tabs on every PdfHub render (the old `panels` object
+// literal built every tab's element even though only one was ever used).
+// Note: switching tabs still unmounts the previous one, so any in-progress
+// upload/settings in that tab are discarded — that's unchanged behavior,
+// just flagging it since it's easy to miss.
+function renderPdfPanel(tab: string, lang: string): React.ReactNode {
+  switch (tab) {
+    case "merge":       return <PdfMergeTab       lang={lang} />;
+    case "split":       return <PdfSplitTab       lang={lang} />;
+    case "compress":    return <PdfCompressTab    lang={lang} />;
+    case "rotate":      return <PdfRotateTab      lang={lang} />;
+    case "jpg2pdf":     return <PdfJpg2PdfTab     lang={lang} />;
+    case "pdf2jpg":     return <PdfToJpgTab       lang={lang} />;
+    case "pdf2word":    return <PdfToWordTab      lang={lang} />;
+    case "pdf2excel":   return <PdfToExcelTab     lang={lang} />;
+    case "html2pdf":    return <PdfHtmlToPdfTab   lang={lang} />;
+    case "removepages": return <PdfRemovePagesTab lang={lang} />;
+    case "rearrange":   return <PdfRearrangeTab   lang={lang} />;
+    case "watermark":   return <PdfWatermarkTab   lang={lang} />;
+    case "protect":     return <PdfProtectTab     lang={lang} />;
+    case "unlock":      return <PdfUnlockTab      lang={lang} />;
+    default:            return null;
+  }
+}
+
+// ── Sidebar navigation ──
+// SideLink / SideGroup are top-level components, not defined inside
+// PdfHub's render body. Previously they were declared as local consts
+// inside PdfHub, so React saw a *new component type* on every PdfHub
+// render (every tab click, every theme toggle) and unmounted + remounted
+// the entire sidebar subtree instead of diffing it. Declaring them here
+// once, and passing `active`/`lang`/`onSelect` as explicit props instead
+// of capturing `tab`/`setTab`/`lang` via closure, fixes that.
+function SideLink({ t, active, lang, onSelect }: {
+  t: typeof PDF_TABS[0], active: boolean, lang: string, onSelect: (id: string) => void,
+}) {
+  const { C } = React.useContext(PdfThemeCtx)
+  return (
+    <button
+      onClick={() => onSelect(t.id)}
+      style={{
+        height: 42, width: "100%",
+        display: "flex", alignItems: "center", gap: 10,
+        padding: "0 12px",
+        color: active ? C.accent : C.text,
+        textDecoration: "none",
+        borderRadius: 8, fontSize: 13,
+        background: active ? `${C.accent}18` : "transparent",
+        border: active ? `none` : "none",
+        borderLeft: active ? `2px solid ${C.accent}` : "2px solid transparent",
+        cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+        textAlign: "left",
+        transition: "all .15s",
+      }}>
+      <span style={{ width: 16 }}>{t.icon}</span>
+      {lang === "fr" ? t.fr : t.en}
+    </button>
+  );
+}
+
+function SideGroup({ label, tabs, activeTab, lang, onSelect }: {
+  label: string, tabs: typeof PDF_TABS, activeTab: string, lang: string, onSelect: (id: string) => void,
+}) {
+  const { C } = React.useContext(PdfThemeCtx)
+  return (
+    <div style={{ marginTop: 24 }}>
+      <div style={{ fontSize: 10, letterSpacing: "0.13em", textTransform: "uppercase", color: C.muted2, padding: "0 12px 8px" }}>
+        {label}
+      </div>
+      {tabs.map(t => (
+        <SideLink key={t.id} t={t} active={activeTab === t.id} lang={lang} onSelect={onSelect} />
+      ))}
+    </div>
+  );
+}
+
 // ── CHRONOS Hub shell ──
 
 function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: string }) {
   const { lang } = useLang();
+  const { dark } = useDark();
+  useChronosFonts();
+  const C = React.useMemo(() => buildPalette(dark), [dark]);
+  const s = React.useMemo(() => buildStyles(C), [C]);
+  const responsiveStyle = React.useMemo(() => buildResponsiveStyle(C), [C]);
   const [tab, setTab] = React.useState(initialTab || "merge");
   const cur = PDF_TABS.find(t => t.id === tab)!;
 
-  const panels: Record<string, React.ReactNode> = {
-    merge:     <PdfMergeTab    lang={lang} />,
-    split:     <PdfSplitTab    lang={lang} />,
-    compress:  <PdfCompressTab lang={lang} />,
-    rotate:    <PdfRotateTab   lang={lang} />,
-    jpg2pdf:   <PdfJpg2PdfTab  lang={lang} />,
-    pdf2jpg:   <PdfToJpgTab    lang={lang} />,
-    pdf2word:  <PdfToWordTab   lang={lang} />,
-    pdf2excel: <PdfToExcelTab  lang={lang} />,
-  };
-
-  const popularTabs  = PDF_TABS.filter(t => t.group === "popular");
-  const convertTabs  = PDF_TABS.filter(t => t.group === "convert");
-  const otherTabs    = PDF_TABS.filter(t => t.group === "other");
-
-  const SideLink = ({ t }: { t: typeof PDF_TABS[0] }) => {
-    const active = tab === t.id;
-    return (
-      <button
-        key={t.id}
-        onClick={() => setTab(t.id)}
-        style={{
-          height: 42, width: "100%",
-          display: "flex", alignItems: "center", gap: 10,
-          padding: "0 12px",
-          color: active ? C.accent : "#c4cad2",
-          textDecoration: "none",
-          borderRadius: 8, fontSize: 13,
-          background: active ? `${C.accent}18` : "transparent",
-          border: active ? `none` : "none",
-          borderLeft: active ? `2px solid ${C.accent}` : "2px solid transparent",
-          cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
-          textAlign: "left",
-          transition: "all .15s",
-        }}>
-        <span style={{ width: 16 }}>{t.icon}</span>
-        {lang === "fr" ? t.fr : t.en}
-      </button>
-    );
-  };
-
-  const SideGroup = ({ label, tabs }: { label: string, tabs: typeof PDF_TABS }) => (
-    <div style={{ marginTop: 24 }}>
-      <div style={{ fontSize: 10, letterSpacing: "0.13em", textTransform: "uppercase", color: "#69727f", padding: "0 12px 8px" }}>
-        {label}
-      </div>
-      {tabs.map(t => <SideLink key={t.id} t={t} />)}
-    </div>
-  );
-
   return (
+    <PdfThemeCtx.Provider value={{ C, s }}>
     <div style={{
       minHeight: "100vh",
       background: `radial-gradient(circle at 65% 10%, ${C.accent}0a, transparent 30%), ${C.bg}`,
       fontFamily: "'DM Sans', sans-serif",
       color: C.text,
     }}>
-      <style>{FONT_STYLE}</style>
-      <style>{RESPONSIVE_STYLE}</style>
+      <style>{responsiveStyle}</style>
 
       {/* ── Layout: sidebar + content ── */}
       <div className="chronos-shell" style={{ display: "grid", gridTemplateColumns: "240px 1fr", minHeight: "calc(100vh - 64px)" }}>
@@ -1211,15 +1765,16 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
         <aside className="chronos-sidebar" style={{
           borderRight: `1px solid ${C.border}`,
           padding: "20px 16px",
-          background: "rgba(12,15,21,.72)",
+          background: C.sidebarBg,
         }}>
           <div style={{ color: C.accent, fontWeight: 700, fontSize: 13 }}>PDF TOOLS</div>
           <div style={{ color: C.muted, fontSize: 11, marginTop: 4 }}>8 tools</div>
 
           <div className="chronos-sidebar-groups">
-            <SideGroup label={lang === "fr" ? "Populaires" : "Popular"} tabs={popularTabs} />
-            <SideGroup label={lang === "fr" ? "Convertir"  : "Convert"}  tabs={convertTabs} />
-            <SideGroup label={lang === "fr" ? "Autres"     : "Other"}    tabs={otherTabs} />
+            <SideGroup label={lang === "fr" ? "Populaires" : "Popular"} tabs={POPULAR_TABS}  activeTab={tab} lang={lang} onSelect={setTab} />
+            <SideGroup label={lang === "fr" ? "Convertir"  : "Convert"}  tabs={CONVERT_TABS}  activeTab={tab} lang={lang} onSelect={setTab} />
+            <SideGroup label={lang === "fr" ? "Sécurité"   : "Security"} tabs={SECURITY_TABS} activeTab={tab} lang={lang} onSelect={setTab} />
+            <SideGroup label={lang === "fr" ? "Autres"     : "Other"}    tabs={OTHER_TABS}    activeTab={tab} lang={lang} onSelect={setTab} />
           </div>
 
           {/* Privacy badge */}
@@ -1231,7 +1786,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
             <b style={{ fontSize: 11, display: "block" }}>
               ♧ &nbsp; {lang === "fr" ? "100% Dans le navigateur" : "100% In-Browser"}
             </b>
-            <p style={{ color: "#78828e", fontSize: 10, lineHeight: 1.5, margin: "6px 0 0" }}>
+            <p style={{ color: C.muted2, fontSize: 10, lineHeight: 1.5, margin: "6px 0 0" }}>
               {lang === "fr"
                 ? "Vos fichiers restent sur votre appareil. Rien n'est téléchargé."
                 : "Your files stay on your device. Nothing is uploaded."}
@@ -1243,8 +1798,8 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
         <main className="chronos-main" style={{ width: "min(1100px, calc(100vw - 280px))", margin: "0 auto", padding: "20px 40px 65px" }}>
 
           {/* Breadcrumb */}
-          <div style={{ fontSize: 11, color: "#69727f", marginBottom: 18 }}>
-            CHRONOS / PDF / <b style={{ color: "#aeb6c0" }}>{lang === "fr" ? cur.fr : cur.en}</b>
+          <div style={{ fontSize: 11, color: C.muted2, marginBottom: 18 }}>
+            CHRONOS / PDF / <b style={{ color: C.muted }}>{lang === "fr" ? cur.fr : cur.en}</b>
           </div>
 
           {/* Hero */}
@@ -1265,7 +1820,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
               </p>
             </div>
             <div style={{
-              border: `1px solid #24543d`, color: C.green,
+              border: `1px solid ${C.greenBorder}`, color: C.green,
               background: `${C.green}0a`, borderRadius: 999,
               padding: "8px 12px", fontSize: 10, whiteSpace: "nowrap",
             }}>
@@ -1289,7 +1844,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
                 </div>
                 <div>
                   <strong style={{ fontSize: 11, display: "block", color: C.text }}>{item.title}</strong>
-                  <small style={{ fontSize: 9, color: "#737d89" }}>{item.sub}</small>
+                  <small style={{ fontSize: 9, color: C.muted2 }}>{item.sub}</small>
                 </div>
               </div>
             ))}
@@ -1298,10 +1853,10 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
           {/* Tool panel */}
           <div style={{
             border: `1px solid ${C.border}`, borderRadius: 16,
-            background: `linear-gradient(#131820, ${C.panel})`,
+            background: `linear-gradient(${C.cardGradFrom}, ${C.panel})`,
             padding: 24,
           }}>
-            {panels[tab]}
+            {renderPdfPanel(tab, lang)}
           </div>
 
           {/* Deep SEO content — What is it / How it works / Examples / FAQ */}
@@ -1330,7 +1885,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
                   <b style={{ fontSize: 11, color: C.text, display: "block" }}>
                     {t.icon} &nbsp; {lang === "fr" ? t.fr : t.en}
                   </b>
-                  <p style={{ fontSize: 9, lineHeight: 1.45, color: "#727c88", margin: "4px 0 0" }}>
+                  <p style={{ fontSize: 9, lineHeight: 1.45, color: C.muted2, margin: "4px 0 0" }}>
                     {lang === "fr" ? t.frDesc : t.enDesc}
                   </p>
                 </button>
@@ -1339,12 +1894,13 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
           </section>
 
           {/* Footer */}
-          <div style={{ borderTop: `1px solid ${C.border}`, marginTop: 22, paddingTop: 14, textAlign: "center", color: "#66717e", fontSize: 9 }}>
+          <div style={{ borderTop: `1px solid ${C.border}`, marginTop: 22, paddingTop: 14, textAlign: "center", color: C.muted2, fontSize: 9 }}>
             ♧ &nbsp; {lang === "fr" ? "Privé · Rapide · Dans le navigateur — Vos fichiers ne quittent jamais votre appareil." : "Private · Fast · In-Browser — Your files never leave your device."}
           </div>
         </main>
       </div>
     </div>
+    </PdfThemeCtx.Provider>
   );
 }
 

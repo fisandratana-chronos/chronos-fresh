@@ -172,8 +172,8 @@ export default function CommandPalette({ open, onClose, dark = false }: Props) {
                   display: 'flex', alignItems: 'center', gap: 12, width: '100%',
                   padding: '11px 20px', cursor: 'pointer', textAlign: 'left',
                   background: selected ? (dark ? '#2563EB22' : '#EFF6FF') : 'transparent',
+                  borderTop: 'none', borderRight: 'none', borderBottom: 'none',
                   borderLeft: `3px solid ${selected ? '#2563EB' : 'transparent'}`,
-                  border: 'none', borderTop: 'none', borderRight: 'none', borderBottom: 'none',
                   transition: 'background 0.1s',
                 }}
               >

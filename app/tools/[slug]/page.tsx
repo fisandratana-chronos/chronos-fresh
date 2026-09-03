@@ -12,6 +12,21 @@ import { registryTools, TOOLS, RegistryTool, Tool, WIRED_SLUGS } from '../../../
 import { CATEGORY_SEO } from '../../../lib/categorySeo'
 import ToolPageClient from './ToolPageClient'
 
+// generateStaticParams (misy eto ambany) dia mamela an'i Next.js
+// hahafantatra ny slug rehetra ho an'ny SEO/routing, fa TSY tokony
+// hahatonga ny pejy ho "static" tanteraka — satria ny votoaty
+// (title, description, ary indrindra ny teny EN/FR ao anaty
+// ToolPageClient/ImageHub sns.) dia miankina amin'ny cookie
+// "ch-lang" izay miova isaky ny mpampiasa. Raha "static" ilay
+// pejy, dia amin'ny fotoana "build" ihany (tsy misy cookie) no
+// hamoronana ny HTML — "en" foana no ho voarindra ao, ka
+// tsy hifanaraka amin'ny teny nofidin'ny mpampiasa ilay HTML
+// server, ary hisy "hydration mismatch" rehefa miova amin'ny
+// client ilay teny. "force-dynamic" dia manery an'i Next.js
+// hamaky ny cookie isaky ny request, tahaka ny natao ao amin'ny
+// layout.tsx sy generateMetadata eto ambany.
+export const dynamic = 'force-dynamic'
+
 type Params = Promise<{ slug: string }>
 
 // ── Helper: mitady tool amin'ny slug ──────────────────────────

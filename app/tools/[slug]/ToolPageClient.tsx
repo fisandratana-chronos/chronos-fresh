@@ -4,6 +4,7 @@
 
 import type { ComponentType } from 'react'
 import { useLang } from '../../../lib/hooks/useLang'
+import { useDark } from '../../../lib/hooks/useDark'
 import { RegistryTool, Tool } from '../../../lib/tools'
 
 import TBMI from '../../../components/tools/TBMI'
@@ -185,6 +186,7 @@ export default function ToolPageClient({
   tool: Tool | null
 }) {
   const { lang } = useLang()
+  const { dark } = useDark()
   const Component = COMPONENT_MAP[slug]
 
   const label = regTool
@@ -206,9 +208,24 @@ export default function ToolPageClient({
         : IMAGE_HUB_PROPS_BY_SLUG[slug]
           ? IMAGE_HUB_PROPS_BY_SLUG[slug]
           : {}
+    // SmartCalcHub dia efa voarindra handray "darkProp" avy amin'ny
+    // ray-aman-dreny (jereo SmartCalcHub.tsx: isDark = darkProp ?? isDarkInternal).
+    // NetworkHub kosa dia manantena "dark" (tsy "darkProp") — jereo
+    // NetworkHub.tsx: function NetworkHub({ dark = true, onBack }...).
+    // Raha tsy alefa ireto avy amin'ity ToolPageClient ity, dia
+    // mitsivalana amin'ny default (SmartCalc: localStorage manokana;
+    // NetworkHub: dark=true foana) izy roa — tsy mankato ny toggle
+    // any amin'ny Nav ambony.
+    const isSmartCalc = Component === SmartCalcHub
+    const isNetworkHub = Component === NetworkHub
+    const themeProp = isSmartCalc
+      ? { darkProp: dark }
+      : isNetworkHub
+        ? { dark }
+        : {}
     return (
       <>
-        <Component {...extraProps} />
+        <Component {...extraProps} {...themeProp} />
         <ToolSeoContent regTool={regTool} tool={tool} slug={slug} />
       </>
     )

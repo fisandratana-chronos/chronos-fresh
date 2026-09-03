@@ -2054,7 +2054,7 @@ function NetworkHub({ dark = true, onBack }: { dark?: boolean; onBack?: () => vo
         <header style={S.header}>
           {onBack && (
             <button onClick={onBack} style={{
-              background: "#10B981", color: "#fff",
+              background: T.green, color: "#fff",
               border: "none", borderRadius: 10,
               padding: "8px 16px", cursor: "pointer",
               fontSize: 13, fontWeight: 700,
