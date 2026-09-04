@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { useLang } from '../lib/hooks/useLang'
 import { useDark } from '../lib/hooks/useDark'
+import { BP } from '../lib/breakpoints'
 import { TOOLS, Tool } from '../lib/tools'
 import CommandPalette from '../components/shell/CommandPalette'
 import Link from 'next/link'
@@ -65,10 +66,16 @@ export default function Home() {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 24px' }}>
 
         {/* ── Hero ── */}
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 48, minHeight: 320, gap: 0 }}>
+        <style>{`
+          @media (max-width: ${BP.tablet}px) {
+            .ch-hero-img-left, .ch-hero-img-right { display: none !important; }
+            .ch-hero { min-height: auto !important; }
+          }
+        `}</style>
+        <div className="ch-hero" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 48, minHeight: 320, gap: 0 }}>
 
           {/* Left image — clock */}
-          <div style={{ flex: '0 0 260px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <div className="ch-hero-img-left" style={{ flex: '0 0 260px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
             <img
               src="/images/saryakavia.png"
               alt="Chronos clock"
@@ -105,7 +112,7 @@ export default function Home() {
           </div>
 
           {/* Right image — toolbox */}
-          <div style={{ flex: '0 0 260px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+          <div className="ch-hero-img-right" style={{ flex: '0 0 260px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
             <img
               src="/images/saryakavanana.png"
               alt="Chronos toolbox"

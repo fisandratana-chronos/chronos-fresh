@@ -98,7 +98,7 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
 
   return (
     <>
-    <nav style={{
+    <nav className="ch-nav" style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 999999,
       height: 64,
       background: dark ? "rgba(15,23,42,0.95)" : "rgba(255,255,255,0.95)",
@@ -116,9 +116,11 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
           .ch-nav-links, .ch-nav-cta { display: none !important; }
           .ch-nav-hamburger { display: flex !important; }
           .ch-nav-mobile-menu.open { display: flex !important; }
+          .ch-nav { padding: 0 16px !important; }
         }
         @media (max-width: 480px) {
           .ch-search-kbd { display: none !important; }
+          .ch-nav { padding: 0 12px !important; }
         }
       `}</style>
       <div style={{ display: "flex", alignItems: "center", gap: 10, width: "100%" }}>
