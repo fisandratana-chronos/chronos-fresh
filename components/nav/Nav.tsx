@@ -206,8 +206,8 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
             style={{
               background: dark ? "#1E293B" : "#F1F5F9", border: "none", cursor: "pointer",
               width: 38, height: 38, borderRadius: 10, fontSize: 18,
-              alignItems: "center", justifyContent: "center",
-              transition: "background 0.15s", flexShrink: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              padding: 0, transition: "background 0.15s", flexShrink: 0,
             }}
           >{menuOpen ? "✕" : "☰"}</button>
         </div>
