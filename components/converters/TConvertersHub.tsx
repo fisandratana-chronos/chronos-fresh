@@ -10,6 +10,7 @@ import { useLang } from '../../lib/hooks/useLang'
 import { useDark } from '../../lib/hooks/useDark'
 import { DARK, LIGHT } from '../../lib/theme'
 import { BP } from '../../lib/breakpoints'
+import { Icon, IconClipboard, IconExchange, IconLockClosed, IconX } from '../shared/Icons'
 
 // ── Theme ──
 
@@ -36,16 +37,16 @@ const ConvThemeCtx = React.createContext(buildPalette(true))
 // ── Tab config ──
 
 const CONV_TABS = [
-  { id: 'length',      icon: '📏', en: 'Length',      fr: 'Longueur',      enDesc: 'Convert between length units',           frDesc: 'Convertir entre unités de longueur' },
-  { id: 'weight',      icon: '⚖️',  en: 'Weight',      fr: 'Poids',         enDesc: 'Convert between weight & mass units',    frDesc: 'Convertir entre unités de masse' },
-  { id: 'area',        icon: '📐', en: 'Area',         fr: 'Superficie',    enDesc: 'Convert between area units',             frDesc: 'Convertir entre unités de surface' },
-  { id: 'volume',      icon: '🧪', en: 'Volume',       fr: 'Volume',        enDesc: 'Convert between volume units',           frDesc: 'Convertir entre unités de volume' },
-  { id: 'speed',       icon: '🚀', en: 'Speed',        fr: 'Vitesse',       enDesc: 'Convert between speed units',            frDesc: 'Convertir entre unités de vitesse' },
-  { id: 'temperature', icon: '🌡️', en: 'Temperature',  fr: 'Température',   enDesc: 'Celsius, Fahrenheit, Kelvin',            frDesc: 'Celsius, Fahrenheit, Kelvin' },
-  { id: 'currency',    icon: '💱', en: 'Currency',     fr: 'Devise',        enDesc: 'Convert between currencies (static)',    frDesc: 'Convertir entre devises (statique)' },
-  { id: 'rgb2hex',     icon: '🎨', en: 'RGB → HEX',   fr: 'RGB → HEX',     enDesc: 'Convert RGB color to HEX code',          frDesc: 'Convertir couleur RGB en code HEX' },
-  { id: 'hex2rgb',     icon: '🖌️', en: 'HEX → RGB',   fr: 'HEX → RGB',     enDesc: 'Convert HEX color code to RGB',          frDesc: 'Convertir code HEX en couleur RGB' },
-  { id: 'textcase',    icon: '🔤', en: 'Text Case',    fr: 'Casse Texte',   enDesc: 'UPPER, lower, Title, Sentence case',     frDesc: 'MAJUSCULE, minuscule, Titre, Phrase' },
+  { id: 'length',      icon: 'ruler', en: 'Length',      fr: 'Longueur',      enDesc: 'Convert between length units',           frDesc: 'Convertir entre unités de longueur' },
+  { id: 'weight',      icon: 'scale',  en: 'Weight',      fr: 'Poids',         enDesc: 'Convert between weight & mass units',    frDesc: 'Convertir entre unités de masse' },
+  { id: 'area',        icon: 'ruler', en: 'Area',         fr: 'Superficie',    enDesc: 'Convert between area units',             frDesc: 'Convertir entre unités de surface' },
+  { id: 'volume',      icon: 'flask', en: 'Volume',       fr: 'Volume',        enDesc: 'Convert between volume units',           frDesc: 'Convertir entre unités de volume' },
+  { id: 'speed',       icon: 'rocket', en: 'Speed',        fr: 'Vitesse',       enDesc: 'Convert between speed units',            frDesc: 'Convertir entre unités de vitesse' },
+  { id: 'temperature', icon: 'thermometer', en: 'Temperature',  fr: 'Température',   enDesc: 'Celsius, Fahrenheit, Kelvin',            frDesc: 'Celsius, Fahrenheit, Kelvin' },
+  { id: 'currency',    icon: 'exchange', en: 'Currency',     fr: 'Devise',        enDesc: 'Convert between currencies (static)',    frDesc: 'Convertir entre devises (statique)' },
+  { id: 'rgb2hex',     icon: 'palette', en: 'RGB → HEX',   fr: 'RGB → HEX',     enDesc: 'Convert RGB color to HEX code',          frDesc: 'Convertir couleur RGB en code HEX' },
+  { id: 'hex2rgb',     icon: 'brush', en: 'HEX → RGB',   fr: 'HEX → RGB',     enDesc: 'Convert HEX color code to RGB',          frDesc: 'Convertir code HEX en couleur RGB' },
+  { id: 'textcase',    icon: 'typography', en: 'Text Case',    fr: 'Casse Texte',   enDesc: 'UPPER, lower, Title, Sentence case',     frDesc: 'MAJUSCULE, minuscule, Titre, Phrase' },
 ]
 
 // ── RELATED_CONVERTERS — static map: tool id → related tool ids ──
@@ -392,7 +393,7 @@ function RelatedConverters({ currentId, lang, onSelect }: { currentId: string; l
               background: C_T.bg, border: `1px solid ${C_T.border}`, borderRadius: 10,
               color: C_T.text, fontFamily: "'Inter','Segoe UI',sans-serif", fontSize: 13, fontWeight: 600,
               cursor: 'pointer', transition: 'border-color .15s' }}>
-            <span>{t.icon}</span>
+            <Icon name={t.icon} size={16} />
             <span>{lang === 'fr' ? t.fr : t.en}</span>
             <span style={{ color: C_T.accent }}>→</span>
           </button>
@@ -437,7 +438,7 @@ function ResultBox({ value, unit, extra }: { value: string; unit: string; extra?
       <button onClick={() => navigator.clipboard?.writeText(`${value} ${unit}`)}
         style={{ marginTop: 14, padding: '7px 18px', background: C_T.accent, color: '#fff',
           border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-        📋 Copy
+        <IconClipboard size={13} style={{marginRight:4,verticalAlign:-2}} /> Copy
       </button>
     </div>
   )
@@ -783,7 +784,7 @@ function RgbToHexTab({ lang }: { lang: string }) {
         <button onClick={() => navigator.clipboard?.writeText(hex)}
           style={{ marginTop: 14, padding: '7px 18px', background: C_T.accent, color: '#fff',
             border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-          📋 {lang === 'fr' ? 'Copier HEX' : 'Copy HEX'}
+          <IconClipboard size={13} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? 'Copier HEX' : 'Copy HEX'}
         </button>
       </div>
     </div>
@@ -841,13 +842,13 @@ function HexToRgbTab({ lang }: { lang: string }) {
           <button onClick={() => navigator.clipboard?.writeText(`rgb(${r}, ${g}, ${b})`)}
             style={{ marginTop: 14, padding: '7px 18px', background: C_T.accent, color: '#fff',
               border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-            📋 {lang === 'fr' ? 'Copier RGB' : 'Copy RGB'}
+            <IconClipboard size={13} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? 'Copier RGB' : 'Copy RGB'}
           </button>
         </div>
       ) : (
         <div style={{ background: `${C_T.err}15`, border: `1px solid ${C_T.err}44`, borderRadius: 10,
           padding: '10px 14px', fontSize: 13, color: C_T.err }}>
-          ❌ {lang === 'fr' ? 'Code HEX invalide' : 'Invalid HEX code'}
+          <IconX size={13} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? 'Code HEX invalide' : 'Invalid HEX code'}
         </div>
       )}
     </div>
@@ -916,7 +917,7 @@ function TextCaseTab({ lang }: { lang: string }) {
         <button onClick={() => navigator.clipboard?.writeText(result)}
           style={{ marginTop: 12, padding: '7px 18px', background: C_T.accent, color: '#fff',
             border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-          📋 {lang === 'fr' ? 'Copier' : 'Copy'}
+          <IconClipboard size={13} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? 'Copier' : 'Copy'}
         </button>
       </div>
     </div>
@@ -990,7 +991,7 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
             ← CHRONOS
           </button>
         )}
-        <span style={{ fontSize: 20 }}>💱</span>
+        <IconExchange size={20} />
         <span style={{ fontWeight: 800, fontSize: 18, color: C_T.accent, letterSpacing: '-0.5px' }}>
           CONVERTERS
         </span>
@@ -1000,7 +1001,7 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
         </span>
         <span style={{ marginLeft: 'auto', background: `${C_T.success}22`, color: C_T.success,
           border: `1px solid ${C_T.success}44`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
-          🔒 100% In-Browser
+          <IconLockClosed size={13} style={{marginRight:4,verticalAlign:-2}} /> 100% In-Browser
         </span>
       </header>
 
@@ -1015,7 +1016,7 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
             padding: '14px 16px', cursor: 'pointer',
             fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', transition: 'all 0.15s',
           }}>
-            {t.icon} {lang === 'fr' ? t.fr : t.en}
+            <Icon name={t.icon} size={14} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? t.fr : t.en}
           </button>
         ))}
       </nav>
@@ -1024,7 +1025,7 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: C_T.muted, marginBottom: 8 }}>
-            <span>{cur?.icon}</span>
+            <Icon name={cur?.icon || 'exchange'} size={16} />
             <span>{lang === 'fr' ? cur?.fr : cur?.en}</span>
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>

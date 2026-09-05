@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { IconGenderMale, IconGenderFemale, IconFlame, IconTrendingDown, IconTrendingUp, IconPointerClick } from '../shared/Icons'
 
 const ACTIVITY = [
   { key: '1.2',  en: 'Sedentary',       fr: 'Sédentaire' },
@@ -41,8 +42,8 @@ export default function TCalories() {
           {lang === 'fr' ? 'Sexe' : 'Sex'}
         </label>
         <div style={{ display: 'flex', gap: 8 }}>
-          {([['m', lang === 'fr' ? '♂ Homme' : '♂ Male'], ['f', lang === 'fr' ? '♀ Femme' : '♀ Female']] as const).map(([v, l]) => (
-            <button key={v} onClick={() => setSex(v)} style={{ flex: 1, padding: '10px', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer', border: `2px solid ${sex===v ? orange : '#E2E8F0'}`, background: sex===v ? `${orange}10` : '#F8FAFC', color: sex===v ? orange : '#64748B' }}>{l}</button>
+          {([['m', IconGenderMale, lang === 'fr' ? 'Homme' : 'Male'], ['f', IconGenderFemale, lang === 'fr' ? 'Femme' : 'Female']] as const).map(([v, Ico, l]) => (
+            <button key={v} onClick={() => setSex(v)} style={{ flex: 1, padding: '10px', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer', border: `2px solid ${sex===v ? orange : '#E2E8F0'}`, background: sex===v ? `${orange}10` : '#F8FAFC', color: sex===v ? orange : '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}><Ico size={14} />{l}</button>
           ))}
         </div>
       </div>
@@ -81,14 +82,14 @@ export default function TCalories() {
             {result.tdee} kcal
           </div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 600 }}>🔥 BMR: {result.bmr}</div>
-            <div style={{ background: '#EFF6FF', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#2563EB' }}>📉 {lang==='fr' ? 'Perte' : 'Loss'}: {result.loss}</div>
-            <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#16A34A' }}>📈 {lang==='fr' ? 'Prise' : 'Gain'}: {result.gain}</div>
+            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}><IconFlame size={14} /> BMR: {result.bmr}</div>
+            <div style={{ background: '#EFF6FF', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#2563EB', display: 'flex', alignItems: 'center', gap: 6 }}><IconTrendingDown size={14} /> {lang==='fr' ? 'Perte' : 'Loss'}: {result.loss}</div>
+            <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#16A34A', display: 'flex', alignItems: 'center', gap: 6 }}><IconTrendingUp size={14} /> {lang==='fr' ? 'Prise' : 'Gain'}: {result.gain}</div>
           </div>
         </div>
       ) : (
         <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: 14, padding: 32, border: '1px dashed #E2E8F0', borderRadius: 14 }}>
-          {lang==='fr' ? '👆 Remplissez les champs pour calculer' : '👆 Fill in the fields to calculate'}
+          <IconPointerClick size={16} style={{marginBottom:6}} /><br/>{lang==='fr' ? 'Remplissez les champs pour calculer' : 'Fill in the fields to calculate'}
         </div>
       )}
     </div>

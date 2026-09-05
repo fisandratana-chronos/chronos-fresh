@@ -13,6 +13,7 @@ import { DARK, LIGHT, COLORS } from '../../lib/theme'
 import { BP } from '../../lib/breakpoints'
 import { TOOLS, resolveToolFromPath, getCats, RELATED_TOOLS, registryTools } from '../../lib/tools'
 import { SEO_CONTENT } from '../../lib/seoContent'
+import { IconCheckCircle, IconBolt, IconShield, IconDeviceMobile, IconCrown, Icon, IconX, IconStar, IconClock, IconPin, IconLink, IconBanknote, IconBulb, IconCheck, IconMessage, IconSend, IconShare, IconUpload, IconSpeakerphone } from '../shared/Icons'
 import { ThemeCtx, useTheme, ResultCtx, useOnResult, HistoryCtx, useHistory } from './shared/contexts'
 import { HEALTH_PANEL_MAP } from './Health/HealthHome'
 import { FINANCE_PANEL_MAP } from './Finance/FinanceHome'
@@ -434,7 +435,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                 color:T.txt,fontFamily:"Inter,sans-serif",fontSize:13,outline:"none",
                 transition:"border-color .15s"}}
             />
-            {query&&<button onClick={()=>setQuery("")} aria-label="Clear search" style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:T.txt3,cursor:"pointer",fontSize:14}}>✕</button>}
+            {query&&<button onClick={()=>setQuery("")} aria-label="Clear search" style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:T.txt3,cursor:"pointer",display:"flex"}}><IconX size={14} /></button>}
           </div>
         </div>
 
@@ -456,7 +457,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                 color:activeCat===cat.id?T.amber:T.txt2,
                 fontFamily:"'Space Grotesk',sans-serif",fontWeight:activeCat===cat.id?600:400,
                 fontSize:13,transition:"all .12s"}}>
-              <span style={{fontSize:14}}>{cat.icon}</span>
+              <Icon name={cat.icon} size={14} />
               <span>{cat.label}</span>
               <span style={{marginLeft:"auto",fontSize:10,fontWeight:600,
                 padding:"1px 7px",borderRadius:10,
@@ -474,7 +475,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           <div style={{marginTop:"auto",paddingTop:16,borderTop:`1px solid ${T.border}`}}>
             <div style={{background:`${T.amber}10`,border:`1px solid ${T.amber}30`,borderRadius:10,padding:"12px"}}>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
-                <span style={{color:T.amber,fontSize:14}}>⚡</span>
+                <IconBolt size={14} color={T.amber} />
                 <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,fontSize:12,color:T.txt}}>Quick access</span>
               </div>
               <p style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3,lineHeight:1.5,marginBottom:8}}>
@@ -564,14 +565,14 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                         cursor:"pointer",lineHeight:1,transition:"color .15s",
                         background:"none",border:"none",padding:"2px",borderRadius:4,
                         userSelect:"none",zIndex:1}}>
-                      {favorites.includes(item.data.id)?"⭐":"☆"}
+                      <IconStar size={13} style={favorites.includes(item.data.id)?{fill:"currentColor"}:{}} />
                     </button>
                     {/* Card body */}
                     <div style={{padding:"20px 16px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:10,flex:1}}>
                       <div style={{width:52,height:52,borderRadius:"50%",
                         background:activeTool===item.data.id?`${T.amber}20`:`${T.bg3}`,
                         display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>
-                        {item.data.icon || "🧮"}
+                        <Icon name={item.data.icon || "calculator"} size={24} />
                       </div>
                       <div style={{textAlign:"center"}}>
                         <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,fontSize:13,
@@ -613,7 +614,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
               {/* Panel header */}
               <div style={{padding:"16px 22px",borderBottom:`1px solid ${T.border}`,
                 display:"flex",alignItems:"center",gap:10}}>
-                <span style={{fontSize:20}}>{tool?.icon}</span>
+                <Icon name={tool?.icon || ''} size={20} />
                 <div>
                   <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:16,color:T.txt}}>{getToolLabel(tool,lang)}</div>
                   <div style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3,marginTop:1}}>
@@ -667,14 +668,14 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
               A collection of smart and easy-to-use calculators for daily life, health, finance, and more. All tools are free to use.
             </p>
             {[
-              {icon:"✅",color:T.emerald,title:"100% Free",desc:"All calculators are free to use with no sign-up required."},
-              {icon:"⚡",color:T.amber,  title:"Fast & Accurate",desc:"Get instant and reliable results with our smart calculators."},
-              {icon:"🛡",color:T.blue,   title:"Private",desc:"Your data stays on your device. We respect your privacy."},
-              {icon:"📱",color:T.purple, title:"Works Everywhere",desc:"Use on any device, anytime, anywhere."},
-            ].map(({icon,color,title,desc})=>(
+              {icon:IconCheckCircle,color:T.emerald,title:"100% Free",desc:"All calculators are free to use with no sign-up required."},
+              {icon:IconBolt,color:T.amber,  title:"Fast & Accurate",desc:"Get instant and reliable results with our smart calculators."},
+              {icon:IconShield,color:T.blue,   title:"Private",desc:"Your data stays on your device. We respect your privacy."},
+              {icon:IconDeviceMobile,color:T.purple, title:"Works Everywhere",desc:"Use on any device, anytime, anywhere."},
+            ].map(({icon:IconCmp,color,title,desc})=>(
               <div key={title} style={{display:"flex",gap:10,marginBottom:12}}>
                 <span style={{width:22,height:22,borderRadius:"50%",background:`${color}20`,
-                  display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0}}>{icon}</span>
+                  display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><IconCmp size={12} color={color} /></span>
                 <div>
                   <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,fontSize:12,color:T.txt,marginBottom:2}}>{title}</div>
                   <div style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3,lineHeight:1.5}}>{desc}</div>
@@ -686,7 +687,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           {/* Unlock More box */}
           <div style={{background:"linear-gradient(135deg,#4F46E5,#7C3AED)",borderRadius:12,padding:"16px"}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-              <span style={{fontSize:18}}>👑</span>
+              <IconCrown size={18} color="#fff" />
               <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:14,color:"#fff"}}>
                 Unlock More
               </span>
@@ -866,7 +867,7 @@ function CalcHistory({ onOpen }) {
             cursor:"pointer",padding:0}}>
           <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,fontSize:13,
             color:T.txt2,letterSpacing:"0.03em"}}>
-            🕐 Calculation History
+            <IconClock size={14} style={{marginRight:6,verticalAlign:-2}} />Calculation History
           </span>
           <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,
             background:`${T.amber}20`,color:T.amber,borderRadius:99,
@@ -904,7 +905,7 @@ function CalcHistory({ onOpen }) {
                 <button onClick={()=>onOpen(entry.id)}
                   style={{display:"flex",alignItems:"center",gap:7,background:"none",
                     border:"none",cursor:"pointer",padding:0,flexShrink:0}}>
-                  <span style={{fontSize:16}}>{toolMeta?.icon}</span>
+                  <Icon name={toolMeta?.icon || ''} size={16} />
                   <div style={{textAlign:"left"}}>
                     <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,
                       fontSize:12,color:T.txt,lineHeight:1.2}}>
@@ -937,7 +938,7 @@ function CalcHistory({ onOpen }) {
                     color:isPinned?T.amber:T.txt4,
                     fontFamily:"Inter,sans-serif",fontSize:10,fontWeight:600,
                     cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}}>
-                  {isPinned ? "📌 Pinned" : "Pin"}
+                  {isPinned ? <><IconPin size={12} style={{marginRight:4,verticalAlign:-1}} />Pinned</> : "Pin"}
                 </button>
               </div>
             );
@@ -984,7 +985,7 @@ function ScenarioCompare() {
         display:"flex",alignItems:"center",justifyContent:"space-between",
         background:`${T.amber}08`}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <span style={{fontSize:15}}>{toolMeta?.icon}</span>
+          <Icon name={toolMeta?.icon || ''} size={15} />
           <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,
             fontSize:13,color:T.amber}}>
             {t("sc.scenario.comparisonTitle")} {getToolLabel(toolMeta, lang)}
@@ -994,7 +995,7 @@ function ScenarioCompare() {
         style={{background:"none",border:"none",cursor:"pointer",
           fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt4,
           padding:"3px 8px",borderRadius:6}}>
-        Clear ✕
+        Clear <IconX size={12} style={{marginLeft:2,verticalAlign:-1}} />
       </button>
       </div>
 
@@ -1086,7 +1087,7 @@ function RelatedTools({ currentId, onOpen }) {
     <div style={{marginTop:28,paddingTop:22,borderTop:`1px solid ${T.border}`}}>
       {/* Header */}
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
-        <span style={{fontSize:14}}>🔗</span>
+        <IconLink size={14} />
         <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,
           fontSize:13,color:T.txt2,letterSpacing:"0.03em"}}>
           Related Tools
@@ -1115,7 +1116,7 @@ function RelatedTools({ currentId, onOpen }) {
               {i===0?"↓":"↓"}
             </span>
             {/* Icon */}
-            <span style={{fontSize:18,flexShrink:0}}>{rt.icon}</span>
+            <span style={{flexShrink:0,display:"flex"}}><Icon name={rt.icon} size={18} /></span>
             {/* Label + hint */}
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,
@@ -1179,7 +1180,7 @@ function AdSlot({ size="728×90", label="Advertisement", slot=ADSENSE_CONFIG.slo
       alignItems:"center", justifyContent:"center",
       background:T.bg2,
     }}>
-      <span style={{fontSize:14,opacity:0.5}}>📢</span>
+      <span style={{opacity:0.5,display:"flex"}}><IconSpeakerphone size={14} /></span>
       <span style={{fontFamily:"Inter,sans-serif",fontSize:10,letterSpacing:"0.08em",
         color:T.txt3,textTransform:"uppercase",fontWeight:600}}>{label}</span>
       <span style={{fontFamily:"Inter,sans-serif",fontSize:9,color:T.txt4}}>{size}</span>
@@ -1229,7 +1230,7 @@ function AfterResultAd({ toolId, visible }) {
         background:`linear-gradient(135deg,${T.amber}20,${T.amber}05)`,
         border:`1px dashed ${T.amber}40`,
         display:"flex",alignItems:"center",justifyContent:"center",
-        fontSize:20}}>💸</div>
+        }}><IconBanknote size={20} /></div>
     </div>
   );
 
@@ -1262,7 +1263,7 @@ function NativeAdCard() {
       <span style={{position:"absolute",top:4,right:6,
         fontFamily:"Inter,sans-serif",fontSize:7,letterSpacing:"0.12em",
         color:T.txt4,textTransform:"uppercase"}}>Ad</span>
-      <span style={{fontSize:18}}>💡</span>
+      <IconBulb size={18} />
       <span style={{fontFamily:"Inter,sans-serif",fontSize:10,fontWeight:500,
         color:T.txt3,textAlign:"center",lineHeight:1.3}}>Sponsored</span>
     </div>
@@ -1359,13 +1360,13 @@ function ShareResultBar({ tool, visible }) {
         {/* Native share — mobile only */}
         {hasNativeShare && (
           <BtnShare onClick={shareNative} bg={T.amber}>
-            <span>📤</span><span>Share</span>
+            <IconUpload size={14} /><span>Share</span>
           </BtnShare>
         )}
 
         {/* Copy link */}
         <BtnShare onClick={copyLink} bg={T.cyan}>
-          <span>{copied ? "✓" : "🔗"}</span>
+          <span>{copied ? <IconCheck size={14} /> : <IconLink size={14} />}</span>
           <span style={{color: copied ? T.emerald : undefined}}>
             {copied ? "Copied!" : "Copy Link"}
           </span>
@@ -1373,12 +1374,12 @@ function ShareResultBar({ tool, visible }) {
 
         {/* WhatsApp */}
         <BtnShare onClick={shareWhatsApp} bg="#25D366">
-          <span>💬</span><span>WhatsApp</span>
+          <IconMessage size={14} /><span>WhatsApp</span>
         </BtnShare>
 
         {/* Telegram */}
         <BtnShare onClick={shareTelegram} bg="#229ED9">
-          <span>✈️</span><span>Telegram</span>
+          <IconSend size={14} /><span>Telegram</span>
         </BtnShare>
 
         {/* Twitter / X */}
@@ -1389,7 +1390,7 @@ function ShareResultBar({ tool, visible }) {
 
         {/* Facebook */}
         <BtnShare onClick={shareFacebook} bg="#1877F2">
-          <span>📘</span><span>Facebook</span>
+          <IconShare size={14} /><span>Facebook</span>
         </BtnShare>
 
       </div>

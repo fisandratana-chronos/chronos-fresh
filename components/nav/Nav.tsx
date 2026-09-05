@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLang } from '../../lib/hooks/useLang'
 import Link from 'next/link'
+import { IconSearch, IconSun, IconMoon, IconX, IconMenu } from '../shared/Icons'
 
 // ── Colors ──────────────────────────────────────────────────
 const COLORS = {
@@ -51,8 +52,8 @@ const COLORS = {
 
 // ── Constants ─────────────────────────────────────────────────
 const LANGS = [
-  { code: "en", label: "English", flag: "🇬🇧" },
-  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "en", label: "English", flag: "EN" },
+  { code: "fr", label: "Français", flag: "FR" },
 ];
 
 // ── Types ─────────────────────────────────────────────────────
@@ -165,7 +166,7 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
             onMouseEnter={e => { e.currentTarget.style.borderColor = "#2563EB"; e.currentTarget.style.color = "#2563EB"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = dark ? "#334155" : "#E2E8F0"; e.currentTarget.style.color = dark ? "#64748B" : "#94A3B8"; }}
           >
-            <span style={{ fontSize: 14 }}>🔍</span>
+            <IconSearch size={14} />
             <span className="ch-search-kbd" style={{ display: "flex", gap: 3, alignItems: "center" }}>
               <kbd style={{ background: dark ? "#0F172A" : "#fff", border: `1px solid ${dark ? "#475569" : "#CBD5E1"}`, borderRadius: 4, padding: "1px 5px", fontFamily: "monospace", fontSize: 10 }}>⌘</kbd>
               <kbd style={{ background: dark ? "#0F172A" : "#fff", border: `1px solid ${dark ? "#475569" : "#CBD5E1"}`, borderRadius: 4, padding: "1px 5px", fontFamily: "monospace", fontSize: 10 }}>K</kbd>
@@ -187,7 +188,7 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
             width: 38, height: 38, borderRadius: 10, fontSize: 16,
             display: "flex", alignItems: "center", justifyContent: "center",
             transition: "background 0.15s",
-          }}>{dark ? "☀️" : "🌙"}</button>
+          }}>{dark ? <IconSun size={16} /> : <IconMoon size={16} />}</button>
           <button className="ch-nav-cta"
             onClick={() => router.push('/')}
             style={{
@@ -211,7 +212,7 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
               display: "flex", alignItems: "center", justifyContent: "center",
               padding: 0, transition: "background 0.15s", flexShrink: 0,
             }}
-          >{menuOpen ? "✕" : "☰"}</button>
+          >{menuOpen ? <IconX size={18} /> : <IconMenu size={18} />}</button>
         </div>
       </div>
     </nav>
@@ -246,14 +247,14 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
             border: `1px solid ${dark ? "#334155" : "#E2E8F0"}`,
             borderRadius: 10, minHeight: 44, cursor: "pointer",
             color: dark ? "#94A3B8" : "#64748B", fontWeight: 600, fontSize: 13,
-          }}>🔍 {t("nav.search")}</button>
+          }}><IconSearch size={14} /> {t("nav.search")}</button>
           <button onClick={() => { setDark(!dark); setMenuOpen(false); }} aria-label={dark ? t("nav.switchToLight") : t("nav.switchToDark")} aria-pressed={dark} style={{
             flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             background: dark ? "#1E293B" : "#F1F5F9",
             border: `1px solid ${dark ? "#334155" : "#E2E8F0"}`,
             borderRadius: 10, minHeight: 44, cursor: "pointer",
             color: dark ? "#94A3B8" : "#64748B", fontWeight: 600, fontSize: 13,
-          }}>{dark ? `☀️ ${t("nav.lightMode")}` : `🌙 ${t("nav.darkMode")}`}</button>
+          }}>{dark ? <><IconSun size={14} /> {t("nav.lightMode")}</> : <><IconMoon size={14} /> {t("nav.darkMode")}</>}</button>
           <button onClick={() => { setLang(lang === "en" ? "fr" : "en"); setMenuOpen(false); }} aria-label={t("nav.language")} style={{
             flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             background: dark ? "#1E293B" : "#F1F5F9",

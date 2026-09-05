@@ -8,6 +8,7 @@
 
 import React from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { Icon, IconCheckCircle, IconX, IconClipboard, IconFolder, IconLockClosed as IconLock, IconLockOpen, IconLink, IconRepeat, IconSearch, IconGlobe, IconPalette, IconBolt } from '../shared/Icons'
 
 // ── Theme ──
 
@@ -28,17 +29,17 @@ const D_T = {
 // ── Tab config ──
 
 const DEV_TABS = [
-  { id: 'json-formatter',      icon: '🗂️',  en: 'JSON Formatter',   fr: 'Formateur JSON',      enDesc: 'Beautify & format JSON',                    frDesc: 'Formater et embellir du JSON' },
-  { id: 'json-validator',      icon: '✅',  en: 'JSON Validator',   fr: 'Validateur JSON',     enDesc: 'Validate JSON syntax',                      frDesc: 'Valider la syntaxe JSON' },
-  { id: 'base64-encoder',      icon: '🔐',  en: 'Base64 Encoder',   fr: 'Encodeur Base64',     enDesc: 'Encode text or files to Base64',             frDesc: 'Encoder du texte ou fichiers en Base64' },
-  { id: 'base64-decoder',      icon: '🔓',  en: 'Base64 Decoder',   fr: 'Décodeur Base64',     enDesc: 'Decode Base64 to text',                     frDesc: 'Décoder Base64 en texte' },
-  { id: 'url-encoder',         icon: '🔗',  en: 'URL Encoder',      fr: 'Encodeur URL',        enDesc: 'Encode URLs & special characters',           frDesc: 'Encoder les URLs et caractères spéciaux' },
-  { id: 'url-decoder',         icon: '🔀',  en: 'URL Decoder',      fr: 'Décodeur URL',        enDesc: 'Decode percent-encoded URLs',               frDesc: 'Décoder les URLs encodées en pourcentage' },
-  { id: 'regex-tester',        icon: '🔍',  en: 'Regex Tester',     fr: 'Testeur Regex',       enDesc: 'Test regular expressions live',             frDesc: 'Tester les expressions régulières en direct' },
-  { id: 'html-formatter',      icon: '🌐',  en: 'HTML Formatter',   fr: 'Formateur HTML',      enDesc: 'Beautify & indent HTML code',               frDesc: 'Formater et indenter du code HTML' },
-  { id: 'css-minifier',        icon: '🎨',  en: 'CSS Minifier',     fr: 'Minifieur CSS',       enDesc: 'Minify CSS to reduce file size',            frDesc: 'Minifier le CSS pour réduire la taille' },
-  { id: 'javascript-minifier', icon: '⚡',  en: 'JS Minifier',      fr: 'Minifieur JS',        enDesc: 'Minify JavaScript code',                    frDesc: 'Minifier le code JavaScript' },
-  { id: 'word-counter',        icon: '📝',  en: 'Word Counter',     fr: 'Compteur de Mots',   enDesc: 'Count words, characters & sentences',       frDesc: 'Compter les mots, caractères et phrases' },
+  { id: 'json-formatter',      icon: 'folder',  en: 'JSON Formatter',   fr: 'Formateur JSON',      enDesc: 'Beautify & format JSON',                    frDesc: 'Formater et embellir du JSON' },
+  { id: 'json-validator',      icon: 'check-circle',  en: 'JSON Validator',   fr: 'Validateur JSON',     enDesc: 'Validate JSON syntax',                      frDesc: 'Valider la syntaxe JSON' },
+  { id: 'base64-encoder',      icon: 'lock',  en: 'Base64 Encoder',   fr: 'Encodeur Base64',     enDesc: 'Encode text or files to Base64',             frDesc: 'Encoder du texte ou fichiers en Base64' },
+  { id: 'base64-decoder',      icon: 'lock-open',  en: 'Base64 Decoder',   fr: 'Décodeur Base64',     enDesc: 'Decode Base64 to text',                     frDesc: 'Décoder Base64 en texte' },
+  { id: 'url-encoder',         icon: 'link',  en: 'URL Encoder',      fr: 'Encodeur URL',        enDesc: 'Encode URLs & special characters',           frDesc: 'Encoder les URLs et caractères spéciaux' },
+  { id: 'url-decoder',         icon: 'repeat',  en: 'URL Decoder',      fr: 'Décodeur URL',        enDesc: 'Decode percent-encoded URLs',               frDesc: 'Décoder les URLs encodées en pourcentage' },
+  { id: 'regex-tester',        icon: 'search',  en: 'Regex Tester',     fr: 'Testeur Regex',       enDesc: 'Test regular expressions live',             frDesc: 'Tester les expressions régulières en direct' },
+  { id: 'html-formatter',      icon: 'globe',  en: 'HTML Formatter',   fr: 'Formateur HTML',      enDesc: 'Beautify & indent HTML code',               frDesc: 'Formater et indenter du code HTML' },
+  { id: 'css-minifier',        icon: 'palette',  en: 'CSS Minifier',     fr: 'Minifieur CSS',       enDesc: 'Minify CSS to reduce file size',            frDesc: 'Minifier le CSS pour réduire la taille' },
+  { id: 'javascript-minifier', icon: 'bolt',  en: 'JS Minifier',      fr: 'Minifieur JS',        enDesc: 'Minify JavaScript code',                    frDesc: 'Minifier le code JavaScript' },
+  { id: 'word-counter',        icon: 'edit',  en: 'Word Counter',     fr: 'Compteur de Mots',   enDesc: 'Count words, characters & sentences',       frDesc: 'Compter les mots, caractères et phrases' },
 ]
 
 // ── Shared helpers ──
@@ -64,7 +65,7 @@ function StatusBox({ ok, message }: { ok: boolean; message: string }) {
   return (
     <div style={{ background: `${color}15`, border: `1px solid ${color}44`, borderRadius: 10,
       padding: '10px 14px', fontSize: 13, color, fontWeight: 600 }}>
-      {ok ? '✅' : '❌'} {message}
+      {ok ? <IconCheckCircle size={14} /> : <IconX size={14} />} {message}
     </div>
   )
 }
@@ -80,7 +81,7 @@ function CopyBtn({ text, lang }: { text: string; lang: string }) {
     <button onClick={copy} style={{ padding: '7px 16px', background: copied ? D_T.success : D_T.accent,
       color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
       transition: 'background 0.2s' }}>
-      {copied ? '✅ Copied!' : `📋 ${lang === 'fr' ? 'Copier' : 'Copy'}`}
+      {copied ? <><IconCheckCircle size={13} style={{marginRight:4,verticalAlign:-2}} />Copied!</> : <><IconClipboard size={13} style={{marginRight:4,verticalAlign:-2}} />{lang === 'fr' ? 'Copier' : 'Copy'}</>}
     </button>
   )
 }
@@ -142,7 +143,7 @@ function JsonFormatterTab({ lang }: { lang: string }) {
             {n}
           </button>
         ))}
-        <RunBtn onClick={run}>🗂️ {lang === 'fr' ? 'Formater' : 'Format'}</RunBtn>
+        <RunBtn onClick={run}><IconFolder size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Formater' : 'Format'}</RunBtn>
       </div>
       {status && <StatusBox ok={status.ok} message={status.msg} />}
       {output && <OutputArea value={output} lang={lang} />}
@@ -174,7 +175,7 @@ function JsonValidatorTab({ lang }: { lang: string }) {
     if (!input.trim()) { setStatus(null); setStats(null); return }
     try {
       const parsed = JSON.parse(input)
-      setStatus({ ok: true, msg: lang === 'fr' ? 'JSON valide ✓' : 'Valid JSON ✓' })
+      setStatus({ ok: true, msg: lang === 'fr' ? 'JSON valide' : 'Valid JSON' })
       setStats({ keys: countKeys(parsed), depth: maxDepth(parsed) })
     } catch (e: any) {
       setStatus({ ok: false, msg: e.message })
@@ -189,7 +190,7 @@ function JsonValidatorTab({ lang }: { lang: string }) {
         <textarea value={input} onChange={e => { setInput(e.target.value); setStatus(null); setStats(null) }}
           rows={8} style={monoInp()} placeholder='{"key": "value"}' />
       </div>
-      <RunBtn onClick={run}>✅ {lang === 'fr' ? 'Valider' : 'Validate'}</RunBtn>
+      <RunBtn onClick={run}><IconCheckCircle size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Valider' : 'Validate'}</RunBtn>
       {status && <StatusBox ok={status.ok} message={status.msg} />}
       {stats && (
         <div style={{ display: 'flex', gap: 12 }}>
@@ -227,7 +228,7 @@ function Base64EncoderTab({ lang }: { lang: string }) {
         <textarea value={input} onChange={e => setInput(e.target.value)} rows={5}
           style={monoInp()} placeholder="Hello, World!" />
       </div>
-      <RunBtn onClick={run}>🔐 {lang === 'fr' ? 'Encoder' : 'Encode'}</RunBtn>
+      <RunBtn onClick={run}><IconLock size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Encoder' : 'Encode'}</RunBtn>
       {output && <OutputArea value={output} lang={lang} />}
     </div>
   )
@@ -257,7 +258,7 @@ function Base64DecoderTab({ lang }: { lang: string }) {
         <textarea value={input} onChange={e => { setInput(e.target.value); setStatus(null) }} rows={5}
           style={monoInp()} placeholder="SGVsbG8sIFdvcmxkIQ==" />
       </div>
-      <RunBtn onClick={run}>🔓 {lang === 'fr' ? 'Décoder' : 'Decode'}</RunBtn>
+      <RunBtn onClick={run}><IconLockOpen size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Décoder' : 'Decode'}</RunBtn>
       {status && <StatusBox ok={status.ok} message={status.msg} />}
       {output && <OutputArea value={output} lang={lang} />}
     </div>
@@ -279,7 +280,7 @@ function UrlEncoderTab({ lang }: { lang: string }) {
         <textarea value={input} onChange={e => setInput(e.target.value)} rows={4}
           style={monoInp()} placeholder="https://example.com/search?q=hello world&lang=fr" />
       </div>
-      <RunBtn onClick={run}>🔗 {lang === 'fr' ? 'Encoder' : 'Encode'}</RunBtn>
+      <RunBtn onClick={run}><IconLink size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Encoder' : 'Encode'}</RunBtn>
       {output && <OutputArea value={output} lang={lang} />}
     </div>
   )
@@ -309,7 +310,7 @@ function UrlDecoderTab({ lang }: { lang: string }) {
         <textarea value={input} onChange={e => { setInput(e.target.value); setStatus(null) }} rows={4}
           style={monoInp()} placeholder="https%3A%2F%2Fexample.com%2Fsearch%3Fq%3Dhello%20world" />
       </div>
-      <RunBtn onClick={run}>🔀 {lang === 'fr' ? 'Décoder' : 'Decode'}</RunBtn>
+      <RunBtn onClick={run}><IconRepeat size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Décoder' : 'Decode'}</RunBtn>
       {status && <StatusBox ok={status.ok} message={status.msg} />}
       {output && <OutputArea value={output} lang={lang} />}
     </div>
@@ -368,7 +369,7 @@ function RegexTesterTab({ lang }: { lang: string }) {
         <Label>{lang === 'fr' ? 'Texte de test' : 'Test string'}</Label>
         <textarea value={text} onChange={e => setText(e.target.value)} rows={4} style={monoInp()} />
       </div>
-      <RunBtn onClick={run}>🔍 {lang === 'fr' ? 'Tester' : 'Test'}</RunBtn>
+      <RunBtn onClick={run}><IconSearch size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Tester' : 'Test'}</RunBtn>
       {status && <StatusBox ok={status.ok} message={status.msg} />}
       {matches.length > 0 && (
         <div>
@@ -423,7 +424,7 @@ function HtmlFormatterTab({ lang }: { lang: string }) {
         <Label>{lang === 'fr' ? 'HTML brut' : 'Raw HTML'}</Label>
         <textarea value={input} onChange={e => setInput(e.target.value)} rows={5} style={monoInp()} />
       </div>
-      <RunBtn onClick={run}>🌐 {lang === 'fr' ? 'Formater' : 'Format'}</RunBtn>
+      <RunBtn onClick={run}><IconGlobe size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Formater' : 'Format'}</RunBtn>
       {output && <OutputArea value={output} lang={lang} />}
     </div>
   )
@@ -454,7 +455,7 @@ function CssMinifierTab({ lang }: { lang: string }) {
         <textarea value={input} onChange={e => { setInput(e.target.value); setOutput(''); setSaved(null) }}
           rows={7} style={monoInp()} />
       </div>
-      <RunBtn onClick={run}>🎨 {lang === 'fr' ? 'Minifier' : 'Minify'}</RunBtn>
+      <RunBtn onClick={run}><IconPalette size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Minifier' : 'Minify'}</RunBtn>
       {saved !== null && (
         <StatusBox ok={saved >= 0}
           message={saved > 0
@@ -498,7 +499,7 @@ function JsMinifierTab({ lang }: { lang: string }) {
           ? 'Minification basique — pour la production, utilisez Terser ou esbuild.'
           : 'Basic minification — for production, use Terser or esbuild.'}
       </div>
-      <RunBtn onClick={run}>⚡ {lang === 'fr' ? 'Minifier' : 'Minify'}</RunBtn>
+      <RunBtn onClick={run}><IconBolt size={14} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Minifier' : 'Minify'}</RunBtn>
       {saved !== null && (
         <StatusBox ok={saved >= 0}
           message={saved > 0
@@ -594,7 +595,7 @@ function TDeveloperHub({ onBack }: { onBack?: () => void }) {
             ← CHRONOS
           </button>
         )}
-        <span style={{ fontSize: 20 }}>⚡</span>
+        <IconBolt size={20} />
         <span style={{ fontWeight: 800, fontSize: 18, color: D_T.accent, letterSpacing: '-0.5px' }}>
           DEVELOPER TOOLS
         </span>
@@ -604,7 +605,7 @@ function TDeveloperHub({ onBack }: { onBack?: () => void }) {
         </span>
         <span style={{ marginLeft: 'auto', background: '#22C55E22', color: '#22C55E',
           border: '1px solid #22C55E44', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
-          🔒 100% In-Browser
+          <IconLock size={13} style={{marginRight:4,verticalAlign:-2}} /> 100% In-Browser
         </span>
       </header>
 
@@ -619,7 +620,7 @@ function TDeveloperHub({ onBack }: { onBack?: () => void }) {
             padding: '14px 14px', cursor: 'pointer',
             fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', transition: 'all 0.15s',
           }}>
-            {t.icon} {lang === 'fr' ? t.fr : t.en}
+            <Icon name={t.icon} size={14} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? t.fr : t.en}
           </button>
         ))}
       </nav>
@@ -628,7 +629,7 @@ function TDeveloperHub({ onBack }: { onBack?: () => void }) {
       <main style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px' }}>
         <div style={{ marginBottom: 20 }}>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-            {cur?.icon} {lang === 'fr' ? cur?.fr : cur?.en}
+            <Icon name={cur?.icon || 'folder'} size={14} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? cur?.fr : cur?.en}
           </h1>
           <p style={{ color: D_T.muted, fontSize: 14, margin: '6px 0 0' }}>
             {lang === 'fr' ? cur?.frDesc : cur?.enDesc}

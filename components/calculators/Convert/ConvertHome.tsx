@@ -18,9 +18,9 @@ export const CONVERT_PANEL_MAP = {
 }
 
 export const CONVERT_TOOLS = [
-  { key: "temp", label: "Temperature Converter", icon: "🌡️", Component: TemperatureConverter },
-  { key: "binary", label: "Binary Converter", icon: "0️⃣", Component: BinaryConverter },
-  { key: "rgb", label: "RGB ↔ HEX Converter", icon: "🎨", Component: RgbHexConverter },
-  { key: "units", label: "Unit Converter", icon: "📏", Component: UnitConverter },
-  { key: "roman", label: "Roman Numeral Converter", icon: "🅾️", Component: RomanNumeralConverter }
+  { key: "temp", label: "Temperature Converter", icon: "thermometer", Component: TemperatureConverter },
+  { key: "binary", label: "Binary Converter", icon: "hash", Component: BinaryConverter },
+  { key: "rgb", label: "RGB ↔ HEX Converter", icon: "palette", Component: RgbHexConverter },
+  { key: "units", label: "Unit Converter", icon: "ruler", Component: UnitConverter },
+  { key: "roman", label: "Roman Numeral Converter", icon: "abc", Component: RomanNumeralConverter }
 ]

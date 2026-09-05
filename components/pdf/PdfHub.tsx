@@ -14,6 +14,7 @@ import * as PDFLib from 'pdf-lib'
 import { useLang } from '../../lib/hooks/useLang'
 import { useDark } from '../../lib/hooks/useDark'
 import { DARK, LIGHT } from '../../lib/theme'
+import { Icon, IconScissors, IconLockClosed, IconLockOpen, IconAlertTriangle, IconCheck, IconBulb, IconShield } from '../shared/Icons'
 import { BP } from '../../lib/breakpoints'
 import { PDF_SEO_CONTENT } from '../../lib/pdfSeoContent'
 import { COMPRESS_PRESETS, type CompressResult } from '../../lib/pdf/compressImages'
@@ -150,7 +151,7 @@ function buildResponsiveStyle(C: ReturnType<typeof buildPalette>) { return `
 
 const PDF_TABS = [
   { id: "merge",     icon: "▧",  en: "Merge PDF",    fr: "Fusionner PDF",    group: "popular",  enDesc: "Combine multiple PDFs into one",        frDesc: "Combiner plusieurs PDF en un seul" },
-  { id: "split",     icon: "✂",  en: "Split PDF",    fr: "Diviser PDF",      group: "popular",  enDesc: "Extract pages or split by range",       frDesc: "Extraire des pages ou diviser par plage" },
+  { id: "split",     icon: "scissors",  en: "Split PDF",    fr: "Diviser PDF",      group: "popular",  enDesc: "Extract pages or split by range",       frDesc: "Extraire des pages ou diviser par plage" },
   { id: "compress",  icon: "⇣",  en: "Compress PDF", fr: "Compresser PDF",   group: "popular",  enDesc: "Reduce PDF file size",                  frDesc: "Réduire la taille du fichier PDF" },
   { id: "jpg2pdf",   icon: "▣",  en: "JPG → PDF",    fr: "JPG → PDF",        group: "convert",  enDesc: "Convert images to PDF",                 frDesc: "Convertir des images en PDF" },
   { id: "pdf2jpg",   icon: "▤",  en: "PDF → JPG",    fr: "PDF → JPG",        group: "convert",  enDesc: "Convert PDF pages to images",           frDesc: "Convertir les pages PDF en images" },
@@ -158,11 +159,11 @@ const PDF_TABS = [
   { id: "pdf2excel", icon: "X",  en: "PDF → Excel",  fr: "PDF → Excel",      group: "convert",  enDesc: "Extract tables from PDF",               frDesc: "Extraire les tableaux d'un PDF" },
   { id: "html2pdf",  icon: "◫",  en: "HTML → PDF",   fr: "HTML → PDF",       group: "convert",  enDesc: "Convert HTML content to a PDF document", frDesc: "Convertir du contenu HTML en document PDF" },
   { id: "rotate",    icon: "↻",  en: "Rotate PDF",   fr: "Pivoter PDF",      group: "other",    enDesc: "Rotate pages 90°, 180° or 270°",       frDesc: "Faire pivoter les pages 90°, 180° ou 270°" },
-  { id: "removepages", icon: "🗑", en: "Remove pages", fr: "Supprimer des pages", group: "other", enDesc: "Delete the pages you don't need",     frDesc: "Supprimer les pages dont vous n'avez pas besoin" },
+  { id: "removepages", icon: "trash", en: "Remove pages", fr: "Supprimer des pages", group: "other", enDesc: "Delete the pages you don't need",     frDesc: "Supprimer les pages dont vous n'avez pas besoin" },
   { id: "rearrange", icon: "⇅",  en: "Rearrange pages", fr: "Réorganiser les pages", group: "other", enDesc: "Reorder the pages of a PDF",        frDesc: "Réorganiser les pages d'un PDF" },
   { id: "watermark", icon: "◈",  en: "Add watermark", fr: "Ajouter un filigrane", group: "other",  enDesc: "Stamp text or an image over your PDF", frDesc: "Apposer du texte ou une image sur votre PDF" },
-  { id: "protect",   icon: "🔒", en: "Protect PDF",  fr: "Protéger PDF",     group: "security", enDesc: "Encrypt your PDF with a password",      frDesc: "Chiffrer votre PDF avec un mot de passe" },
-  { id: "unlock",    icon: "🔓", en: "Unlock PDF",   fr: "Déverrouiller PDF", group: "security", enDesc: "Remove PDF password security",         frDesc: "Supprimer la protection par mot de passe" },
+  { id: "protect",   icon: "lock", en: "Protect PDF",  fr: "Protéger PDF",     group: "security", enDesc: "Encrypt your PDF with a password",      frDesc: "Chiffrer votre PDF avec un mot de passe" },
+  { id: "unlock",    icon: "lock-open", en: "Unlock PDF",   fr: "Déverrouiller PDF", group: "security", enDesc: "Remove PDF password security",         frDesc: "Supprimer la protection par mot de passe" },
 ];
 
 const GROUPS = [
@@ -342,7 +343,7 @@ function PdfDropZone({ accept, multiple, onFiles, label, hint, maxSizeMB = 100, 
         borderRadius: 8, color: C.hot, fontSize: 11,
         fontFamily: "'DM Sans', sans-serif",
       }}>
-        ⚠ &nbsp; {sizeError}
+        <IconAlertTriangle size={13} style={{marginRight:4,verticalAlign:-2}} /> {sizeError}
       </div>
     )}
     </div>
@@ -387,7 +388,7 @@ function PdfFileList({ files, onRemove, onMoveUp, onMoveDown }: {
           {onRemove && (
             <button onClick={() => onRemove(i)}
               style={{ border: 0, background: "none", color: C.muted, cursor: "pointer", fontSize: 14, padding: 0 }}>
-              ✕
+              <Icon name="x" size={12} />
             </button>
           )}
         </div>
@@ -415,7 +416,7 @@ function PdfStatus({ status, message }: { status: string | null, message: string
   const { C } = React.useContext(PdfThemeCtx)
   if (!status) return null;
   const color = status === "ok" ? C.green : status === "err" ? C.hot : C.accent;
-  const icon = status === "ok" ? "✓" : status === "err" ? "✕" : "⏳";
+  const icon = status === "ok" ? <IconCheck size={14} /> : status === "err" ? <Icon name="x" size={14} /> : "⏳";
   return (
     <div style={{
       background: `${color}12`,
@@ -550,7 +551,7 @@ function HowItWorksCard({ steps, tip, lang }: {
             color: C.tipText, fontSize: 9,
           }}>
             <span style={{ color: C.accent, fontWeight: 700, display: "block", marginBottom: 3 }}>
-              💡 {lang === "fr" ? "Conseil" : "Tip"}
+              <IconBulb size={13} style={{marginRight:4,verticalAlign:-2}} /> {lang === "fr" ? "Conseil" : "Tip"}
             </span>
             {lang === "fr" ? tip.fr : tip.en}
           </div>
@@ -844,7 +845,7 @@ function PdfSplitTab({ lang }: { lang: string }) {
               placeholder="e.g. 1-3, 5, 7-10" style={s.input} />
           )}
           <button onClick={run} style={s.cta()}>
-            ✂ &nbsp; {lang === "fr" ? "Diviser le PDF" : "Split PDF"}
+            <IconScissors size={14} style={{marginRight:6,verticalAlign:-2}} /> {lang === "fr" ? "Diviser le PDF" : "Split PDF"}
           </button>
         </>
       )}
@@ -1340,7 +1341,7 @@ function PdfRemovePagesTab({ lang }: { lang: string }) {
             <input value={pages} onChange={e => setPages(e.target.value)} placeholder="e.g. 2, 4-6" style={s.input} />
           </div>
           <button onClick={run} style={s.cta(!pages.trim())} disabled={!pages.trim()}>
-            🗑 &nbsp; {lang === "fr" ? "Supprimer les pages" : "Remove pages"}
+            <Icon name="trash" size={14} style={{marginRight:6,verticalAlign:-2}} /> {lang === "fr" ? "Supprimer les pages" : "Remove pages"}
           </button>
         </>
       )}
@@ -1564,7 +1565,7 @@ function PdfProtectTab({ lang }: { lang: string }) {
             <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} style={s.input} />
           </div>
           <button onClick={run} style={s.cta(!password)} disabled={!password}>
-            🔒 &nbsp; {lang === "fr" ? "Protéger le PDF" : "Protect PDF"}
+            <IconLockClosed size={14} style={{marginRight:6,verticalAlign:-2}} /> {lang === "fr" ? "Protéger le PDF" : "Protect PDF"}
           </button>
         </>
       )}
@@ -1607,7 +1608,7 @@ function PdfUnlockTab({ lang }: { lang: string }) {
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={s.input} />
           </div>
           <button onClick={run} style={s.cta()}>
-            🔓 &nbsp; {lang === "fr" ? "Déverrouiller le PDF" : "Unlock PDF"}
+            <IconLockOpen size={14} style={{marginRight:6,verticalAlign:-2}} /> {lang === "fr" ? "Déverrouiller le PDF" : "Unlock PDF"}
           </button>
         </>
       )}
@@ -1824,7 +1825,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
             background: C.panel,
           }}>
             <b style={{ fontSize: 11, display: "block" }}>
-              ♧ &nbsp; {lang === "fr" ? "100% Dans le navigateur" : "100% In-Browser"}
+              <IconShield size={13} style={{marginRight:4,verticalAlign:-2}} /> {lang === "fr" ? "100% Dans le navigateur" : "100% In-Browser"}
             </b>
             <p style={{ color: C.muted2, fontSize: 10, lineHeight: 1.5, margin: "6px 0 0" }}>
               {lang === "fr"
@@ -1871,16 +1872,16 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
           {/* Trust badges */}
           <div className="chronos-trust-badges" style={{ display: "flex", gap: 32, marginBottom: 24 }}>
             {[
-              { icon: "♧", title: lang === "fr" ? "100% Privé" : "100% Private", sub: lang === "fr" ? "Traité dans votre navigateur" : "Processed in your browser" },
-              { icon: "↯", title: lang === "fr" ? "Rapide & Sécurisé" : "Fast & Secure", sub: lang === "fr" ? "Pas d'upload, pas d'attente" : "No upload, no waiting" },
-              { icon: "✓", title: lang === "fr" ? "Facile à utiliser" : "Easy to Use", sub: lang === "fr" ? "Glissez-déposez simplement" : "Just drag and drop" },
+              { icon: "shield", title: lang === "fr" ? "100% Privé" : "100% Private", sub: lang === "fr" ? "Traité dans votre navigateur" : "Processed in your browser" },
+              { icon: "bolt", title: lang === "fr" ? "Rapide & Sécurisé" : "Fast & Secure", sub: lang === "fr" ? "Pas d'upload, pas d'attente" : "No upload, no waiting" },
+              { icon: "check", title: lang === "fr" ? "Facile à utiliser" : "Easy to Use", sub: lang === "fr" ? "Glissez-déposez simplement" : "Just drag and drop" },
             ].map((item, i) => (
               <div key={i} style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <div style={{
                   width: 30, height: 30, border: `1px solid ${C.border}`,
                   borderRadius: 9, display: "grid", placeItems: "center", color: C.accent,
                 }}>
-                  {item.icon}
+                  <Icon name={item.icon} size={15} />
                 </div>
                 <div>
                   <strong style={{ fontSize: 11, display: "block", color: C.text }}>{item.title}</strong>
@@ -1935,7 +1936,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
 
           {/* Footer */}
           <div style={{ borderTop: `1px solid ${C.border}`, marginTop: 22, paddingTop: 14, textAlign: "center", color: C.muted2, fontSize: 9 }}>
-            ♧ &nbsp; {lang === "fr" ? "Privé · Rapide · Dans le navigateur — Vos fichiers ne quittent jamais votre appareil." : "Private · Fast · In-Browser — Your files never leave your device."}
+            <IconShield size={13} style={{marginRight:4,verticalAlign:-2}} /> {lang === "fr" ? "Privé · Rapide · Dans le navigateur — Vos fichiers ne quittent jamais votre appareil." : "Private · Fast · In-Browser — Your files never leave your device."}
           </div>
         </main>
       </div>

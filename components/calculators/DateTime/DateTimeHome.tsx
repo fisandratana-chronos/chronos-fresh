@@ -12,6 +12,6 @@ export const DATETIME_PANEL_MAP = {
 }
 
 export const DATETIME_TOOLS = [
-  { key: "datediff", label: "Date Difference Calculator", icon: "📅", Component: DateDifferenceCalculator },
-  { key: "timezone", label: "Time Zone Converter", icon: "🕒", Component: TimeZoneConverter }
+  { key: "datediff", label: "Date Difference Calculator", icon: "calendar", Component: DateDifferenceCalculator },
+  { key: "timezone", label: "Time Zone Converter", icon: "clock", Component: TimeZoneConverter }
 ]

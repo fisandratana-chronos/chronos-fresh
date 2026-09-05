@@ -14,7 +14,7 @@ export const HEALTH_PANEL_MAP = {
 }
 
 export const HEALTH_TOOLS = [
-  { key: "bmi", label: "BMI Calculator", icon: "⚖️", Component: BmiCalculator },
-  { key: "age", label: "Age Calculator", icon: "🎂", Component: AgeCalculator },
-  { key: "calories", label: "Calorie Calculator", icon: "🔥", Component: CalorieCalculator }
+  { key: "bmi", label: "BMI Calculator", icon: "scale", Component: BmiCalculator },
+  { key: "age", label: "Age Calculator", icon: "cake", Component: AgeCalculator },
+  { key: "calories", label: "Calorie Calculator", icon: "flame", Component: CalorieCalculator }
 ]

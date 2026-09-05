@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { IconGenderMale, IconGenderFemale, IconChartBar, IconClipboard, IconPointerClick } from '../shared/Icons'
 
 export default function TIdealWeight() {
   const { lang } = useLang()
@@ -29,14 +30,15 @@ export default function TIdealWeight() {
           {lang === 'fr' ? 'Sexe' : 'Sex'}
         </label>
         <div style={{ display: 'flex', gap: 8 }}>
-          {([['m', lang === 'fr' ? '♂ Homme' : '♂ Male'], ['f', lang === 'fr' ? '♀ Femme' : '♀ Female']] as const).map(([v, label]) => (
+          {([['m', IconGenderMale, lang === 'fr' ? 'Homme' : 'Male'], ['f', IconGenderFemale, lang === 'fr' ? 'Femme' : 'Female']] as const).map(([v, Ico, label]) => (
             <button key={v} onClick={() => setSex(v)} style={{
               flex: 1, padding: '10px', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer',
               border: `2px solid ${sex === v ? green : '#E2E8F0'}`,
               background: sex === v ? `${green}10` : '#F8FAFC',
               color: sex === v ? green : '#64748B',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             }}>
-              {label}
+              <Ico size={14} />{label}
             </button>
           ))}
         </div>
@@ -65,7 +67,7 @@ export default function TIdealWeight() {
           </div>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
             <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, color: '#0F172A', fontWeight: 600 }}>
-              📊 {lang === 'fr' ? 'Fourchette' : 'Range'}: {result.low}–{result.high} kg
+              <span style={{display:'inline-flex',alignItems:'center',gap:6}}><IconChartBar size={14} /> {lang === 'fr' ? 'Fourchette' : 'Range'}: {result.low}–{result.high} kg</span>
             </div>
             <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, color: '#0F172A', fontWeight: 600 }}>
               🇺🇸 {result.lbs} lbs
@@ -78,14 +80,14 @@ export default function TIdealWeight() {
             onClick={() => navigator.clipboard?.writeText(`${lang === 'fr' ? 'Poids idéal' : 'Ideal weight'}: ${result.kg} kg (${result.low}–${result.high} kg)`)}
             style={{ padding: '8px 20px', background: green, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
           >
-            {lang === 'fr' ? '📋 Copier' : '📋 Copy'}
+            <><IconClipboard size={13} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Copier' : 'Copy'}</>
           </button>
         </div>
       )}
 
       {!result && (
         <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: 14, padding: 32, border: '1px dashed #E2E8F0', borderRadius: 14 }}>
-          {lang === 'fr' ? '👆 Entrez votre taille pour calculer' : '👆 Enter your height to calculate'}
+          <IconPointerClick size={16} style={{marginBottom:6}} /><br/>{lang === 'fr' ? 'Entrez votre taille pour calculer' : 'Enter your height to calculate'}
         </div>
       )}
     </div>

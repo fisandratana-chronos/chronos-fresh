@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { IconSun, IconDroplet, IconCoffee, IconClipboard, IconPointerClick } from '../shared/Icons'
 
 const ACTIVITY_LEVELS = [
   { key: 'sedentary',  mult: 1.0,  en: 'Sedentary',     fr: 'Sédentaire' },
@@ -74,8 +75,8 @@ export default function TWaterIntake() {
             boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
           }} />
         </button>
-        <span style={{ fontSize: 14, color: '#64748B' }}>
-          {lang === 'fr' ? '☀️ Climat chaud / humide' : '☀️ Hot / humid climate'}
+        <span style={{ fontSize: 14, color: '#64748B', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <IconSun size={14} /> {lang === 'fr' ? 'Climat chaud / humide' : 'Hot / humid climate'}
         </span>
       </div>
 
@@ -89,25 +90,25 @@ export default function TWaterIntake() {
             {lang === 'fr' ? 'par jour' : 'per day'}
           </div>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, color: '#0F172A', fontWeight: 600 }}>
-              💧 {result.ml.toLocaleString()} ml
+            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, color: '#0F172A', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <IconDroplet size={14} /> {result.ml.toLocaleString()} ml
             </div>
-            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, color: '#0F172A', fontWeight: 600 }}>
-              ☕ {result.cups} {lang === 'fr' ? 'tasses' : 'cups'}
+            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, color: '#0F172A', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <IconCoffee size={14} /> {result.cups} {lang === 'fr' ? 'tasses' : 'cups'}
             </div>
           </div>
           <button
             onClick={() => navigator.clipboard?.writeText(`${lang === 'fr' ? 'Apport en eau' : 'Water intake'}: ${result.liters} L / ${result.cups} cups`)}
             style={{ marginTop: 16, padding: '8px 20px', background: blue, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
           >
-            {lang === 'fr' ? '📋 Copier' : '📋 Copy'}
+            <><IconClipboard size={13} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Copier' : 'Copy'}</>
           </button>
         </div>
       )}
 
       {!result && (
         <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: 14, padding: 32, border: '1px dashed #E2E8F0', borderRadius: 14 }}>
-          {lang === 'fr' ? '👆 Entrez votre poids pour calculer' : '👆 Enter your weight to calculate'}
+          <IconPointerClick size={16} style={{marginBottom:6}} /><br/>{lang === 'fr' ? 'Entrez votre poids pour calculer' : 'Enter your weight to calculate'}
         </div>
       )}
     </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { IconCash, IconTrendingUp, IconClipboard, IconPointerClick } from '../shared/Icons'
 
 export default function TMortgage() {
   const { lang } = useLang()
@@ -56,21 +57,21 @@ export default function TMortgage() {
             ${result.monthly.toLocaleString()}
           </div>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600 }}>
-              💰 {lang === 'fr' ? 'Total' : 'Total'}: ${result.total.toLocaleString()}
+            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <IconCash size={14} /> {lang === 'fr' ? 'Total' : 'Total'}: ${result.total.toLocaleString()}
             </div>
-            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600 }}>
-              📈 {lang === 'fr' ? 'Intérêts' : 'Interest'}: ${result.interest.toLocaleString()}
+            <div style={{ background: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <IconTrendingUp size={14} /> {lang === 'fr' ? 'Intérêts' : 'Interest'}: ${result.interest.toLocaleString()}
             </div>
           </div>
           <button onClick={() => navigator.clipboard?.writeText(`${lang === 'fr' ? 'Mensualité' : 'Monthly'}: $${result.monthly.toLocaleString()}`)}
             style={{ marginTop: 16, padding: '8px 20px', background: blue, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-            {lang === 'fr' ? '📋 Copier' : '📋 Copy'}
+            <><IconClipboard size={13} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Copier' : 'Copy'}</>
           </button>
         </div>
       ) : (
         <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: 14, padding: 32, border: '1px dashed #E2E8F0', borderRadius: 14 }}>
-          {lang === 'fr' ? '👆 Remplissez les champs pour calculer' : '👆 Fill in the fields to calculate'}
+          <IconPointerClick size={16} style={{marginBottom:6}} /><br/>{lang === 'fr' ? 'Remplissez les champs pour calculer' : 'Fill in the fields to calculate'}
         </div>
       )}
     </div>

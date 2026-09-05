@@ -28,14 +28,14 @@ export const DEVELOPER_PANEL_MAP = {
 }
 
 export const DEVELOPER_TOOLS = [
-  { key: "password", label: "Password Generator", icon: "🔑", Component: PasswordGenerator },
-  { key: "uuid", label: "UUID Generator", icon: "🆔", Component: UuidGenerator },
-  { key: "json", label: "JSON Formatter", icon: "🧩", Component: JsonFormatter },
-  { key: "qr", label: "QR Code Generator", icon: "📱", Component: QrCodeGenerator },
-  { key: "wordcount", label: "Word Counter", icon: "🔢", Component: WordCounter },
-  { key: "textdiff", label: "Text Diff Checker", icon: "🔍", Component: TextDiffChecker },
-  { key: "lorem", label: "Lorem Ipsum Generator", icon: "📝", Component: LoremIpsumGenerator },
-  { key: "casegen", label: "Case Converter", icon: "🔤", Component: CaseConverter },
-  { key: "sha256", label: "SHA-256 Generator", icon: "🔐", Component: Sha256Generator },
-  { key: "base64", label: "Base64 Encoder/Decoder", icon: "🔡", Component: Base64Tool }
+  { key: "password", label: "Password Generator", icon: "key", Component: PasswordGenerator },
+  { key: "uuid", label: "UUID Generator", icon: "id-badge", Component: UuidGenerator },
+  { key: "json", label: "JSON Formatter", icon: "folder", Component: JsonFormatter },
+  { key: "qr", label: "QR Code Generator", icon: "device-mobile", Component: QrCodeGenerator },
+  { key: "wordcount", label: "Word Counter", icon: "hash", Component: WordCounter },
+  { key: "textdiff", label: "Text Diff Checker", icon: "search", Component: TextDiffChecker },
+  { key: "lorem", label: "Lorem Ipsum Generator", icon: "edit", Component: LoremIpsumGenerator },
+  { key: "casegen", label: "Case Converter", icon: "typography", Component: CaseConverter },
+  { key: "sha256", label: "SHA-256 Generator", icon: "lock", Component: Sha256Generator },
+  { key: "base64", label: "Base64 Encoder/Decoder", icon: "abc", Component: Base64Tool }
 ]

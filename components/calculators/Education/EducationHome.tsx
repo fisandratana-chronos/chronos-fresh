@@ -12,6 +12,6 @@ export const EDUCATION_PANEL_MAP = {
 }
 
 export const EDUCATION_TOOLS = [
-  { key: "gpa", label: "GPA Calculator", icon: "🎓", Component: GpaCalculator },
-  { key: "scientific", label: "Scientific Calculator", icon: "🧮", Component: ScientificCalculator }
+  { key: "gpa", label: "GPA Calculator", icon: "graduation-cap", Component: GpaCalculator },
+  { key: "scientific", label: "Scientific Calculator", icon: "calculator", Component: ScientificCalculator }
 ]

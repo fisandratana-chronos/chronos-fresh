@@ -10,5 +10,5 @@ export const MISC_PANEL_MAP = {
 }
 
 export const MISC_TOOLS = [
-  { key: "randompick", label: "Random Picker", icon: "🎲", Component: RandomPicker }
+  { key: "randompick", label: "Random Picker", icon: "dice", Component: RandomPicker }
 ]

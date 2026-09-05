@@ -7,6 +7,7 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
 import { TOOLS, Tool } from '../../lib/tools'
+import { IconSearch, IconX, Icon } from '../shared/Icons'
 
 // ── Simple fuzzySearch (no pre-built index needed) ─────────────
 function fuzzySearch(query: string, tools: Tool[]): Tool[] {
@@ -34,12 +35,12 @@ function fuzzySearch(query: string, tools: Tool[]): Tool[] {
 
 // ── Quick actions (navigate to a hub directly) ─────────────────
 const QUICK_ACTIONS = [
-  { id: '__calc',    name: 'Smart Calculator',  frName: 'Calculatrice',   icon: '🧮', href: '/tools/smart-calculator' },
-  { id: '__pdf',     name: 'PDF Tools',          frName: 'Outils PDF',     icon: '📄', href: '/tools/pdf-hub' },
-  { id: '__network', name: 'Network Hub',        frName: 'Hub Réseau',     icon: '📡', href: '/tools/network-hub' },
-  { id: '__bmi',     name: 'BMI Calculator',     frName: 'Calcul IMC',     icon: '⚖️', href: '/tools/bmi-calculator' },
-  { id: '__merge',   name: 'Merge PDF',           frName: 'Fusionner PDF',  icon: '📑', href: '/tools/merge-pdf' },
-  { id: '__ip',      name: 'IP Lookup',           frName: 'Recherche IP',   icon: '🌐', href: '/tools/ip-lookup' },
+  { id: '__calc',    name: 'Smart Calculator',  frName: 'Calculatrice',   icon: 'calculator', href: '/tools/smart-calculator' },
+  { id: '__pdf',     name: 'PDF Tools',          frName: 'Outils PDF',     icon: 'file-text', href: '/tools/pdf-hub' },
+  { id: '__network', name: 'Network Hub',        frName: 'Hub Réseau',     icon: 'antenna', href: '/tools/network-hub' },
+  { id: '__bmi',     name: 'BMI Calculator',     frName: 'Calcul IMC',     icon: 'scale', href: '/tools/bmi-calculator' },
+  { id: '__merge',   name: 'Merge PDF',           frName: 'Fusionner PDF',  icon: 'file-text', href: '/tools/merge-pdf' },
+  { id: '__ip',      name: 'IP Lookup',           frName: 'Recherche IP',   icon: 'globe', href: '/tools/ip-lookup' },
 ]
 
 // ── CommandPalette component ───────────────────────────────────
@@ -134,7 +135,7 @@ export default function CommandPalette({ open, onClose, dark = false }: Props) {
       >
         {/* Input */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 20px', borderBottom: `1px solid ${bdr}` }}>
-          <span style={{ fontSize: 18, opacity: 0.5 }}>🔍</span>
+          <span style={{ opacity: 0.5 }}><IconSearch size={18} /></span>
           <input
             ref={inputRef}
             value={query}
@@ -146,7 +147,7 @@ export default function CommandPalette({ open, onClose, dark = false }: Props) {
             }}
           />
           {query && (
-            <button onClick={() => setQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: sub }}>✕</button>
+            <button onClick={() => setQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: sub, display: 'flex', alignItems: 'center' }}><IconX size={14} /></button>
           )}
           <kbd style={{ background: dark ? '#0F172A' : '#F8FAFC', border: `1px solid ${bdr}`, borderRadius: 6, padding: '3px 8px', fontSize: 11, color: sub, fontFamily: 'monospace' }}>ESC</kbd>
         </div>
@@ -181,7 +182,7 @@ export default function CommandPalette({ open, onClose, dark = false }: Props) {
                   width: 36, height: 36, borderRadius: 10, flexShrink: 0,
                   background: dark ? '#0F172A' : '#F1F5F9',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
-                }}>{item.icon}</div>
+                }}><Icon name={item.icon} size={18} /></div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 600, fontSize: 14, color: text }}>{item.name}</div>
                   <div style={{ fontSize: 12, color: sub, marginTop: 1 }}>
@@ -197,7 +198,7 @@ export default function CommandPalette({ open, onClose, dark = false }: Props) {
 
           {query.trim() && results.length === 0 && (
             <div style={{ padding: '32px 20px', textAlign: 'center', color: sub }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>🔍</div>
+              <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center' }}><IconSearch size={32} /></div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>
                 {lang === 'fr' ? `Aucun résultat pour "${query}"` : `No results for "${query}"`}
               </div>

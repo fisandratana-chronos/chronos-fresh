@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { IconClipboard, IconPointerClick } from '../shared/Icons'
 
 // ── BMI Categories ────────────────────────────────────────────
 function getBmiCategory(bmi: number, lang: string) {
@@ -163,7 +164,7 @@ export default function TBMI() {
               cursor: 'pointer',
             }}
           >
-            {lang === 'fr' ? '📋 Copier' : '📋 Copy'}
+            <><IconClipboard size={13} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Copier' : 'Copy'}</>
           </button>
         </div>
       )}
@@ -175,9 +176,10 @@ export default function TBMI() {
           fontSize: 14, padding: '32px',
           border: '1px dashed #E2E8F0', borderRadius: 14,
         }}>
+          <IconPointerClick size={16} style={{marginBottom:6}} /><br/>
           {lang === 'fr'
-            ? '👆 Entrez votre poids et taille pour calculer votre IMC'
-            : '👆 Enter your weight and height to calculate your BMI'}
+            ? 'Entrez votre poids et taille pour calculer votre IMC'
+            : 'Enter your weight and height to calculate your BMI'}
         </div>
       )}
 

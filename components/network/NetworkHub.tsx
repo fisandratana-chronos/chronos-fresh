@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
 import { NETWORK_SEO_CONTENT } from '../../lib/seoContent'
+import { Icon, IconSun, IconMoon, IconAntenna, IconAlertTriangle, IconCheck, IconX } from '../shared/Icons'
 
 // ── useTrans: typed wrapper mba i t() dia manaiky argument 2 ──
 type TFn = (key: string, vars?: Record<string, unknown>) => string;
@@ -240,41 +241,41 @@ const mkStyles = (T: Theme): Record<string, any> => ({
 // ── Static data ──
 
 const TABS = [
-  { id: "ip", icon: "📡", en: "My IP", fr: "Mon IP",
+  { id: "ip", icon: "antenna", en: "My IP", fr: "Mon IP",
     enDesc: "View your public IP address and connection info", frDesc: "Voir votre adresse IP publique et les infos de connexion" },
-  { id: "speed", icon: "⚡", en: "Speed Test", fr: "Test de Débit",
+  { id: "speed", icon: "bolt", en: "Speed Test", fr: "Test de Débit",
     enDesc: "Measure your download speed and latency", frDesc: "Mesurer votre vitesse de téléchargement et la latence" },
-  { id: "status", icon: "🔍", en: "Site Status", fr: "État du Site",
+  { id: "status", icon: "search", en: "Site Status", fr: "État du Site",
     enDesc: "Check if a website is up or down", frDesc: "Vérifier si un site web est en ligne ou hors service" },
-  { id: "password", icon: "🔒", en: "Password", fr: "Mot de Passe",
+  { id: "password", icon: "lock", en: "Password", fr: "Mot de Passe",
     enDesc: "Generate and check the strength of a password", frDesc: "Générer un mot de passe et vérifier sa robustesse" },
-  { id: "dns", icon: "🌐", en: "DNS Lookup", fr: "Recherche DNS",
+  { id: "dns", icon: "globe", en: "DNS Lookup", fr: "Recherche DNS",
     enDesc: "Look up DNS records for a domain", frDesc: "Consulter les enregistrements DNS d'un domaine" },
-  { id: "whois", icon: "📋", en: "Whois", fr: "Whois",
+  { id: "whois", icon: "clipboard", en: "Whois", fr: "Whois",
     enDesc: "Look up domain registration and ownership info", frDesc: "Consulter les infos d'enregistrement et de propriété d'un domaine" },
-  { id: "ssl", icon: "🔐", en: "SSL Checker", fr: "Vérif. SSL",
+  { id: "ssl", icon: "lock", en: "SSL Checker", fr: "Vérif. SSL",
     enDesc: "Check a website's SSL certificate validity", frDesc: "Vérifier la validité du certificat SSL d'un site" },
-  { id: "domainAge", icon: "📅", en: "Domain Age", fr: "Âge du Domaine",
+  { id: "domainAge", icon: "calendar", en: "Domain Age", fr: "Âge du Domaine",
     enDesc: "Find out when a domain was first registered", frDesc: "Découvrir la date de première création d'un domaine" },
-  { id: "ping", icon: "📶", en: "Ping Test", fr: "Test de Ping",
+  { id: "ping", icon: "wifi", en: "Ping Test", fr: "Test de Ping",
     enDesc: "Test response time to a server or domain", frDesc: "Tester le temps de réponse d'un serveur ou domaine" },
-  { id: "ports", icon: "🔌", en: "Port Scanner", fr: "Scanneur de Ports",
+  { id: "ports", icon: "plug", en: "Port Scanner", fr: "Scanneur de Ports",
     enDesc: "Check which ports are open on a host", frDesc: "Vérifier quels ports sont ouverts sur un hôte" },
-  { id: "headers", icon: "📨", en: "HTTP Headers", fr: "En-têtes HTTP",
+  { id: "headers", icon: "mail", en: "HTTP Headers", fr: "En-têtes HTTP",
     enDesc: "Inspect the HTTP response headers of a URL", frDesc: "Inspecter les en-têtes de réponse HTTP d'une URL" },
-  { id: "traceroute", icon: "🗺", en: "Traceroute", fr: "Traceroute",
+  { id: "traceroute", icon: "map", en: "Traceroute", fr: "Traceroute",
     enDesc: "Trace the network path to a destination", frDesc: "Tracer le chemin réseau vers une destination" },
 ];
 
 const POPULAR_SITES = [
-  { name: "Google", url: "https://google.com", icon: "🔍" },
-  { name: "Facebook", url: "https://facebook.com", icon: "👤" },
-  { name: "YouTube", url: "https://youtube.com", icon: "▶" },
-  { name: "WhatsApp", url: "https://web.whatsapp.com", icon: "💬" },
-  { name: "Instagram", url: "https://instagram.com", icon: "📸" },
-  { name: "Twitter/X", url: "https://x.com", icon: "✕" },
-  { name: "TikTok", url: "https://tiktok.com", icon: "🎵" },
-  { name: "Netflix", url: "https://netflix.com", icon: "🎬" },
+  { name: "Google", url: "https://google.com", icon: "search" },
+  { name: "Facebook", url: "https://facebook.com", icon: "user" },
+  { name: "YouTube", url: "https://youtube.com", icon: "send" },
+  { name: "WhatsApp", url: "https://web.whatsapp.com", icon: "message" },
+  { name: "Instagram", url: "https://instagram.com", icon: "camera" },
+  { name: "Twitter/X", url: "https://x.com", icon: "x" },
+  { name: "TikTok", url: "https://tiktok.com", icon: "music" },
+  { name: "Netflix", url: "https://netflix.com", icon: "movie" },
 ];
 
 const CHAR_SETS = {
@@ -285,22 +286,22 @@ const CHAR_SETS = {
 };
 
 const AD_CATALOG = {
-  ip:         { icon: "🛡", label: "NordVPN",       copy: "Your IP is visible to every site you visit.",                    cta: "Hide My IP →",       color: "#4169E1", url: "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=YOUR_AFF_ID&url_id=902" },
-  speed:      { icon: "⚡", label: "ExpressVPN",    copy: "Slow connection? A VPN can route around congestion.",           cta: "Boost Speed →",       color: "#DA3B2F", url: "https://www.expressvpn.com/order?a_aid=YOUR_AFF_ID" },
-  dns:        { icon: "🌐", label: "Namecheap",     copy: "Found the perfect domain? Register it before someone else does.", cta: "Register Domain →",  color: "#DE3723", url: "https://www.namecheap.com/?aff=YOUR_AFF_ID" },
-  whois:      { icon: "🔒", label: "Namecheap",     copy: "Keep your WHOIS private — enable domain privacy protection.",   cta: "Enable Privacy →",    color: "#DE3723", url: "https://www.namecheap.com/security/whoisguard/?aff=YOUR_AFF_ID" },
-  ssl:        { icon: "🔐", label: "ZeroSSL",       copy: "SSL expiring soon? Automate renewal and never go dark.",        cta: "Auto-Renew SSL →",    color: "#2ECC71", url: "https://zerossl.com/?via=YOUR_AFF_ID" },
-  domainAge:  { icon: "📋", label: "GoDaddy",       copy: "Old domain available? Aged domains rank faster in search.",     cta: "Buy Aged Domain →",   color: "#1BDBDB", url: "https://www.godaddy.com/domains/auction?isc=YOUR_AFF_ID" },
-  ping:       { icon: "🚀", label: "Cloudflare",    copy: "High latency? Cloudflare's CDN puts your content closer to users.", cta: "Try Cloudflare →", color: "#F48120", url: "https://www.cloudflare.com/plans/?aff=YOUR_AFF_ID" },
-  ports:      { icon: "🔥", label: "Cloudflare WAF",copy: "Open ports are attack surfaces. A WAF blocks threats at the edge.", cta: "Protect My Server →", color: "#F48120", url: "https://www.cloudflare.com/application-services/products/waf/?aff=YOUR_AFF_ID" },
-  headers:    { icon: "🛡", label: "Sucuri",        copy: "Missing security headers? Sucuri adds HSTS, CSP and more instantly.", cta: "Fix My Headers →", color: "#1A9C3E", url: "https://sucuri.net/?aff=YOUR_AFF_ID" },
-  traceroute: { icon: "📡", label: "DigitalOcean",  copy: "Too many hops? Deploy closer to your users with global droplets.", cta: "Reduce Latency →", color: "#0080FF", url: "https://www.digitalocean.com/?refcode=YOUR_REF_CODE" },
-  status:     { icon: "📊", label: "UptimeRobot",   copy: "Monitor uptime 24/7 — get alerted before your users notice.",   cta: "Monitor Free →",     color: "#3BD671", url: "https://uptimerobot.com/?aff=YOUR_AFF_ID" },
-  password:   { icon: "🔑", label: "1Password",     copy: "Generated a strong password? Store it safely in a password manager.", cta: "Try 1Password →", color: "#1A8CFF", url: "https://1password.com/?ref=YOUR_AFF_ID" },
+  ip:         { icon: "shield", label: "NordVPN",       copy: "Your IP is visible to every site you visit.",                    cta: "Hide My IP →",       color: "#4169E1", url: "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=YOUR_AFF_ID&url_id=902" },
+  speed:      { icon: "bolt", label: "ExpressVPN",    copy: "Slow connection? A VPN can route around congestion.",           cta: "Boost Speed →",       color: "#DA3B2F", url: "https://www.expressvpn.com/order?a_aid=YOUR_AFF_ID" },
+  dns:        { icon: "globe", label: "Namecheap",     copy: "Found the perfect domain? Register it before someone else does.", cta: "Register Domain →",  color: "#DE3723", url: "https://www.namecheap.com/?aff=YOUR_AFF_ID" },
+  whois:      { icon: "lock", label: "Namecheap",     copy: "Keep your WHOIS private — enable domain privacy protection.",   cta: "Enable Privacy →",    color: "#DE3723", url: "https://www.namecheap.com/security/whoisguard/?aff=YOUR_AFF_ID" },
+  ssl:        { icon: "lock", label: "ZeroSSL",       copy: "SSL expiring soon? Automate renewal and never go dark.",        cta: "Auto-Renew SSL →",    color: "#2ECC71", url: "https://zerossl.com/?via=YOUR_AFF_ID" },
+  domainAge:  { icon: "clipboard", label: "GoDaddy",       copy: "Old domain available? Aged domains rank faster in search.",     cta: "Buy Aged Domain →",   color: "#1BDBDB", url: "https://www.godaddy.com/domains/auction?isc=YOUR_AFF_ID" },
+  ping:       { icon: "rocket", label: "Cloudflare",    copy: "High latency? Cloudflare's CDN puts your content closer to users.", cta: "Try Cloudflare →", color: "#F48120", url: "https://www.cloudflare.com/plans/?aff=YOUR_AFF_ID" },
+  ports:      { icon: "flame", label: "Cloudflare WAF",copy: "Open ports are attack surfaces. A WAF blocks threats at the edge.", cta: "Protect My Server →", color: "#F48120", url: "https://www.cloudflare.com/application-services/products/waf/?aff=YOUR_AFF_ID" },
+  headers:    { icon: "shield", label: "Sucuri",        copy: "Missing security headers? Sucuri adds HSTS, CSP and more instantly.", cta: "Fix My Headers →", color: "#1A9C3E", url: "https://sucuri.net/?aff=YOUR_AFF_ID" },
+  traceroute: { icon: "antenna", label: "DigitalOcean",  copy: "Too many hops? Deploy closer to your users with global droplets.", cta: "Reduce Latency →", color: "#0080FF", url: "https://www.digitalocean.com/?refcode=YOUR_REF_CODE" },
+  status:     { icon: "chart-bar", label: "UptimeRobot",   copy: "Monitor uptime 24/7 — get alerted before your users notice.",   cta: "Monitor Free →",     color: "#3BD671", url: "https://uptimerobot.com/?aff=YOUR_AFF_ID" },
+  password:   { icon: "key", label: "1Password",     copy: "Generated a strong password? Store it safely in a password manager.", cta: "Try 1Password →", color: "#1A8CFF", url: "https://1password.com/?ref=YOUR_AFF_ID" },
 };
 
 const AD_DEFAULT = {
-  icon: "🌐",
+  icon: "globe",
   label: "CHRONOS",
   copy: "Explore all network diagnostic tools in one place.",
   cta: "Explore →",
@@ -395,11 +396,11 @@ function ThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }
       <span style={{
         position: "absolute", left: 5, top: "50%", transform: "translateY(-50%)",
         fontSize: "10px", opacity: dark ? 0.4 : 0, transition: "opacity 0.2s",
-      }}>🌙</span>
+      }}><IconMoon size={16} /></span>
       <span style={{
         position: "absolute", right: 5, top: "50%", transform: "translateY(-50%)",
         fontSize: "10px", opacity: dark ? 0 : 0.8, transition: "opacity 0.2s",
-      }}>☀️</span>
+      }}><IconSun size={16} /></span>
       {/* knob */}
       <div style={{
         position: "absolute",
@@ -511,7 +512,7 @@ function PulseRing({ active }: { active: boolean }) {
         background: `radial-gradient(circle at 35% 35%, ${T.cyan}30, ${T.cyan}08)`,
         border: `2px solid ${T.cyan}60`,
         display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px",
-      }}>📡</div>
+      }}><IconAntenna size={20} /></div>
     </div>
   );
 }
@@ -602,7 +603,7 @@ function NHAdBanner({ tab }: { tab: string }) {
       transition: "all 0.3s ease",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
-        <span style={{ fontSize: "15px", flexShrink: 0 }}>{ad.icon}</span>
+        <span style={{ flexShrink: 0, display: "flex" }}><Icon name={ad.icon} size={15} /></span>
         <div style={{ minWidth: 0 }}>
           <span style={{ fontSize: "10px", fontWeight: 700, color: accentColor, letterSpacing: "0.1em", textTransform: "uppercase" }}>
             Ad · {ad.label}
@@ -912,7 +913,7 @@ function StatusTab() {
               background: T.bgSubtle, border: `1px solid ${T.border}`,
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontSize: "16px" }}>{site.icon}</span>
+                <Icon name={site.icon} size={16} />
                 <span style={{ fontSize: "13px", fontWeight: 600 }}>{site.name}</span>
               </div>
               <StatusBadge status={statuses[site.name]} />
@@ -988,7 +989,7 @@ function PasswordTab() {
           </span>
           <div style={{ display: "flex", gap: "8px" }}>
             <button style={S.btnSm(T.cyan)} onClick={generate} aria-label={t("nh.password.generateAria")}>↻</button>
-            <button style={S.btnSm(copied ? T.green : T.cyan)} onClick={copy}>{copied ? "✓" : t("nh.password.copy")}</button>
+            <button style={S.btnSm(copied ? T.green : T.cyan)} onClick={copy}>{copied ? <IconCheck size={14} /> : t("nh.password.copy")}</button>
           </div>
         </div>
         <StrengthBar bits={bits} />
@@ -1101,7 +1102,7 @@ function DnsTab() {
 
       {error && (
         <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
-          <div style={{ color: T.red, fontSize: "13px" }}>⚠ {error}</div>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
         </div>
       )}
 
@@ -1190,14 +1191,14 @@ function WhoisTab() {
             value={domain} onChange={e => setDomain(e.target.value)}
             onKeyDown={e => e.key === "Enter" && lookup()} />
           <button style={S.btn(T.cyan)} onClick={lookup} disabled={loading || !domain.trim()}>
-            {loading ? <span style={{ animation: "spin-slow 1s linear infinite", display: "inline-block" }}>↻</span> : "🔍"}
+            {loading ? <span style={{ animation: "spin-slow 1s linear infinite", display: "inline-flex" }}><Icon name="repeat" size={14} /></span> : <Icon name="search" size={14} />}
           </button>
         </div>
       </div>
 
       {error && (
         <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
-          <div style={{ color: T.red, fontSize: "13px" }}>⚠ {error}</div>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
         </div>
       )}
 
@@ -1298,14 +1299,14 @@ function SslTab() {
             value={domain} onChange={e => setDomain(e.target.value)}
             onKeyDown={e => e.key === "Enter" && check()} />
           <button style={S.btn(T.cyan)} onClick={check} disabled={loading || !domain.trim()}>
-            {loading ? <span style={{ animation: "spin-slow 1s linear infinite", display: "inline-block" }}>↻</span> : "🔐"}
+            {loading ? <span style={{ animation: "spin-slow 1s linear infinite", display: "inline-flex" }}><Icon name="repeat" size={14} /></span> : <Icon name="lock" size={14} />}
           </button>
         </div>
       </div>
 
       {error && (
         <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
-          <div style={{ color: T.red, fontSize: "13px" }}>⚠ {error}</div>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
         </div>
       )}
 
@@ -1397,14 +1398,14 @@ function DomainAgeTab() {
             value={domain} onChange={e => setDomain(e.target.value)}
             onKeyDown={e => e.key === "Enter" && check()} />
           <button style={S.btn(T.cyan)} onClick={check} disabled={loading || !domain.trim()}>
-            {loading ? <span style={{ animation: "spin-slow 1s linear infinite", display: "inline-block" }}>↻</span> : "📅"}
+            {loading ? <span style={{ animation: "spin-slow 1s linear infinite", display: "inline-flex" }}><Icon name="repeat" size={14} /></span> : <Icon name="calendar" size={14} />}
           </button>
         </div>
       </div>
 
       {error && (
         <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
-          <div style={{ color: T.red, fontSize: "13px" }}>⚠ {error}</div>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
         </div>
       )}
 
@@ -1749,11 +1750,11 @@ function HttpHeadersTab() {
         <div style={{ ...S.row, marginBottom: "16px" }}>
           <input style={{ ...S.input, flex: 1 }} placeholder={t("nh.headers.placeholder")} value={url} onChange={e => setUrl(e.target.value)} onKeyDown={e => e.key === "Enter" && check()} />
           <button style={S.btn(T.cyan)} onClick={check} disabled={loading || !url.trim()}>
-            {loading ? <span style={{ animation: "spin-slow 1s linear infinite", display: "inline-block" }}>↻</span> : "📨"}
+            {loading ? <span style={{ animation: "spin-slow 1s linear infinite", display: "inline-flex" }}><Icon name="repeat" size={14} /></span> : <Icon name="mail" size={14} />}
           </button>
         </div>
       </div>
-      {error && <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}><div style={{ color: T.red, fontSize: "13px" }}>⚠ {error}</div></div>}
+      {error && <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}><div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div></div>}
       {data && (
         <>
           <div style={{ ...S.card, animation: "slide-in 0.3s ease" }}>
@@ -1773,7 +1774,7 @@ function HttpHeadersTab() {
                       <div style={{ fontFamily: "monospace", fontSize: "12px", color: present ? T.green : T.textSecondary }}>{h}</div>
                       {present && <div style={{ fontSize: "11px", color: T.textSecondary, marginTop: "2px", wordBreak: "break-all" }}>{data.headers[h]}</div>}
                     </div>
-                    <span style={{ background: (present ? T.green : T.red) + "18", border: `1px solid ${(present ? T.green : T.red)}40`, color: present ? T.green : T.red, fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", marginLeft: "12px", flexShrink: 0 }}>{present ? "✓" : "✗"}</span>
+                    <span style={{ background: (present ? T.green : T.red) + "18", border: `1px solid ${(present ? T.green : T.red)}40`, color: present ? T.green : T.red, fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", marginLeft: "12px", flexShrink: 0 }}>{present ? <IconCheck size={11} /> : <IconX size={11} />}</span>
                   </div>
                 );
               })}
@@ -2075,7 +2076,7 @@ function NetworkHub({ dark = true, onBack }: { dark?: boolean; onBack?: () => vo
           {TABS.map(tabItem => (
             <button key={tabItem.id} style={S.tabBtn(tab === tabItem.id)} onClick={() => setTab(tabItem.id)}
               title={lang === "fr" ? tabItem.frDesc : tabItem.enDesc}>
-              {tabItem.icon} {lang === "fr" ? tabItem.fr : tabItem.en}
+              <Icon name={tabItem.icon} size={14} style={{marginRight:4,verticalAlign:-2}} /> {lang === "fr" ? tabItem.fr : tabItem.en}
             </button>
           ))}
         </nav>

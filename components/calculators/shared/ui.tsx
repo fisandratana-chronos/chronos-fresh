@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTheme } from './contexts'
 import { useLang } from '../../../lib/hooks/useLang'
+import { IconAlertTriangle } from '../../shared/Icons'
 
 export function Inp({ label, unit, value, onChange, placeholder, type="number", min, max, step }: { label?: string; unit?: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; min?: number | string; max?: number | string; step?: number; }) {
   const { T } = useTheme();
@@ -133,7 +134,7 @@ export function ErrBox({ msg }) {
   const { T } = useTheme();
   if(!msg) return null;
   return <div style={{padding:"10px 14px",background:`${T.red}15`,border:`1px solid ${T.red}50`,
-    color:T.red,borderRadius:8,fontFamily:"Inter,sans-serif",fontSize:13}}>⚠️ {msg}</div>;
+    color:T.red,borderRadius:8,fontFamily:"Inter,sans-serif",fontSize:13,display:"flex",alignItems:"center",gap:6}}><IconAlertTriangle size={14} /> {msg}</div>;
 }
 
 export function ModeToggle({ options, value, onChange }) {

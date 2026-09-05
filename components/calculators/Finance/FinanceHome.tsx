@@ -26,13 +26,13 @@ export const FINANCE_PANEL_MAP = {
 }
 
 export const FINANCE_TOOLS = [
-  { key: "mortgage", label: "Mortgage Calculator", icon: "🏠", Component: MortgageCalculator },
-  { key: "emi", label: "EMI Calculator", icon: "💳", Component: EmiCalculator },
-  { key: "vat", label: "VAT Calculator", icon: "🧾", Component: VatCalculator },
-  { key: "discount", label: "Discount Calculator", icon: "🏷️", Component: DiscountCalculator },
-  { key: "percentage", label: "Percentage Calculator", icon: "％", Component: PercentageCalculator },
-  { key: "tip", label: "Tip Calculator", icon: "💵", Component: TipCalculator },
-  { key: "compound", label: "Compound Interest Calculator", icon: "📈", Component: CompoundInterestCalculator },
-  { key: "loan", label: "Loan Calculator", icon: "🏦", Component: LoanCalculator },
-  { key: "currency", label: "Currency Converter", icon: "💱", Component: CurrencyConverter }
+  { key: "mortgage", label: "Mortgage Calculator", icon: "home", Component: MortgageCalculator },
+  { key: "emi", label: "EMI Calculator", icon: "credit-card", Component: EmiCalculator },
+  { key: "vat", label: "VAT Calculator", icon: "receipt", Component: VatCalculator },
+  { key: "discount", label: "Discount Calculator", icon: "tag", Component: DiscountCalculator },
+  { key: "percentage", label: "Percentage Calculator", icon: "percent", Component: PercentageCalculator },
+  { key: "tip", label: "Tip Calculator", icon: "banknote", Component: TipCalculator },
+  { key: "compound", label: "Compound Interest Calculator", icon: "trending-up", Component: CompoundInterestCalculator },
+  { key: "loan", label: "Loan Calculator", icon: "bank", Component: LoanCalculator },
+  { key: "currency", label: "Currency Converter", icon: "exchange", Component: CurrencyConverter }
 ]

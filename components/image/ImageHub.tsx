@@ -6,6 +6,7 @@ import { useDark } from '../../lib/hooks/useDark'
 import { useLang } from '../../lib/hooks/useLang'
 import { BP } from '../../lib/breakpoints'
 import { IMAGE_SEO_CONTENT } from '../../lib/imageSeoContent'
+import { Icon, IconAlertTriangle, IconCheck } from '../shared/Icons'
 
 // ── Types ─────────────────────────────────────────────────────
 type Tab = 'compress' | 'convert' | 'resize' | 'upscale' | 'bgremove' | 'crop' | 'flip' | 'watermark' | 'colorpicker'
@@ -80,7 +81,7 @@ function SizeWarning({ message, T }: { message: string | null; T: any }) {
       border: `1px solid ${T.danger}44`, background: `${T.danger}12`,
       borderRadius: 8, color: T.danger, fontSize: 12,
     }}>
-      ⚠ &nbsp; {message}
+      <IconAlertTriangle size={13} style={{marginRight:4,verticalAlign:-2}} /> {message}
     </div>
   )
 }
@@ -246,14 +247,14 @@ function computeDraw(sw: number, sh: number, dw: number, dh: number, fit: FitMod
 
 // ── Presets ───────────────────────────────────────────────────
 const PRESETS = [
-  { label: 'Instagram Square', w: 1080, h: 1080, icon: '📷' },
-  { label: 'Instagram Portrait', w: 1080, h: 1350, icon: '📷' },
-  { label: 'Instagram Story', w: 1080, h: 1920, icon: '📱' },
-  { label: 'Twitter Post', w: 1200, h: 675, icon: '🐦' },
-  { label: 'Facebook Post', w: 1200, h: 630, icon: '👥' },
+  { label: 'Instagram Square', w: 1080, h: 1080, icon: 'camera' },
+  { label: 'Instagram Portrait', w: 1080, h: 1350, icon: 'camera' },
+  { label: 'Instagram Story', w: 1080, h: 1920, icon: 'device-mobile' },
+  { label: 'Twitter Post', w: 1200, h: 675, icon: 'share' },
+  { label: 'Facebook Post', w: 1200, h: 630, icon: 'users' },
   { label: 'YouTube Thumbnail', w: 1280, h: 720, icon: '▶️' },
-  { label: 'TikTok Video', w: 1080, h: 1920, icon: '🎵' },
-  { label: 'LinkedIn Banner', w: 1584, h: 396, icon: '💼' },
+  { label: 'TikTok Video', w: 1080, h: 1920, icon: 'music' },
+  { label: 'LinkedIn Banner', w: 1584, h: 396, icon: 'briefcase' },
 ]
 
 interface SubTool { id: Tab; label: string; frLabel: string; icon: string; heading: string; frHeading: string; desc: string; frDesc: string }
@@ -277,33 +278,33 @@ const FAMILIES: FamilyDef[] = [
   {
     id: 'edit', label: 'Edit', frLabel: 'Modifier',
     tools: [
-      { id: 'crop',     label: 'Crop', frLabel: 'Recadrer',        icon: '✂', heading: 'Crop an image', frHeading: 'Recadrer une image',  desc: 'Crop to any ratio or custom area.', frDesc: 'Recadrez selon n\'importe quel ratio ou zone personnalisée.' },
+      { id: 'crop',     label: 'Crop', frLabel: 'Recadrer',        icon: 'scissors', heading: 'Crop an image', frHeading: 'Recadrer une image',  desc: 'Crop to any ratio or custom area.', frDesc: 'Recadrez selon n\'importe quel ratio ou zone personnalisée.' },
       { id: 'flip',     label: 'Flip/Rotate', frLabel: 'Retourner/Pivoter', icon: '↻', heading: 'Flip or rotate', frHeading: 'Retourner ou pivoter', desc: 'Mirror horizontally, vertically, or rotate by angle.', frDesc: 'Effet miroir horizontal, vertical, ou rotation selon un angle.' },
     ],
   },
   {
     id: 'privacy', label: 'Privacy', frLabel: 'Confidentialité',
     tools: [
-      { id: 'removemetadata',   label: 'Remove Metadata', frLabel: 'Supprimer les métadonnées',    icon: '🛡', heading: 'Remove Image Metadata', frHeading: 'Supprimer les métadonnées de l\'image',   desc: 'Strip GPS, camera model, date and all EXIF data from your image.', frDesc: 'Supprimez le GPS, le modèle d\'appareil photo, la date et toutes les données EXIF de votre image.' },
-      { id: 'exifviewer',       label: 'EXIF Viewer', frLabel: 'Visionneuse EXIF',        icon: '🔍', heading: 'EXIF Viewer', frHeading: 'Visionneuse EXIF',             desc: 'Inspect all metadata embedded in your image file.', frDesc: 'Inspectez toutes les métadonnées intégrées dans votre fichier image.' },
+      { id: 'removemetadata',   label: 'Remove Metadata', frLabel: 'Supprimer les métadonnées',    icon: 'shield', heading: 'Remove Image Metadata', frHeading: 'Supprimer les métadonnées de l\'image',   desc: 'Strip GPS, camera model, date and all EXIF data from your image.', frDesc: 'Supprimez le GPS, le modèle d\'appareil photo, la date et toutes les données EXIF de votre image.' },
+      { id: 'exifviewer',       label: 'EXIF Viewer', frLabel: 'Visionneuse EXIF',        icon: 'search', heading: 'EXIF Viewer', frHeading: 'Visionneuse EXIF',             desc: 'Inspect all metadata embedded in your image file.', frDesc: 'Inspectez toutes les métadonnées intégrées dans votre fichier image.' },
       { id: 'screenshotredact', label: 'Screenshot Redact', frLabel: 'Caviarder une capture',  icon: '▓', heading: 'Screenshot Redact', frHeading: 'Caviarder une capture d\'écran',       desc: 'Blur, pixelate or black out sensitive areas in any screenshot.', frDesc: 'Floutez, pixelisez ou masquez les zones sensibles de n\'importe quelle capture d\'écran.' },
-      { id: 'bgremove',         label: 'Remove BG', frLabel: 'Supprimer l\'arrière-plan',          icon: '✦', heading: 'Remove Background', frHeading: 'Supprimer l\'arrière-plan',       desc: 'Remove image backgrounds automatically with AI.', frDesc: 'Supprimez automatiquement l\'arrière-plan de vos images grâce à l\'IA.' },
+      { id: 'bgremove',         label: 'Remove BG', frLabel: 'Supprimer l\'arrière-plan',          icon: 'sparkles', heading: 'Remove Background', frHeading: 'Supprimer l\'arrière-plan',       desc: 'Remove image backgrounds automatically with AI.', frDesc: 'Supprimez automatiquement l\'arrière-plan de vos images grâce à l\'IA.' },
     ],
   },
   {
     id: 'create', label: 'Create', frLabel: 'Créer',
     tools: [
       { id: 'watermark',    label: 'Watermark', frLabel: 'Filigrane',     icon: '◈', heading: 'Add a Watermark', frHeading: 'Ajouter un filigrane',       desc: 'Protect your images with text or image watermarks.', frDesc: 'Protégez vos images avec des filigranes texte ou image.' },
-      { id: 'passportphoto',label: 'Passport Photo', frLabel: 'Photo d\'identité', icon: '🪪', heading: 'Passport / ID Photo', frHeading: 'Photo passeport / identité',   desc: 'Generate passport or ID photos at the correct size and background.', frDesc: 'Générez des photos passeport ou d\'identité au bon format et avec le bon arrière-plan.' },
+      { id: 'passportphoto',label: 'Passport Photo', frLabel: 'Photo d\'identité', icon: 'id-badge', heading: 'Passport / ID Photo', frHeading: 'Photo passeport / identité',   desc: 'Generate passport or ID photos at the correct size and background.', frDesc: 'Générez des photos passeport ou d\'identité au bon format et avec le bon arrière-plan.' },
       { id: 'favicon',      label: 'Favicon', frLabel: 'Favicon',        icon: '⭐', heading: 'Favicon Generator', frHeading: 'Générateur de favicon',     desc: 'Generate favicon.ico and all PNG sizes from any image or logo.', frDesc: 'Générez un favicon.ico et toutes les tailles PNG à partir de n\'importe quelle image ou logo.' },
-      { id: 'upscale',      label: 'AI Upscale', frLabel: 'Agrandir (IA)',     icon: '✦', heading: 'AI Upscale', frHeading: 'Agrandissement par IA',            desc: 'Upscale images 2× or 4× using AI — Real-ESRGAN.', frDesc: 'Agrandissez vos images 2× ou 4× grâce à l\'IA — Real-ESRGAN.' },
+      { id: 'upscale',      label: 'AI Upscale', frLabel: 'Agrandir (IA)',     icon: 'sparkles', heading: 'AI Upscale', frHeading: 'Agrandissement par IA',            desc: 'Upscale images 2× or 4× using AI — Real-ESRGAN.', frDesc: 'Agrandissez vos images 2× ou 4× grâce à l\'IA — Real-ESRGAN.' },
     ],
   },
   {
     id: 'colors', label: 'Colors', frLabel: 'Couleurs',
     tools: [
       { id: 'colorpicker',     label: 'Color Picker', frLabel: 'Pipette à couleurs',     icon: '◉', heading: 'Pick a Color', frHeading: 'Choisir une couleur',          desc: 'Extract colors from any image pixel.', frDesc: 'Extrayez la couleur de n\'importe quel pixel d\'une image.' },
-      { id: 'paletteextractor',label: 'Palette Extractor', frLabel: 'Extracteur de palette', icon: '🎨', heading: 'Palette Extractor', frHeading: 'Extracteur de palette',     desc: 'Extract the dominant color palette from any image.', frDesc: 'Extrayez la palette de couleurs dominante de n\'importe quelle image.' },
+      { id: 'paletteextractor',label: 'Palette Extractor', frLabel: 'Extracteur de palette', icon: 'palette', heading: 'Palette Extractor', frHeading: 'Extracteur de palette',     desc: 'Extract the dominant color palette from any image.', frDesc: 'Extrayez la palette de couleurs dominante de n\'importe quelle image.' },
     ],
   },
 ]
@@ -441,7 +442,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
                       className={`ih-drop-item${tab === tool.id ? ' tool-active' : ''}`}
                       onClick={() => selectTool(tool.id)}
                     >
-                      <span className="ih-drop-icon">{tool.icon}</span>
+                      <span className="ih-drop-icon"><Icon name={tool.icon} size={20} /></span>
                       <div>
                         <div style={{ fontWeight: tab === tool.id ? 600 : 500 }}>{lang === 'fr' ? tool.frLabel : tool.label}</div>
                         <div style={{ fontSize: '.73rem', color: T.muted, marginTop: 1 }}>{lang === 'fr' ? tool.frDesc : tool.desc}</div>
@@ -456,7 +457,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         {/* Active tool breadcrumb — right side */}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', paddingRight: 4 }}>
           <span style={{ fontSize: '.72rem', color: T.muted, fontWeight: 500 }}>
-            {findTool(tab).icon} {lang === 'fr' ? findTool(tab).frLabel : findTool(tab).label}
+            <Icon name={findTool(tab).icon} size={14} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? findTool(tab).frLabel : findTool(tab).label}
           </span>
         </div>
       </nav>
@@ -598,9 +599,9 @@ function CompressPanel({ T }: { T: any }) {
                   <span style={{ fontSize: '.6rem', color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.file.name}</span>
                   <span style={{ fontSize: '.58rem', color: 'rgba(255,255,255,.7)' }}>{formatBytes(f.originalSize)}</span>
                 </div>
-                {f.status === 'done' && <span style={{ position: 'absolute', top: 4, left: 4, background: T.success, borderRadius: 99, width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.6rem' }}>✓</span>}
-                {f.status === 'error' && <span title={f.error} style={{ position: 'absolute', top: 4, left: 4, background: T.danger, borderRadius: 99, width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.6rem' }}>⚠</span>}
-                <button onClick={() => removeFile(f.id)} style={{ position: 'absolute', top: 4, right: 4, width: 18, height: 18, background: 'rgba(0,0,0,.55)', border: 'none', borderRadius: '50%', color: '#fff', fontSize: '.65rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                {f.status === 'done' && <span style={{ position: 'absolute', top: 4, left: 4, background: T.success, borderRadius: 99, width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCheck size={10} /></span>}
+                {f.status === 'error' && <span title={f.error} style={{ position: 'absolute', top: 4, left: 4, background: T.danger, borderRadius: 99, width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconAlertTriangle size={10} /></span>}
+                <button onClick={() => removeFile(f.id)} style={{ position: 'absolute', top: 4, right: 4, width: 18, height: 18, background: 'rgba(0,0,0,.55)', border: 'none', borderRadius: '50%', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="x" size={10} /></button>
               </div>
             ))}
           </div>
@@ -644,7 +645,7 @@ function CompressPanel({ T }: { T: any }) {
 
           {/* Buttons */}
           <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-            <button className="ih-btn-primary" onClick={compress} disabled={processing}>{lang === 'fr' ? '⚡ Compresser' : '⚡ Compress Now'}</button>
+            <button className="ih-btn-primary" onClick={compress} disabled={processing}>{lang === 'fr' ? 'Compresser' : 'Compress Now'}</button>
             <button className="ih-btn-ghost" onClick={reset}>{lang === 'fr' ? '↺ Nouvelles images' : '↺ New Images'}</button>
           </div>
         </>
@@ -755,7 +756,7 @@ function ConvertPanel({ T, initialFormat }: { T: any; initialFormat?: string }) 
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); addFiles(e.dataTransfer.files) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={e => addFiles(e.target.files)} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🔄</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="repeat" size={40} /></span>
           <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez des images à convertir' : 'Drop images to convert format'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? `JPG, PNG, WEBP, AVIF — jusqu'à ${MAX_IMAGE_MB}MB par image` : `JPG, PNG, WEBP, AVIF — up to ${MAX_IMAGE_MB}MB per image`}</p>
         </div>
@@ -774,7 +775,7 @@ function ConvertPanel({ T, initialFormat }: { T: any; initialFormat?: string }) 
           <div style={{ marginBottom: 16 }}>
             {files.map(f => (
               <div key={f.id} className="ih-result-card">
-                <span style={{ fontSize: '1.4rem' }}>🖼</span>
+                <span style={{ display:'inline-flex' }}><Icon name="image" size={22} /></span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '.83rem', fontWeight: 500 }}>{f.file.name}</div>
                   <div style={{ fontSize: '.75rem', color: T.muted }}>{formatBytes(f.originalSize)}</div>
@@ -788,7 +789,7 @@ function ConvertPanel({ T, initialFormat }: { T: any; initialFormat?: string }) 
           {processing && <p style={{ color: T.muted, fontSize: '.85rem', marginBottom: 12 }}>{lang === 'fr' ? 'Conversion en cours…' : 'Converting…'}</p>}
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="ih-btn-primary" onClick={convert} disabled={processing}>{lang === 'fr' ? '🔄 Convertir' : '🔄 Convert Now'}</button>
+            <button className="ih-btn-primary" onClick={convert} disabled={processing}>{lang === 'fr' ? 'Convertir' : 'Convert Now'}</button>
             <button className="ih-btn-ghost" onClick={() => { setFiles([]); setDone(false) }}>{lang === 'fr' ? '↺ Nouvelles images' : '↺ New Images'}</button>
           </div>
         </>
@@ -867,16 +868,16 @@ function ResizePanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>📐</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="ruler" size={40} /></span>
           <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'JPG, PNG, WEBP · une image à la fois' : 'JPG, PNG, WEBP · one image at a time'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
 
           <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: T.muted, marginBottom: 12 }}>{lang === 'fr' ? 'Choisir un préréglage' : 'Choose a preset'}</div>
@@ -884,7 +885,7 @@ function ResizePanel({ T }: { T: any }) {
             {PRESETS.map(p => (
               <button key={p.label} onClick={() => selectPreset(p)}
                 style={{ background: preset?.label === p.label ? `rgba(6,182,212,.1)` : T.surface, border: `1.5px solid ${preset?.label === p.label ? T.accent : T.border}`, borderRadius: T.radiusSm, padding: '10px 12px', cursor: 'pointer', textAlign: 'left', transition: 'all .15s' }}>
-                <div style={{ fontSize: '.78rem', fontWeight: 600, color: preset?.label === p.label ? T.accent : T.text }}>{p.icon} {p.label}</div>
+                <div style={{ fontSize: '.78rem', fontWeight: 600, color: preset?.label === p.label ? T.accent : T.text }}><Icon name={p.icon} size={14} style={{marginRight:4,verticalAlign:-2}} /> {p.label}</div>
                 <div style={{ fontSize: '.72rem', color: T.muted, marginTop: 2 }}>{p.w}×{p.h}</div>
               </button>
             ))}
@@ -895,8 +896,8 @@ function ResizePanel({ T }: { T: any }) {
             {(['cover', 'contain', 'stretch'] as FitMode[]).map(f => (
               <button key={f} className={`ih-fit-btn${fit === f ? ' active' : ''}`} onClick={() => setFit(f)}>
                 {lang === 'fr'
-                  ? (f === 'cover' ? '✂️ Recadrer' : f === 'contain' ? '🖼 Contenir' : '↔ Étirer')
-                  : (f === 'cover' ? '✂️ Crop' : f === 'contain' ? '🖼 Contain' : '↔ Stretch')}
+                  ? (f === 'cover' ? 'Recadrer' : f === 'contain' ? 'Contenir' : 'Étirer')
+                  : (f === 'cover' ? 'Crop' : f === 'contain' ? 'Contain' : 'Stretch')}
               </button>
             ))}
           </div>
@@ -1018,16 +1019,16 @@ function CropPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>✂️</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="scissors" size={40} /></span>
           <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Glissez pour sélectionner la zone à conserver' : 'Drag to select the area you want to keep'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl(''); setSel(null) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl(''); setSel(null) }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
           <p style={{ fontSize: '.8rem', color: T.muted, marginBottom: 10 }}>{lang === 'fr' ? 'Cliquez et glissez sur l\'image pour sélectionner la zone à recadrer.' : 'Click and drag on the image to select the crop area.'}</p>
           <div ref={imgBoxRef}
@@ -1039,7 +1040,7 @@ function CropPanel({ T }: { T: any }) {
             )}
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="ih-btn-primary" onClick={applyCrop} disabled={!sel || sel.w < 4 || sel.h < 4}>{lang === 'fr' ? '✂️ Recadrer' : '✂️ Apply Crop'}</button>
+            <button className="ih-btn-primary" onClick={applyCrop} disabled={!sel || sel.w < 4 || sel.h < 4}>{lang === 'fr' ? 'Recadrer' : 'Apply Crop'}</button>
             {sel && <button className="ih-btn-ghost" onClick={() => setSel(null)}>{lang === 'fr' ? '↺ Effacer la sélection' : '↺ Clear Selection'}</button>}
           </div>
           {resultUrl && (
@@ -1118,16 +1119,16 @@ function FlipPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🔃</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="repeat" size={40} /></span>
           <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Retournez horizontalement, verticalement, ou pivotez de 90°' : 'Flip horizontally, vertically, or rotate 90°'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
             <button className={`ih-fit-btn${flipH ? ' active' : ''}`} onClick={() => setFlipH(v => !v)}>{lang === 'fr' ? '↔ Retourner horizontalement' : '↔ Flip Horizontal'}</button>
@@ -1224,16 +1225,16 @@ function WatermarkPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>💧</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="droplet" size={40} /></span>
           <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Ajoutez un filigrane texte — logo, copyright, ou signature' : 'Add a text watermark — logo, copyright, or signature'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
 
           <div style={{ marginBottom: 14 }}>
@@ -1345,16 +1346,16 @@ function ColorPickerPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🎨</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="palette" size={40} /></span>
           <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Cliquez n\'importe où sur l\'image pour choisir une couleur' : 'Click anywhere on the image to pick a color'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPicked(null); setHistory([]) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPicked(null); setHistory([]) }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
           <canvas ref={canvasRef} width={displayW} height={displayH} onClick={pickColor}
             style={{ cursor: 'crosshair', borderRadius: T.radiusSm, border: `1px solid ${T.border}`, marginBottom: 16, maxWidth: '100%' }} />
@@ -1400,14 +1401,14 @@ function UpscalePanel({ T }: { T: any }) {
   return (
     <div>
       <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span style={{ fontSize: '1.4rem' }}>✨</span>
+        <span style={{ display:'inline-flex' }}><Icon name="sparkles" size={22} /></span>
         <div>
           <div style={{ fontSize: '.88rem', fontWeight: 500 }}>{lang === 'fr' ? 'AI Upscaler — Propulsé par Real-ESRGAN' : 'AI Upscaler — Powered by Real-ESRGAN'}</div>
           <div style={{ fontSize: '.75rem', color: T.muted, marginTop: 3 }}>{lang === 'fr' ? 'Agrandissez vos images 2× ou 4× grâce à l\'IA · Sans compte' : 'Upscale images 2× or 4× using AI · No account needed'}</div>
         </div>
       </div>
       <div style={{ background: `rgba(6,182,212,.06)`, border: `1.5px dashed ${T.accent}`, borderRadius: T.radius, padding: '40px 32px', textAlign: 'center' }}>
-        <div style={{ fontSize: '3rem', marginBottom: 16 }}>🔬</div>
+        <div style={{ display:'flex', justifyContent:'center', marginBottom: 16 }}><Icon name="microscope" size={46} /></div>
         <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 8, color: T.accent }}>{lang === 'fr' ? 'Bientôt disponible' : 'Coming Soon'}</h3>
         <p style={{ fontSize: '.88rem', color: T.muted, maxWidth: 400, margin: '0 auto' }}>
           {lang === 'fr'
@@ -1415,7 +1416,7 @@ function UpscalePanel({ T }: { T: any }) {
             : "AI Upscale requires an API connection to Real-ESRGAN. Coming in a future version."}
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20, fontSize: '.82rem', color: T.muted }}>
-          <span>✓ {lang === 'fr' ? 'Agrandissement 2×' : '2× upscale'}</span><span>✓ {lang === 'fr' ? 'Agrandissement 4×' : '4× upscale'}</span><span>✓ {lang === 'fr' ? '3 gratuits/jour' : '3 free/day'}</span>
+          <span><IconCheck size={12} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? 'Agrandissement 2×' : '2× upscale'}</span><span><IconCheck size={12} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? 'Agrandissement 4×' : '4× upscale'}</span><span><IconCheck size={12} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? '3 gratuits/jour' : '3 free/day'}</span>
         </div>
       </div>
     </div>
@@ -1430,7 +1431,7 @@ function BgRemovePanel({ T }: { T: any }) {
   return (
     <div>
       <div style={{ background: `rgba(6,182,212,.06)`, border: `1.5px dashed ${T.accent}`, borderRadius: T.radius, padding: '40px 32px', textAlign: 'center' }}>
-        <div style={{ fontSize: '3rem', marginBottom: 16 }}>🪄</div>
+        <div style={{ display:'flex', justifyContent:'center', marginBottom: 16 }}><Icon name="wand" size={46} /></div>
         <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 8, color: T.accent }}>{lang === 'fr' ? 'Bientôt disponible' : 'Coming Soon'}</h3>
         <p style={{ fontSize: '.88rem', color: T.muted, maxWidth: 400, margin: '0 auto' }}>
           {lang === 'fr'
@@ -1438,7 +1439,7 @@ function BgRemovePanel({ T }: { T: any }) {
             : 'Background Remover requires an AI model (REMBG/BRIA). Coming in a future version.'}
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20, fontSize: '.82rem', color: T.muted }}>
-          <span>✓ {lang === 'fr' ? 'PNG transparent' : 'Transparent PNG'}</span><span>✓ {lang === 'fr' ? 'Arrière-plan personnalisé' : 'Custom background'}</span><span>✓ {lang === 'fr' ? 'Dans le navigateur' : 'In-browser'}</span>
+          <span><IconCheck size={12} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? 'PNG transparent' : 'Transparent PNG'}</span><span><IconCheck size={12} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? 'Arrière-plan personnalisé' : 'Custom background'}</span><span><IconCheck size={12} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? 'Dans le navigateur' : 'In-browser'}</span>
         </div>
       </div>
     </div>
@@ -1505,17 +1506,17 @@ function RemoveMetadataPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🛡</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="shield" size={40} /></span>
           <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'GPS · Appareil photo · Date · EXIF — tout sera supprimé' : 'GPS · Camera · Date · EXIF — all will be removed'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{file.name}</span>
             <span style={{ fontSize: '.78rem', color: T.muted, marginLeft: 4 }}>{formatBytes(file.size)}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setFile(null); setDone(false) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setFile(null); setDone(false) }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
 
           {/* EXIF preview */}
@@ -1532,11 +1533,11 @@ function RemoveMetadataPanel({ T }: { T: any }) {
           </div>
 
           {!done ? (
-            <button className="ih-btn-primary" onClick={strip}>{lang === 'fr' ? '🛡 Supprimer toutes les métadonnées' : '🛡 Remove All Metadata'}</button>
+            <button className="ih-btn-primary" onClick={strip}>{lang === 'fr' ? 'Supprimer toutes les métadonnées' : 'Remove All Metadata'}</button>
           ) : (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', background: 'rgba(52,211,153,.08)', border: `1px solid rgba(52,211,153,.3)`, borderRadius: T.radiusSm, marginBottom: 16 }}>
-                <span style={{ fontSize: '1.2rem' }}>✅</span>
+                <span style={{ display:'inline-flex' }}><IconCheck size={18} /></span>
                 <div>
                   <div style={{ fontSize: '.85rem', fontWeight: 600, color: T.success }}>{lang === 'fr' ? 'Métadonnées supprimées' : 'Metadata removed'}</div>
                   <div style={{ fontSize: '.75rem', color: T.muted, marginTop: 2 }}>{lang === 'fr' ? `GPS · Appareil photo · EXIF — tout supprimé · ${formatBytes(resultSize)}` : `GPS · Camera · EXIF — all stripped · ${formatBytes(resultSize)}`}</div>
@@ -1605,16 +1606,16 @@ function ExifViewerPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🔍</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="search" size={40} /></span>
           <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Inspectez toutes les métadonnées intégrées' : 'Inspect all embedded metadata'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{file.name}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => setFile(null)}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => setFile(null)}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
 
           <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, overflow: 'hidden', marginBottom: 20 }}>
@@ -1638,7 +1639,7 @@ function ExifViewerPanel({ T }: { T: any }) {
                 a.download = file.name.replace(/\.[^.]+$/, '') + '-clean.' + getExt(file.type || 'image/jpeg')
                 a.click()
               })
-            }}>{lang === 'fr' ? '🛡 Supprimer les métadonnées et télécharger' : '🛡 Remove Metadata & Download'}</button>
+            }}>{lang === 'fr' ? 'Supprimer les métadonnées et télécharger' : 'Remove Metadata & Download'}</button>
             <button className="ih-btn-ghost" onClick={() => setFile(null)}>{lang === 'fr' ? '↺ Nouvelle image' : '↺ New Image'}</button>
           </div>
         </>
@@ -1749,7 +1750,7 @@ function ScreenshotRedactPanel({ T }: { T: any }) {
   }
 
   const MODES: { v: RedactMode; label: string; frLabel: string; icon: string }[] = [
-    { v: 'blur',     label: 'Blur',     frLabel: 'Flouter',    icon: '🌫' },
+    { v: 'blur',     label: 'Blur',     frLabel: 'Flouter',    icon: 'cloud' },
     { v: 'pixelate', label: 'Pixelate', frLabel: 'Pixeliser',  icon: '▦' },
     { v: 'blackout', label: 'Blackout', frLabel: 'Masquer',    icon: '■' },
   ]
@@ -1764,23 +1765,23 @@ function ScreenshotRedactPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>▓</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="sparkles" size={40} /></span>
           <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre capture d\'écran ici' : 'Drop your screenshot here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Floutez, pixelisez ou masquez les informations sensibles' : 'Blur, pixelate or black out sensitive information'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 16 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setZones([]); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setZones([]); setResultUrl('') }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
 
           {/* Mode selector */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
             {MODES.map(m => (
               <button key={m.v} className={`ih-fit-btn${mode === m.v ? ' active' : ''}`} onClick={() => setMode(m.v)}>
-                {m.icon} {lang === 'fr' ? m.frLabel : m.label}
+                <Icon name={m.icon} size={14} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? m.frLabel : m.label}
               </button>
             ))}
             {zones.length > 0 && (
@@ -1901,16 +1902,16 @@ function PaletteExtractorPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🎨</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="palette" size={40} /></span>
           <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Extrayez la palette de couleurs dominante' : 'Extract the dominant color palette'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPalette([]) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPalette([]) }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
@@ -2038,16 +2039,16 @@ function PassportPhotoPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>🪪</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="id-badge" size={40} /></span>
           <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre photo ici' : 'Drop your photo here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Générez des photos passeport ou d\'identité aux bonnes dimensions' : 'Generate passport or ID photos at the correct dimensions'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setResultUrl('') }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
 
           <div className="ih-passport-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
@@ -2179,16 +2180,16 @@ function FaviconPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*,image/svg+xml" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>⭐</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="sparkles" size={40} /></span>
           <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre logo ici' : 'Drop your logo here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Génère toutes les tailles de favicon — PNG + extrait HTML' : 'Generates all favicon sizes — PNG + HTML snippet'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <span style={{ fontSize: '.88rem', fontWeight: 500 }}>{fileName}</span>
-            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPreviews([]) }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setImg(null); setPreviews([]) }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
 
           {previews.length > 0 && (
@@ -2280,14 +2281,14 @@ function Base64Panel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f) }} />
-          <span style={{ fontSize: '2.8rem', display: 'block', marginBottom: 14 }}>{'{}'}</span>
+          <span style={{ display: 'flex', justifyContent:'center', marginBottom: 14 }}><Icon name="sparkles" size={40} /></span>
           <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 600, marginBottom: 6 }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ fontSize: '.85rem', color: T.muted }}>{lang === 'fr' ? 'Convertissez en Data URI Base64 — pour HTML, CSS ou JS' : 'Convert to Base64 Data URI — for HTML, CSS, or JS'}</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: `1px solid ${T.border}`, marginBottom: 20 }}>
-            <span style={{ fontSize: '1.2rem' }}>🖼</span>
+            <span style={{ display:'inline-flex' }}><Icon name="image" size={19} /></span>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '.88rem', fontWeight: 500 }}>{file.name}</div>
               <div style={{ fontSize: '.75rem', color: T.muted, marginTop: 2 }}>
@@ -2295,7 +2296,7 @@ function Base64Panel({ T }: { T: any }) {
                 {dataUri && <> · Base64: <span style={{ color: T.accent, fontWeight: 600 }}>{formatBytes(dataUri.length)}</span></>}
               </div>
             </div>
-            <button className="ih-btn-ghost" style={{ padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setFile(null); setDataUri('') }}>{lang === 'fr' ? '✕ Changer' : '✕ Change'}</button>
+            <button className="ih-btn-ghost" style={{ padding: '6px 12px', fontSize: '.78rem' }} onClick={() => { setFile(null); setDataUri('') }}><><Icon name="x" size={12} style={{marginRight:4,verticalAlign:-1}} />{lang === 'fr' ? 'Changer' : 'Change'}</></button>
           </div>
 
           {!dataUri ? (

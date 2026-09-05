@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { IconClipboard } from '../shared/Icons'
 
 const CURRENCIES = [
   { code: 'USD', symbol: '$',  name: 'US Dollar' },
@@ -91,7 +92,7 @@ export default function TCurrency() {
           </div>
           <button onClick={() => navigator.clipboard?.writeText(`${amount} ${from} = ${result} ${to}`)}
             style={{ padding: '8px 20px', background: cyan, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-            {lang === 'fr' ? '📋 Copier' : '📋 Copy'}
+            <><IconClipboard size={13} style={{marginRight:6,verticalAlign:-2}} />{lang === 'fr' ? 'Copier' : 'Copy'}</>
           </button>
         </div>
       )}
