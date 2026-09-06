@@ -6,15 +6,16 @@ import { useDark } from '../lib/hooks/useDark'
 import { BP } from '../lib/breakpoints'
 import { TOOLS, Tool } from '../lib/tools'
 import CommandPalette from '../components/shell/CommandPalette'
+import { Icon, IconBolt, IconHeart, IconCash, IconSettings, IconEdit, IconRepeat, IconSparkles, IconSearch, IconX } from '../components/shared/Icons'
 import Link from 'next/link'
 
 const CATEGORIES = [
-  { id: 'all',      en: 'All',          fr: 'Tous',           icon: '⚡' },
-  { id: 'health',   en: 'Health',       fr: 'Santé',          icon: '❤️' },
-  { id: 'finance',  en: 'Finance',      fr: 'Finance',        icon: '💰' },
-  { id: 'dev',      en: 'Developer',    fr: 'Développeur',    icon: '⚙️' },
-  { id: 'text',     en: 'Text',         fr: 'Texte',          icon: '📝' },
-  { id: 'convert',  en: 'Converters',   fr: 'Convertisseurs', icon: '🔄' },
+  { id: 'all',      en: 'All',          fr: 'Tous',           icon: IconBolt },
+  { id: 'health',   en: 'Health',       fr: 'Santé',          icon: IconHeart },
+  { id: 'finance',  en: 'Finance',      fr: 'Finance',        icon: IconCash },
+  { id: 'dev',      en: 'Developer',    fr: 'Développeur',    icon: IconSettings },
+  { id: 'text',     en: 'Text',         fr: 'Texte',          icon: IconEdit },
+  { id: 'convert',  en: 'Converters',   fr: 'Convertisseurs', icon: IconRepeat },
 ]
 
 // Tools with Next.js pages (implemented — shown as clickable in the grid)
@@ -86,7 +87,7 @@ export default function Home() {
           {/* Center text */}
           <div style={{ flex: '1 1 auto', textAlign: 'center', padding: '0 24px', maxWidth: 520 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: dark ? '#1E3A5F' : '#EFF6FF', border: `1px solid ${dark ? '#2563EB50' : '#BFDBFE'}`, borderRadius: 99, padding: '6px 16px', fontSize: 13, color: '#3B82F6', fontWeight: 600, marginBottom: 20 }}>
-              ✨ {TOOLS.length} {lang === 'fr' ? 'outils gratuits' : 'free tools'} · {lang === 'fr' ? 'Sans inscription' : 'No sign-up'}
+              <IconSparkles size={13} style={{marginRight:2,verticalAlign:-2}} /> {TOOLS.length} {lang === 'fr' ? 'outils gratuits' : 'free tools'} · {lang === 'fr' ? 'Sans inscription' : 'No sign-up'}
             </div>
             <h1 style={{ fontSize: 44, fontWeight: 800, color: dark ? '#F1F5F9' : '#0F172A', lineHeight: 1.15, margin: '0 0 14px', letterSpacing: '-0.03em' }}>
               {t('home.headline') || 'Everything you need.'}
@@ -105,7 +106,7 @@ export default function Home() {
                   background: lang === l ? '#EFF6FF' : '#fff',
                   color: lang === l ? '#3B82F6' : '#64748B',
                 }}>
-                  {l === 'en' ? '🇬🇧 English' : '🇫🇷 Français'}
+                  {l === 'en' ? 'EN — English' : 'FR — Français'}
                 </button>
               ))}
             </div>
@@ -124,14 +125,14 @@ export default function Home() {
 
         {/* ── Search ── */}
         <div style={{ position: 'relative', maxWidth: 560, margin: '0 auto 32px' }}>
-          <span style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 16 }}>🔍</span>
+          <span style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex' }}><IconSearch size={16} /></span>
           <input
             value={query} onChange={e => setQuery(e.target.value)}
             placeholder={lang === 'fr' ? 'Rechercher des outils...' : 'Search tools...'}
             style={{ width: '100%', padding: '14px 16px 14px 44px', borderRadius: 12, fontSize: 15, border: `1px solid ${dark ? '#334155' : '#E2E8F0'}`, background: dark ? '#1E293B' : '#fff', color: dark ? '#F1F5F9' : '#0F172A', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
           />
           {query && (
-            <button onClick={() => setQuery('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#94A3B8' }}>✕</button>
+            <button onClick={() => setQuery('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', display: 'flex', alignItems: 'center' }}><IconX size={16} /></button>
           )}
         </div>
 
@@ -145,7 +146,7 @@ export default function Home() {
               color: cat === c.id ? '#fff' : dark ? '#94A3B8' : '#64748B',
               transition: 'all 0.15s',
             }}>
-              {c.icon} {lang === 'fr' ? c.fr : c.en}
+              <c.icon size={13} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? c.fr : c.en}
               <span style={{ marginLeft: 6, fontSize: 11, opacity: 0.75 }}>
                 {cat === c.id || c.id === 'all' ? (c.id === 'all' ? TOOLS.length : TOOLS.filter(t => t.cat === c.id).length) : ''}
               </span>
@@ -177,7 +178,7 @@ export default function Home() {
                   onMouseEnter={e => { if (isLive) { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)' }}}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)' }}
                 >
-                  <div style={{ fontSize: 28, marginBottom: 10 }}>{tool.icon}</div>
+                  <div style={{ marginBottom: 10 }}><Icon name={tool.icon} size={26} /></div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: dark ? '#F1F5F9' : '#0F172A', marginBottom: 4, lineHeight: 1.3 }}>
                     {label}
                   </div>

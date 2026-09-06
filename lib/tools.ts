@@ -122,6 +122,15 @@ export const WIRED_SLUGS = new Set([
   'css-minifier',
   'javascript-minifier',
   'word-counter',
+  // ── Text Tools Hub (VAOVAO) ──────────────────────────────────
+  'text-tools-hub',
+  'case-converter',
+  'text-cleaner',
+  'find-replace',
+  'remove-duplicates',
+  'sort-lines',
+  'text-diff',
+  'slug-generator',
 ])
 
 // ── TOOLS — the 7 tools that have a real /tools/<slug> page today ──
@@ -147,6 +156,22 @@ export const TOOLS: Tool[] = [
   { id: 'currency-converter', label: 'Currency Converter', frLabel: 'Convertisseur de Devises',
     slug: '/currency-converter', cat: 'convert', icon: 'exchange',
     keywords: ['currency', 'exchange rate', 'convert money'] },
+  // Calculators — components already exist in PANEL_MAP (Finance/Health/
+  // Education) and routing is already wired in ToolPageClient.tsx
+  // (COMPONENT_MAP, FULLSCREEN_SLUGS, SMARTCALC_TOOL_BY_SLUG); these were
+  // just missing from TOOLS, so the home grid never surfaced them.
+  { id: 'percentage-calculator', label: 'Percentage Calculator', frLabel: 'Calculateur de Pourcentage',
+    slug: '/percentage-calculator', cat: 'finance', icon: 'percent',
+    keywords: ['percentage calculator', 'calculate percentage online', 'percent calculator free', 'percentage increase calculator'] },
+  { id: 'loan-calculator', label: 'Loan Calculator', frLabel: 'Calculateur de Prêt',
+    slug: '/loan-calculator', cat: 'finance', icon: 'cash',
+    keywords: ['loan calculator', 'monthly payment calculator', 'loan interest calculator', 'loan amortization calculator'] },
+  { id: 'age-calculator', label: 'Age Calculator', frLabel: "Calculateur d'Âge",
+    slug: '/age-calculator', cat: 'health', icon: 'cake',
+    keywords: ['age calculator', 'calculate age online', 'how old am i', 'birthday calculator'] },
+  { id: 'scientific-calculator', label: 'Scientific Calculator', frLabel: 'Calculatrice Scientifique',
+    slug: '/scientific-calculator', cat: 'dev', icon: 'calculator',
+    keywords: ['scientific calculator online', 'advanced calculator free', 'math calculator', 'trig calculator'] },
   // Network Hub entry points (all render NetworkHub component)
   { id: 'network-hub',          label: 'Network Hub',          frLabel: 'Hub Réseau',           slug: '/network-hub',          cat: 'dev', icon: 'antenna', keywords: ['network', 'internet', 'hub'] },
   { id: 'ip-lookup',            label: 'IP Lookup',            frLabel: 'Recherche IP',          slug: '/ip-lookup',            cat: 'dev', icon: 'antenna', keywords: ['ip', 'address', 'location'] },
@@ -165,6 +190,16 @@ export const TOOLS: Tool[] = [
   { id: 'jpg-to-pdf', label: 'JPG → PDF', frLabel: 'JPG → PDF',    slug: '/jpg-to-pdf', cat: 'dev', icon: 'camera', keywords: ['jpg', 'image', 'pdf'] },
   // Smart Calculator
   { id: 'smart-calculator', label: 'Smart Calculator', frLabel: 'Calculatrice Intelligente', slug: '/smart-calculator', cat: 'finance', icon: 'calculator', keywords: ['calculator', 'smart', 'all-in-one'] },
+  // Text Tools Hub entry points (all render TTextToolsHub component) — VAOVAO
+  { id: 'text-tools-hub',    label: 'Text Tools',              frLabel: 'Outils Texte',              slug: '/text-tools-hub',    cat: 'text', icon: 'edit',      keywords: ['text tools', 'outils texte', 'hub'] },
+  { id: 'word-counter',      label: 'Word Counter',            frLabel: 'Compteur de mots',          slug: '/word-counter',      cat: 'text', icon: 'hash',      keywords: ['word count', 'character count', 'compteur de mots'] },
+  { id: 'case-converter',    label: 'Case Converter',          frLabel: 'Convertisseur de casse',    slug: '/case-converter',    cat: 'text', icon: 'typography',keywords: ['case converter', 'uppercase', 'lowercase', 'majuscule'] },
+  { id: 'text-cleaner',      label: 'Text Cleaner',            frLabel: 'Nettoyeur de texte',        slug: '/text-cleaner',      cat: 'text', icon: 'sparkle',   keywords: ['clean text', 'remove spaces', 'nettoyer texte'] },
+  { id: 'find-replace',      label: 'Find & Replace',          frLabel: 'Rechercher et remplacer',   slug: '/find-replace',      cat: 'text', icon: 'search',    keywords: ['find replace', 'regex', 'rechercher remplacer'] },
+  { id: 'remove-duplicates', label: 'Remove Duplicate Lines',  frLabel: 'Supprimer les doublons',    slug: '/remove-duplicates', cat: 'text', icon: 'layers',    keywords: ['duplicate lines', 'remove duplicates', 'doublons'] },
+  { id: 'sort-lines',        label: 'Sort Lines',              frLabel: 'Trier les lignes',          slug: '/sort-lines',        cat: 'text', icon: 'sort',      keywords: ['sort lines', 'alphabetical', 'trier'] },
+  { id: 'text-diff',         label: 'Text Diff',               frLabel: 'Comparateur de textes',     slug: '/text-diff',         cat: 'text', icon: 'exchange',  keywords: ['text diff', 'compare text', 'comparer'] },
+  { id: 'slug-generator',    label: 'Slug Generator',          frLabel: 'Générateur de slug',        slug: '/slug-generator',    cat: 'text', icon: 'link',      keywords: ['slug generator', 'url slug', 'générateur de slug'] },
 ]
 
 // ── registryCategories — all 7 categories (full SEO registry) ──
@@ -2719,4 +2754,8 @@ export const RELATED_TOOLS: Record<string, string[]> = {
   'calories-calculator':     ['bmi-calculator', 'water-intake-calculator', 'ideal-weight-calculator'],
   'currency-converter':      ['mortgage-calculator', 'emi-calculator'],
   'smart-calculator':        ['bmi-calculator', 'mortgage-calculator', 'currency-converter'],
+  'percentage-calculator':   ['loan-calculator', 'scientific-calculator', 'currency-converter'],
+  'loan-calculator':         ['mortgage-calculator', 'percentage-calculator', 'emi-calculator'],
+  'age-calculator':          ['bmi-calculator', 'calories-calculator'],
+  'scientific-calculator':   ['percentage-calculator', 'bmi-calculator'],
 }

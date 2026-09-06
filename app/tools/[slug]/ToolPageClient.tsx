@@ -20,6 +20,7 @@ import NetworkHub from '../../../components/network/NetworkHub'
 import TConvertersHub from '../../../components/converters/TConvertersHub'
 import TDeveloperHub from '../../../components/developer/TDeveloperHub'
 import ImageHub from '../../../components/image/ImageHub'
+import TTextToolsHub from '../../../components/texttools/TTextToolsHub'
 import ToolSeoContent from '../../../components/seo/ToolSeoContent'
 import RichCalcContent from '../../../components/seo/RichCalcContent'
 
@@ -109,7 +110,22 @@ const COMPONENT_MAP: Record<string, ComponentType<any>> = {
   'html-formatter':        TDeveloperHub,
   'css-minifier':          TDeveloperHub,
   'javascript-minifier':   TDeveloperHub,
-  'word-counter':          TDeveloperHub,
+  // 'word-counter' removed from here — moved to Text Tools Hub below.
+  // ⚠️ Raha efa nampiasainao tokoa ilay Word Counter ao amin'ny
+  // TDeveloperHub, dia mila averina eto ianao ('word-counter': TDeveloperHub)
+  // ary asio slug hafa ho an'ny an'ny Text Tools (ohatra 'text-word-counter')
+  // eo ambany, mba tsy hisy fifanoherana.
+
+  // Text Tools Hub slugs — all tabs inside TTextToolsHub (VAOVAO)
+  'text-tools-hub':    TTextToolsHub,
+  'word-counter':      TTextToolsHub,
+  'case-converter':    TTextToolsHub,
+  'text-cleaner':      TTextToolsHub,
+  'find-replace':      TTextToolsHub,
+  'remove-duplicates': TTextToolsHub,
+  'sort-lines':        TTextToolsHub,
+  'text-diff':         TTextToolsHub,
+  'slug-generator':    TTextToolsHub,
 }
 
 // Hub-level slugs that render full-screen (own header/nav — skip the wrapper)
@@ -130,6 +146,9 @@ const FULLSCREEN_SLUGS = new Set([
   'developer-hub','json-formatter','json-validator','base64-encoder','base64-decoder',
   'url-encoder','url-decoder','regex-tester','html-formatter','css-minifier',
   'javascript-minifier','word-counter',
+  // Text Tools Hub (VAOVAO)
+  'text-tools-hub','case-converter','text-cleaner','find-replace',
+  'remove-duplicates','sort-lines','text-diff','slug-generator',
 ])
 
 // Slug (URL /tools/xxx) → props ho an'ny ImageHub.tsx (tab + format

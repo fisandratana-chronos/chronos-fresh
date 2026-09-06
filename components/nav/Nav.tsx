@@ -87,6 +87,7 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
   { label: t("nav.calculators"), action: () => router.push('/tools/smart-calculator')   },
   { label: t("nav.converters"),  action: () => router.push('/tools/converters-hub')     },
   { label: t("nav.network"),     action: () => router.push('/tools/network-hub')        },
+  { label: t("nav.textTools"),   action: () => router.push('/tools/text-tools-hub')     },
 ];
 
   const linkBtnStyle = {

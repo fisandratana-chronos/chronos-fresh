@@ -57,6 +57,29 @@ const PANEL_MAP = {
   ...MISC_PANEL_MAP
 };
 
+// Alias: lib/tools.ts TOOLS[].id uses the full "xxx-calculator" slug-style
+// id (needed so it matches WIRED_SLUGS/registryTools/ToolPageClient's
+// COMPONENT_MAP for routing). SmartCalcHub's OWN internal grid, though,
+// sets activeTool = t.id directly when a card is clicked (see openTool()
+// below) — so without this, clicking a card here looks up
+// PANEL_MAP["percentage-calculator"], finds nothing (only the short
+// "percentage" key exists), and silently renders nothing. This mirrors
+// every long-form id SMARTCALC_TOOL_BY_SLUG already maps to a short one,
+// so both the direct-URL path and the in-hub click path resolve the same
+// component.
+const ID_ALIASES: Record<string, string> = {
+  'percentage-calculator': 'percentage',
+  'loan-calculator': 'loan',
+  'age-calculator': 'age',
+  'scientific-calculator': 'scientific',
+  'vat-calculator': 'vat',
+  'date-difference-calculator': 'datediff',
+  'gpa-calculator': 'gpa',
+};
+for (const [longId, shortId] of Object.entries(ID_ALIASES)) {
+  if (PANEL_MAP[shortId] && !PANEL_MAP[longId]) PANEL_MAP[longId] = PANEL_MAP[shortId];
+}
+
 // ── Hub shell ──
 
 function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }: { darkProp?: any; favsProp?: any; onFavsChange?: any; onBack?: () => void; initialTool?: string }) {
@@ -381,7 +404,13 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(schemaBreadcrumb)}}/>
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(schemaFAQ)}}/>
 
-      <style>{FONTS}{`
+      {/* Single template-literal child (not `{FONTS}{...}` as two separate
+          JSX expression children) — <style>/<script> are React's "raw text"
+          host elements, and two adjacent text children (one of them empty,
+          since FONTS === "") serialize differently between SSR and the
+          client's hydration matcher, which is what triggered the
+          "Hydration failed" error on this page. */}
+      <style>{`${FONTS}
         *{box-sizing:border-box;margin:0;padding:0;}
         ::-webkit-scrollbar{width:4px;height:4px;}
         ::-webkit-scrollbar-track{background:${T.scrollTrack};}
