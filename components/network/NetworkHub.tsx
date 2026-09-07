@@ -1,10 +1,15 @@
 'use client'
 
 // ── components/network/NetworkHub.tsx ─────────────────────────
+// CHRONOS shell (sidebar + hero + trust badges), matching PdfHub.tsx —
+// all tab logic (My IP, DNS, Subnet, DNS Propagation, etc.) unchanged.
 import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { useDark } from '../../lib/hooks/useDark'
+import { DARK, LIGHT } from '../../lib/theme'
+import { BP } from '../../lib/breakpoints'
 import { NETWORK_SEO_CONTENT } from '../../lib/seoContent'
-import { Icon, IconSun, IconMoon, IconAntenna, IconAlertTriangle, IconCheck, IconX } from '../shared/Icons'
+import { Icon, IconAntenna, IconAlertTriangle, IconCheck, IconX } from '../shared/Icons'
 
 // ── useTrans: typed wrapper mba i t() dia manaiky argument 2 ──
 type TFn = (key: string, vars?: Record<string, unknown>) => string;
@@ -17,125 +22,73 @@ const useTrans = () => {
 const cleanDomain = (raw: string): string =>
   raw.replace(/^https?:\/\//, "").replace(/\/.*$/, "").trim().toLowerCase();
 
-// ── Theme ──
+// ── Fonts — mitovy amin'ny PdfHub.tsx (Cormorant Garamond ho an'ny
+// heading serif, DM Sans ho an'ny body). <link> fa tsy @import, mba
+// hisokafan'ny connection any amin'ny fonts.gstatic.com miaraka amin'ny
+// sisa amin'ny pejy fa tsy mandry an'ny inline <style> aloha. ──
+const FONT_HREF =
+  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap";
 
-const getTheme = (dark: boolean) => dark ? {
-  bg: "#0A0E1A",
-  bgCard: "#111827",
-  bgCardHover: "#1A2235",
-  bgSubtle: "rgba(255,255,255,0.02)",
-  border: "#1E2D45",
-  cyan: "#00D4FF",
-  cyanDim: "#00A8CC",
-  orange: "#FF6B35",
-  green: "#00E676",
-  red: "#FF3D57",
-  yellow: "#FFD600",
-  textPrimary: "#E8EDF5",
-  textSecondary: "#6B7FA3",
-  textMono: "#A8D8FF",
-  headerBg: "rgba(10,14,26,0.95)",
-  inputBg: "rgba(255,255,255,0.03)",
-  logBg: "rgba(0,212,255,0.04)",
-  adBg: "rgba(255,107,53,0.06)",
-  modalOverlay: "rgba(0,0,0,0.75)",
-  isDark: true,
-} : {
-  bg: "#F0F4FA",
-  bgCard: "#FFFFFF",
-  bgCardHover: "#F8FAFF",
-  bgSubtle: "rgba(0,0,0,0.02)",
-  border: "#D8E2F0",
-  cyan: "#0099CC",
-  cyanDim: "#007AA8",
-  orange: "#E85A1F",
-  green: "#00A854",
-  red: "#E02040",
-  yellow: "#C8A000",
-  textPrimary: "#0D1520",
-  textSecondary: "#5A6A85",
-  textMono: "#0066AA",
-  headerBg: "rgba(240,244,250,0.95)",
-  inputBg: "rgba(0,0,0,0.03)",
-  logBg: "rgba(0,153,204,0.05)",
-  adBg: "rgba(232,90,31,0.06)",
-  modalOverlay: "rgba(0,0,0,0.45)",
-  isDark: false,
+function useChronosFonts() {
+  React.useEffect(() => {
+    if (document.getElementById("chronos-fonts")) return;
+    const pre1 = document.createElement("link");
+    pre1.rel = "preconnect";
+    pre1.href = "https://fonts.googleapis.com";
+    const pre2 = document.createElement("link");
+    pre2.rel = "preconnect";
+    pre2.href = "https://fonts.gstatic.com";
+    pre2.crossOrigin = "anonymous";
+    const sheet = document.createElement("link");
+    sheet.id = "chronos-fonts";
+    sheet.rel = "stylesheet";
+    sheet.href = FONT_HREF;
+    document.head.append(pre1, pre2, sheet);
+  }, []);
+}
+
+// ── Theme ──
+// Loko dia alaina avy amin'ny lib/theme.ts (DARK/LIGHT) — ny site design
+// system iombonana amin'ny PdfHub/ImageHub/Calculators — mba tsy hisy
+// palette local intsony. Ny "shape" (bg, bgCard, cyan, textPrimary, sns.)
+// dia mitovy amin'ilay teo aloha mba tsy hisy tab body (S.card, S.input,
+// sns.) tokony hovaina — ny fanovana dia eo amin'ny loisiny ihany.
+const buildPalette = (dark: boolean) => {
+  const B = dark ? DARK : LIGHT;
+  return {
+    bg: B.bg0,
+    bgCard: B.bg1,
+    bgSubtle: dark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
+    border: B.border,
+    cyan: B.cyan,
+    cyanDim: B.amberD,
+    orange: dark ? "#FF6B35" : "#E85A1F",
+    green: B.emerald,
+    red: B.red,
+    yellow: dark ? "#FFD600" : "#C8A000",
+    textPrimary: B.txt,
+    textSecondary: B.txt2,
+    textMono: B.amberL,
+    inputBg: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+    logBg: `${B.cyan}0A`,
+    isDark: dark,
+    // ── Shell-only tokens (sidebar / hero / SEO article) ──
+    bgCard2: B.bg2,
+    sidebarBg: dark ? "rgba(7,9,15,.72)" : "rgba(255,255,255,.82)",
+    cardGradFrom: B.bg2,
+    greenBorder: `${B.emerald}40`,
+    tipBorder: dark ? "#3b3427" : "#FCD34D66",
+    tipText: dark ? "#9f9887" : "#92400E",
+    muted2: B.txt3,
+  };
 };
 
-const NHThemeCtx = createContext(getTheme(true));
+const NHThemeCtx = createContext(buildPalette(true));
 const useNHTheme = () => useContext(NHThemeCtx);
 
-type Theme = ReturnType<typeof getTheme>;
+type Theme = ReturnType<typeof buildPalette>;
 
 const mkStyles = (T: Theme): Record<string, any> => ({
-  app: {
-    minHeight: "100vh",
-    background: T.bg,
-    fontFamily: "'Inter', system-ui, sans-serif",
-    color: T.textPrimary,
-    transition: "background 0.25s ease, color 0.25s ease",
-  },
-  header: {
-    borderBottom: `1px solid ${T.border}`,
-    padding: "20px 32px",
-    display: "flex",
-    alignItems: "center",
-    gap: "16px",
-    background: T.headerBg,
-    backdropFilter: "blur(12px)",
-    position: "sticky",
-    top: 65, // eo ambanin'ny Nav CHRONOS (65px = haavon'ny navbar global)
-    zIndex: 100,
-    transition: "background 0.25s ease, border-color 0.25s ease",
-  },
-  logo: {
-    fontFamily: "'JetBrains Mono', 'Courier New', monospace",
-    fontSize: "20px",
-    fontWeight: 700,
-    color: T.cyan,
-    letterSpacing: "0.08em",
-  },
-  logoSub: {
-    fontSize: "11px",
-    color: T.textSecondary,
-    fontFamily: "'JetBrains Mono', monospace",
-    letterSpacing: "0.12em",
-  },
-  nav: {
-    display: "flex",
-    gap: "4px",
-    padding: "20px 16px 0",
-    borderBottom: `1px solid ${T.border}`,
-    overflowX: "auto",
-    WebkitOverflowScrolling: "touch",
-    scrollbarWidth: "none",
-    msOverflowStyle: "none",
-    background: T.bg,
-    transition: "background 0.25s ease",
-    flexWrap: "nowrap",
-  },
-  tabBtn: (active: boolean) => ({
-    padding: "10px 14px",
-    borderRadius: "8px 8px 0 0",
-    border: `1px solid ${active ? T.border : "transparent"}`,
-    borderBottom: active ? `1px solid ${T.bg}` : "none",
-    background: active ? T.bgCard : "transparent",
-    color: active ? T.cyan : T.textSecondary,
-    cursor: "pointer",
-    fontSize: "13px",
-    fontWeight: 600,
-    letterSpacing: "0.04em",
-    whiteSpace: "nowrap",
-    flexShrink: 0,
-    transition: "all 0.15s ease",
-    marginBottom: active ? "-1px" : 0,
-  }),
-  content: {
-    padding: "32px",
-    maxWidth: "900px",
-    margin: "0 auto",
-  },
   card: {
     background: T.bgCard,
     border: `1px solid ${T.border}`,
@@ -241,30 +194,57 @@ const mkStyles = (T: Theme): Record<string, any> => ({
 // ── Static data ──
 
 const TABS = [
-  { id: "ip", icon: "antenna", en: "My IP", fr: "Mon IP",
+  // ── 🌐 Network ──
+  { id: "ip", icon: "antenna", en: "My IP", fr: "Mon IP", group: "network",
     enDesc: "View your public IP address and connection info", frDesc: "Voir votre adresse IP publique et les infos de connexion" },
-  { id: "speed", icon: "bolt", en: "Speed Test", fr: "Test de Débit",
-    enDesc: "Measure your download speed and latency", frDesc: "Mesurer votre vitesse de téléchargement et la latence" },
-  { id: "status", icon: "search", en: "Site Status", fr: "État du Site",
-    enDesc: "Check if a website is up or down", frDesc: "Vérifier si un site web est en ligne ou hors service" },
-  { id: "password", icon: "lock", en: "Password", fr: "Mot de Passe",
-    enDesc: "Generate and check the strength of a password", frDesc: "Générer un mot de passe et vérifier sa robustesse" },
-  { id: "dns", icon: "globe", en: "DNS Lookup", fr: "Recherche DNS",
-    enDesc: "Look up DNS records for a domain", frDesc: "Consulter les enregistrements DNS d'un domaine" },
-  { id: "whois", icon: "clipboard", en: "Whois", fr: "Whois",
-    enDesc: "Look up domain registration and ownership info", frDesc: "Consulter les infos d'enregistrement et de propriété d'un domaine" },
-  { id: "ssl", icon: "lock", en: "SSL Checker", fr: "Vérif. SSL",
-    enDesc: "Check a website's SSL certificate validity", frDesc: "Vérifier la validité du certificat SSL d'un site" },
-  { id: "domainAge", icon: "calendar", en: "Domain Age", fr: "Âge du Domaine",
-    enDesc: "Find out when a domain was first registered", frDesc: "Découvrir la date de première création d'un domaine" },
-  { id: "ping", icon: "wifi", en: "Ping Test", fr: "Test de Ping",
+  { id: "iplookup", icon: "target", en: "IP Lookup", fr: "Recherche IP", group: "network",
+    enDesc: "Look up geolocation and ISP info for any IP address", frDesc: "Consulter la géolocalisation et le FAI de n'importe quelle adresse IP" },
+  { id: "subnet", icon: "network", en: "Subnet Calculator", fr: "Calc. Sous-réseau", group: "network",
+    enDesc: "Calculate network, broadcast and usable host range from a CIDR", frDesc: "Calculer réseau, diffusion et plage d'hôtes utilisables à partir d'un CIDR" },
+  { id: "ping", icon: "wifi", en: "Ping Test", fr: "Test de Ping", group: "network",
     enDesc: "Test response time to a server or domain", frDesc: "Tester le temps de réponse d'un serveur ou domaine" },
-  { id: "ports", icon: "plug", en: "Port Scanner", fr: "Scanneur de Ports",
-    enDesc: "Check which ports are open on a host", frDesc: "Vérifier quels ports sont ouverts sur un hôte" },
-  { id: "headers", icon: "mail", en: "HTTP Headers", fr: "En-têtes HTTP",
-    enDesc: "Inspect the HTTP response headers of a URL", frDesc: "Inspecter les en-têtes de réponse HTTP d'une URL" },
-  { id: "traceroute", icon: "map", en: "Traceroute", fr: "Traceroute",
+  { id: "traceroute", icon: "map", en: "Traceroute", fr: "Traceroute", group: "network",
     enDesc: "Trace the network path to a destination", frDesc: "Tracer le chemin réseau vers une destination" },
+  { id: "ipconv", icon: "exchange", en: "IP Converter", fr: "Convertisseur IP", group: "network",
+    enDesc: "Convert an IP between decimal, binary and hexadecimal", frDesc: "Convertir une IP entre décimal, binaire et hexadécimal" },
+  { id: "contping", icon: "clock", en: "Continuous Ping", fr: "Ping Continu", group: "network",
+    enDesc: "Ping a host continuously and track latency over time", frDesc: "Envoyer des pings continus vers un hôte et suivre la latence" },
+  // ── 🔎 DNS & Domain ──
+  { id: "dns", icon: "globe", en: "DNS Lookup", fr: "Recherche DNS", group: "dns",
+    enDesc: "Look up DNS records for a domain", frDesc: "Consulter les enregistrements DNS d'un domaine" },
+  { id: "dnsprop", icon: "repeat", en: "DNS Propagation", fr: "Propagation DNS", group: "dns",
+    enDesc: "Check if DNS changes have propagated across major resolvers", frDesc: "Vérifier si les changements DNS se sont propagés sur les résolveurs majeurs" },
+  { id: "whois", icon: "clipboard", en: "Whois", fr: "Whois", group: "dns",
+    enDesc: "Look up domain registration and ownership info", frDesc: "Consulter les infos d'enregistrement et de propriété d'un domaine" },
+  { id: "domainAge", icon: "calendar", en: "Domain Age", fr: "Âge du Domaine", group: "dns",
+    enDesc: "Find out when a domain was first registered", frDesc: "Découvrir la date de première création d'un domaine" },
+  // ── 🔐 Security ──
+  { id: "ssl", icon: "lock", en: "SSL Checker", fr: "Vérif. SSL", group: "security",
+    enDesc: "Check a website's SSL certificate validity", frDesc: "Vérifier la validité du certificat SSL d'un site" },
+  { id: "ports", icon: "plug", en: "Port Scanner", fr: "Scanneur de Ports", group: "security",
+    enDesc: "Check which ports are open on a host", frDesc: "Vérifier quels ports sont ouverts sur un hôte" },
+  { id: "password", icon: "key", en: "Password", fr: "Mot de Passe", group: "security",
+    enDesc: "Generate and check the strength of a password", frDesc: "Générer un mot de passe et vérifier sa robustesse" },
+  { id: "emailsec", icon: "mail", en: "Email Security", fr: "Sécurité Email", group: "security",
+    enDesc: "Check a domain's SPF, DKIM and DMARC records", frDesc: "Vérifier les enregistrements SPF, DKIM et DMARC d'un domaine" },
+  { id: "secheaders", icon: "shield", en: "Security Headers", fr: "En-têtes de Sécurité", group: "security",
+    enDesc: "Grade a website's HTTP security headers", frDesc: "Noter les en-têtes de sécurité HTTP d'un site" },
+  { id: "blacklist", icon: "x", en: "Blacklist Check", fr: "Vérif. Liste Noire", group: "security",
+    enDesc: "Check if an IP is listed on major DNS blacklists", frDesc: "Vérifier si une IP figure sur les listes noires DNS majeures" },
+  // ── 🌍 Website ──
+  { id: "status", icon: "search", en: "Site Status", fr: "État du Site", group: "website",
+    enDesc: "Check if a website is up or down", frDesc: "Vérifier si un site web est en ligne ou hors service" },
+  { id: "headers", icon: "file-text", en: "HTTP Headers", fr: "En-têtes HTTP", group: "website",
+    enDesc: "Inspect the HTTP response headers of a URL", frDesc: "Inspecter les en-têtes de réponse HTTP d'une URL" },
+  { id: "speed", icon: "bolt", en: "Speed Test", fr: "Test de Débit", group: "website",
+    enDesc: "Measure your download speed and latency", frDesc: "Mesurer votre vitesse de téléchargement et la latence" },
+];
+
+const TAB_GROUPS = [
+  { id: "network", icon: "antenna", en: "Network", fr: "Réseau" },
+  { id: "dns", icon: "globe", en: "DNS & Domain", fr: "DNS & Domaine" },
+  { id: "security", icon: "shield", en: "Security", fr: "Sécurité" },
+  { id: "website", icon: "search", en: "Website", fr: "Site Web" },
 ];
 
 const POPULAR_SITES = [
@@ -298,6 +278,14 @@ const AD_CATALOG = {
   traceroute: { icon: "antenna", label: "DigitalOcean",  copy: "Too many hops? Deploy closer to your users with global droplets.", cta: "Reduce Latency →", color: "#0080FF", url: "https://www.digitalocean.com/?refcode=YOUR_REF_CODE" },
   status:     { icon: "chart-bar", label: "UptimeRobot",   copy: "Monitor uptime 24/7 — get alerted before your users notice.",   cta: "Monitor Free →",     color: "#3BD671", url: "https://uptimerobot.com/?aff=YOUR_AFF_ID" },
   password:   { icon: "key", label: "1Password",     copy: "Generated a strong password? Store it safely in a password manager.", cta: "Try 1Password →", color: "#1A8CFF", url: "https://1password.com/?ref=YOUR_AFF_ID" },
+  subnet:     { icon: "network", label: "DigitalOcean",  copy: "Planning a VPC layout? Deploy the real infrastructure in minutes.", cta: "Deploy Now →",       color: "#0080FF", url: "https://www.digitalocean.com/?refcode=YOUR_REF_CODE" },
+  dnsprop:    { icon: "globe", label: "Namecheap",     copy: "Waiting on propagation? Fast-propagating managed DNS cuts the wait.", cta: "Manage My DNS →",    color: "#DE3723", url: "https://www.namecheap.com/?aff=YOUR_AFF_ID" },
+  iplookup:   { icon: "shield", label: "NordVPN",       copy: "Anyone can look up an IP like this. Mask yours before they do.",   cta: "Hide My IP →",       color: "#4169E1", url: "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=YOUR_AFF_ID&url_id=902" },
+  emailsec:   { icon: "mail", label: "Mailgun",         copy: "Sending mail from your own domain? Get SPF/DKIM/DMARC set up right.", cta: "Set Up Email →",    color: "#F06B66", url: "https://www.mailgun.com/?ref=YOUR_AFF_ID" },
+  secheaders: { icon: "shield", label: "Cloudflare",    copy: "Missing security headers? A CDN/WAF can add most of them for you.", cta: "Secure My Site →",  color: "#F38020", url: "https://www.cloudflare.com/?ref=YOUR_AFF_ID" },
+  blacklist:  { icon: "cloud", label: "SendGrid",       copy: "IP flagged on a blacklist? A reputable mail relay avoids the problem entirely.", cta: "Try SendGrid →", color: "#51A9E3", url: "https://sendgrid.com/?ref=YOUR_AFF_ID" },
+  ipconv:     { icon: "exchange", label: "DigitalOcean", copy: "Scripting network config? Deploy real infrastructure to test it on.", cta: "Deploy Now →", color: "#0080FF", url: "https://www.digitalocean.com/?refcode=YOUR_REF_CODE" },
+  contping:   { icon: "clock", label: "UptimeRobot",    copy: "Watching latency by hand? Get automated alerts the moment a host drops.", cta: "Monitor Free →", color: "#3BD671", url: "https://uptimerobot.com/?aff=YOUR_AFF_ID" },
 };
 
 const AD_DEFAULT = {
@@ -372,48 +360,6 @@ const GlobalStyles = () => (
 // ============================================================
 
 // ── Shared UI ──
-
-function ThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
-  const T = useNHTheme();
-  return (
-    <button
-      onClick={onToggle}
-      aria-label={dark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-      aria-pressed={dark}
-      title={dark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-      style={{
-        width: 44, height: 24, borderRadius: 12,
-        border: `1.5px solid ${T.border}`,
-        background: dark ? T.bgCard : "#E0EDFF",
-        cursor: "pointer",
-        position: "relative",
-        transition: "background 0.25s ease, border-color 0.25s",
-        flexShrink: 0,
-        padding: 0,
-      }}
-    >
-      {/* track icons */}
-      <span style={{
-        position: "absolute", left: 5, top: "50%", transform: "translateY(-50%)",
-        fontSize: "10px", opacity: dark ? 0.4 : 0, transition: "opacity 0.2s",
-      }}><IconMoon size={16} /></span>
-      <span style={{
-        position: "absolute", right: 5, top: "50%", transform: "translateY(-50%)",
-        fontSize: "10px", opacity: dark ? 0 : 0.8, transition: "opacity 0.2s",
-      }}><IconSun size={16} /></span>
-      {/* knob */}
-      <div style={{
-        position: "absolute",
-        top: 3, left: dark ? 3 : 21,
-        width: 16, height: 16,
-        borderRadius: "50%",
-        background: dark ? T.cyan : "#0099CC",
-        boxShadow: `0 1px 4px ${T.cyan}60`,
-        transition: "left 0.22s cubic-bezier(.4,0,.2,1), background 0.25s",
-      }} />
-    </button>
-  );
-}
 
 const HISTORY_KEY = (toolKey: string) => `chronos_nh_${toolKey}`;
 
@@ -540,7 +486,7 @@ function SpeedGauge({ value, max = 100, color, label, unit = "Mbps" }: { value: 
           {value > 0 ? value.toFixed(1) : "—"}
         </text>
         <text x={cx} y={cy + 14} textAnchor="middle" fill={T.textSecondary}
-          style={{ fontFamily: "Inter, sans-serif", fontSize: "10px" }}>
+          style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px" }}>
           {unit}
         </text>
       </svg>
@@ -594,7 +540,7 @@ function NHAdBanner({ tab }: { tab: string }) {
 
   return (
     <div style={{
-      margin: "0 32px",
+      margin: "0",
       padding: "11px 16px",
       background: T.isDark ? `${accentColor}0D` : `${accentColor}08`,
       border: `1px solid ${accentColor}30`,
@@ -717,6 +663,96 @@ function IPTab() {
       )}
       <HistoryPanel entries={entries} onClear={clear}
         renderLabel={e => `${e.ip} — ${e.city || ""} ${e.country || ""}`} />
+    </div>
+  );
+}
+
+// ── IP Lookup / Geo-IP ──
+// Ohatra amin'ny IPTab (ipapi.co + ip-api.com fallback), fa ho an'ny
+// IP arbitrary nampidirin'ny mpampiasa, tsy ny IP-n'ny mpampiasa ihany.
+
+const IPV4_RE = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
+
+function IpLookupTab() {
+  const T = useNHTheme();
+  const S = mkStyles(T);
+  const { t } = useTrans();
+  const [ip, setIp] = useState("");
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { entries, save, clear } = useNHHistory("iplookup");
+
+  const lookup = async () => {
+    const q = ip.trim();
+    if (!IPV4_RE.test(q)) { setError(t("nh.iplookup.error")); setData(null); return; }
+    setLoading(true); setError(null); setData(null);
+    try {
+      const res = await fetch(`https://ipapi.co/${q}/json/`);
+      const d = await res.json();
+      if (d.error) throw new Error();
+      setData(d);
+      save({ ip: d.ip || q, city: d.city, country: d.country_name });
+    } catch {
+      try {
+        const r2 = await fetch(`https://ip-api.com/json/${q}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`);
+        const j2 = await r2.json();
+        if (j2.status !== "success") throw new Error();
+        const d = { ip: j2.query, city: j2.city, country_name: j2.country, region: j2.regionName, timezone: j2.timezone, org: j2.isp, asn: j2.as, latitude: j2.lat, longitude: j2.lon };
+        setData(d);
+        save({ ip: d.ip, city: d.city, country: d.country_name });
+      } catch {
+        setError(t("nh.iplookup.notFound"));
+      }
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <div style={S.card}>
+        <div style={S.cardTitle}>{t("nh.iplookup.title")}</div>
+        <div style={{ ...S.row, marginBottom: "4px" }}>
+          <input style={{ ...S.input, flex: 1 }} placeholder={t("nh.iplookup.placeholder")}
+            value={ip} onChange={e => setIp(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && lookup()} />
+          <button style={S.btn(T.cyan)} onClick={lookup} disabled={loading || !ip.trim()}>
+            {loading ? <><span style={{ animation: "spin-slow 1s linear infinite", display: "inline-block" }}>↻</span> {t("nh.iplookup.lookingUp")}</> : t("nh.iplookup.lookupBtn")}
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
+        </div>
+      )}
+
+      {data && !loading && (
+        <div style={{ ...S.card, animation: "slide-in 0.3s ease" }}>
+          <div style={S.cardTitle}>{t("nh.iplookup.resultsFor", { ip: data.ip })}</div>
+          <div style={{ ...S.monoValue, fontSize: "26px", marginBottom: "18px" }}>{data.ip}</div>
+          <div style={S.grid2}>
+            {[
+              [t("nh.iplookup.country"), data.country_name],
+              [t("nh.iplookup.region"), data.region],
+              [t("nh.iplookup.city"), data.city],
+              [t("nh.iplookup.isp"), data.org],
+              [t("nh.iplookup.organization"), data.org],
+              [t("nh.iplookup.asn"), data.asn],
+              [t("nh.iplookup.timezone"), data.timezone],
+              [t("nh.iplookup.coordinates"), (data.latitude && data.longitude) ? `${data.latitude}, ${data.longitude}` : null],
+            ].map(([k, v]) => v ? (
+              <div key={k as string}>
+                <div style={S.label}>{k}</div>
+                <div style={S.monoValueSm}>{v}</div>
+              </div>
+            ) : null)}
+          </div>
+        </div>
+      )}
+      <HistoryPanel entries={entries} onClear={clear}
+        renderLabel={e => t("nh.iplookup.historyLabel", { ip: e.ip, city: e.city || "—", country: e.country || "—" })} />
     </div>
   );
 }
@@ -1041,6 +1077,122 @@ function PasswordTab() {
   );
 }
 
+// ── Subnet / CIDR Calculator ──
+// Kajy local tanteraka (tsy misy API) — 32-bit unsigned bitwise math.
+
+function ipStrToInt(ip: string): number {
+  const parts = ip.split(".").map(Number);
+  return ((parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3]) >>> 0;
+}
+function intToIpStr(n: number): string {
+  return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join(".");
+}
+function parseCidr(input: string) {
+  const m = input.trim().match(/^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/(\d{1,2})$/);
+  if (!m) return null;
+  const [, ipStr, prefixStr] = m;
+  const octets = ipStr.split(".").map(Number);
+  if (octets.some(o => o < 0 || o > 255)) return null;
+  const prefix = parseInt(prefixStr, 10);
+  if (prefix < 0 || prefix > 32) return null;
+  return { ipStr, prefix, ipInt: ipStrToInt(ipStr) };
+}
+function calcSubnet(ipStr: string, prefix: number) {
+  const ipInt = ipStrToInt(ipStr);
+  const mask = prefix === 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+  const wildcard = (~mask) >>> 0;
+  const network = (ipInt & mask) >>> 0;
+  const broadcast = (network | wildcard) >>> 0;
+  const total = Math.pow(2, 32 - prefix);
+  let firstUsable, lastUsable, usableHosts;
+  if (prefix >= 31) {
+    firstUsable = network; lastUsable = broadcast;
+    usableHosts = prefix === 32 ? 1 : 2;
+  } else {
+    firstUsable = network + 1; lastUsable = broadcast - 1;
+    usableHosts = total - 2;
+  }
+  return {
+    network: intToIpStr(network),
+    broadcast: intToIpStr(broadcast),
+    mask: intToIpStr(mask),
+    wildcard: intToIpStr(wildcard),
+    firstUsable: intToIpStr(firstUsable),
+    lastUsable: intToIpStr(lastUsable),
+    usableHosts,
+    totalAddresses: total,
+    cidr: `${ipStr}/${prefix}`,
+  };
+}
+
+function SubnetTab() {
+  const T = useNHTheme();
+  const S = mkStyles(T);
+  const { t } = useTrans();
+  const [input, setInput] = useState("");
+  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { entries, save, clear } = useNHHistory("subnet");
+
+  const calculate = () => {
+    const parsed = parseCidr(input);
+    if (!parsed) { setError(t("nh.subnet.error")); setResult(null); return; }
+    setError(null);
+    const r = calcSubnet(parsed.ipStr, parsed.prefix);
+    setResult(r);
+    save({ cidr: r.cidr, hosts: r.usableHosts });
+  };
+
+  return (
+    <div>
+      <div style={S.card}>
+        <div style={S.cardTitle}>{t("nh.subnet.title")}</div>
+        <div style={S.row}>
+          <input style={{ ...S.input, flex: 1 }} placeholder={t("nh.subnet.placeholder")}
+            value={input} onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && calculate()} />
+          <button style={S.btn(T.cyan)} onClick={calculate} disabled={!input.trim()}>{t("nh.subnet.calculateBtn")}</button>
+        </div>
+      </div>
+
+      {error && (
+        <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
+        </div>
+      )}
+
+      {result && (
+        <div style={{ ...S.card, animation: "slide-in 0.3s ease" }}>
+          <div style={S.cardTitle}>{result.cidr}</div>
+          <div style={{ marginBottom: "20px" }}>
+            <div style={S.label}>{t("nh.subnet.usableHosts")}</div>
+            <div style={S.monoValue}>{result.usableHosts.toLocaleString()}</div>
+          </div>
+          <div style={S.grid2}>
+            {[
+              [t("nh.subnet.networkAddress"), result.network],
+              [t("nh.subnet.broadcastAddress"), result.broadcast],
+              [t("nh.subnet.subnetMask"), result.mask],
+              [t("nh.subnet.wildcardMask"), result.wildcard],
+              [t("nh.subnet.firstUsable"), result.firstUsable],
+              [t("nh.subnet.lastUsable"), result.lastUsable],
+              [t("nh.subnet.totalAddresses"), result.totalAddresses.toLocaleString()],
+              [t("nh.subnet.cidr"), result.cidr],
+            ].map(([k, v]) => (
+              <div key={k as string}>
+                <div style={S.label}>{k}</div>
+                <div style={S.monoValueSm}>{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <HistoryPanel entries={entries} onClear={clear}
+        renderLabel={e => t("nh.subnet.historyLabel", { cidr: e.cidr, hosts: e.hosts })} />
+    </div>
+  );
+}
+
 function DnsTab() {
   const T = useNHTheme();
   const S = mkStyles(T);
@@ -1135,6 +1287,137 @@ function DnsTab() {
       )}
       <HistoryPanel entries={entries} onClear={clear}
         renderLabel={e => t("nh.dns.historyLabel", { domain: e.domain, type: e.type, count: e.count, plural: e.count !== 1 ? "s" : "" })} />
+    </div>
+  );
+}
+
+// ── DNS Propagation Checker ──
+// Mampitaha ny valiny avy amin'ny operateur DoH publika lehibe telo
+// (Cloudflare, Google, Quad9) — tsy afaka mifantina "vantage point"
+// ara-jeografika marina avy amin'ny browser (izany dia sanda amin'ny
+// serivisy manokana any am-pizarantany), ka "resolver" tsirairay no
+// asongadina fa tsy "faritra".
+
+const PROPAGATION_RESOLVERS = [
+  { id: "cloudflare", label: "Cloudflare (1.1.1.1)", url: (d: string, ty: string) => `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(d)}&type=${ty}`, headers: { Accept: "application/dns-json" } },
+  { id: "google", label: "Google (8.8.8.8)", url: (d: string, ty: string) => `https://dns.google/resolve?name=${encodeURIComponent(d)}&type=${ty}` },
+  { id: "quad9", label: "Quad9 (9.9.9.9)", url: (d: string, ty: string) => `https://dns.quad9.net:5053/dns-query?name=${encodeURIComponent(d)}&type=${ty}`, headers: { Accept: "application/dns-json" } },
+];
+const DNSPROP_TYPES = ["A", "AAAA", "CNAME", "MX", "TXT", "NS"];
+
+function DnsPropagationTab() {
+  const T = useNHTheme();
+  const S = mkStyles(T);
+  const { t } = useTrans();
+  const [domain, setDomain] = useState("");
+  const [type, setType] = useState("A");
+  const [rows, setRows] = useState<any[] | null>(null);
+  const [status, setStatus] = useState<"complete" | "partial" | "failed" | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { entries, save, clear } = useNHHistory("dnsprop");
+
+  const check = async () => {
+    const d = cleanDomain(domain);
+    if (!d) return;
+    setLoading(true); setError(null); setRows(null); setStatus(null);
+    const results = await Promise.allSettled(PROPAGATION_RESOLVERS.map(async r => {
+      const res = await fetch(r.url(d, type), r.headers ? { headers: r.headers } : undefined);
+      const j = await res.json();
+      if (j.Status !== 0) throw new Error("nxdomain");
+      const answers = (j.Answer || []).map((a: any) => a.data);
+      return { id: r.id, label: r.label, answers };
+    }));
+
+    const rowsOut = PROPAGATION_RESOLVERS.map((r, i) => {
+      const res = results[i];
+      if (res.status === "fulfilled") return { ...res.value, ok: true };
+      return { id: r.id, label: r.label, answers: [], ok: false };
+    });
+
+    const okRows = rowsOut.filter(r => r.ok);
+    if (okRows.length === 0) {
+      setError(t("nh.dnsprop.error"));
+      setLoading(false);
+      return;
+    }
+    const signatures = new Set(okRows.map(r => [...r.answers].sort().join(",")));
+    let overall: "complete" | "partial" | "failed";
+    if (okRows.length < rowsOut.length) overall = "partial";
+    else if (signatures.size === 1 && okRows[0].answers.length > 0) overall = "complete";
+    else if (signatures.size === 1 && okRows[0].answers.length === 0) overall = "failed";
+    else overall = "partial";
+
+    setRows(rowsOut);
+    setStatus(overall);
+    save({ domain: d, type, status: overall });
+    setLoading(false);
+  };
+
+  const statusColor = status === "complete" ? T.green : status === "partial" ? T.yellow : T.red;
+  const statusLabel = status === "complete" ? t("nh.dnsprop.statusComplete") : status === "partial" ? t("nh.dnsprop.statusPartial") : t("nh.dnsprop.statusFailed");
+
+  return (
+    <div>
+      <div style={S.card}>
+        <div style={S.cardTitle}>{t("nh.dnsprop.title")}</div>
+        <div style={{ marginBottom: "16px" }}>
+          <div style={S.label}>{t("nh.dns.domainLabel")}</div>
+          <div style={{ ...S.row, marginBottom: "12px" }}>
+            <input style={{ ...S.input, flex: 1 }} placeholder={t("nh.dnsprop.placeholder")}
+              value={domain} onChange={e => setDomain(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && check()} />
+          </div>
+          <div style={S.label}>{t("nh.dns.recordType")}</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "16px" }}>
+            {DNSPROP_TYPES.map(rt => (
+              <button key={rt} onClick={() => setType(rt)} style={{
+                ...S.btnSm(type === rt ? T.cyan : T.textSecondary),
+                background: type === rt ? `${T.cyan}18` : T.bgSubtle,
+                border: `1.5px solid ${type === rt ? T.cyan : T.border}`,
+              }}>{rt}</button>
+            ))}
+          </div>
+          <button style={S.btn(T.cyan)} onClick={check} disabled={loading || !domain.trim()}>
+            {loading ? <><span style={{ animation: "spin-slow 1s linear infinite", display: "inline-block" }}>↻</span> {t("nh.dnsprop.checking")}</> : t("nh.dnsprop.checkBtn")}
+          </button>
+        </div>
+        <div style={{ fontSize: "11px", color: T.textSecondary, lineHeight: 1.6 }}>{t("nh.dnsprop.note")}</div>
+      </div>
+
+      {error && (
+        <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
+        </div>
+      )}
+
+      {rows && (
+        <div style={{ ...S.card, animation: "slide-in 0.3s ease" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+            <div style={S.cardTitle}>{t("nh.dnsprop.resultsFor", { domain: cleanDomain(domain) })}</div>
+            {status && <span style={S.badge(statusColor)}>{statusLabel}</span>}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {rows.map(r => (
+              <div key={r.id} style={{ padding: "12px 14px", borderRadius: "10px", background: T.bgSubtle, border: `1px solid ${T.border}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: r.answers.length ? "6px" : 0 }}>
+                  <span style={{ fontSize: "12px", fontWeight: 700, color: T.textPrimary }}>{r.label}</span>
+                  {r.ok
+                    ? <IconCheck size={14} color={T.green} />
+                    : <IconX size={14} color={T.red} />}
+                </div>
+                {r.answers.length > 0
+                  ? r.answers.map((a: string, i: number) => (
+                    <div key={i} style={{ fontFamily: "monospace", fontSize: "12px", color: T.textMono, wordBreak: "break-all" }}>{a}</div>
+                  ))
+                  : <div style={{ fontSize: "12px", color: T.textSecondary }}>{t("nh.dnsprop.noRecords")}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <HistoryPanel entries={entries} onClear={clear}
+        renderLabel={e => t("nh.dnsprop.historyLabel", { domain: e.domain, type: e.type, status: e.status })} />
     </div>
   );
 }
@@ -1799,6 +2082,556 @@ function HttpHeadersTab() {
   );
 }
 
+// ── Email Security (SPF / DKIM / DMARC) ──
+
+const DKIM_SELECTORS = ["google", "selector1", "selector2", "default", "k1", "dkim", "mail", "smtp", "s1", "s2", "zoho", "mandrill"];
+const cleanTxt = (raw: string) => raw.replace(/^"+|"+$/g, "");
+
+async function dohTxt(name: string): Promise<string[]> {
+  const res = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(name)}&type=TXT`);
+  const j = await res.json();
+  return (j.Answer || []).map((a: any) => cleanTxt(a.data));
+}
+
+function EmailSecurityTab() {
+  const T = useNHTheme();
+  const S = mkStyles(T);
+  const { t, lang } = useTrans();
+  const [domain, setDomain] = useState("");
+  const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const { entries, save, clear } = useNHHistory("emailsec");
+
+  const check = async () => {
+    const d = cleanDomain(domain);
+    if (!d) return;
+    setLoading(true); setError(null); setResult(null);
+    try {
+      setProgress(t("nh.emailsec.checkingSpf"));
+      const [spfTxt, dmarcTxt] = await Promise.all([dohTxt(d), dohTxt(`_dmarc.${d}`)]);
+      const spf = spfTxt.find(r => r.toLowerCase().startsWith("v=spf1")) || null;
+      const dmarc = dmarcTxt.find(r => r.toLowerCase().startsWith("v=dmarc1")) || null;
+      const dmarcPolicy = dmarc ? (dmarc.match(/p=([a-zA-Z]+)/i)?.[1]?.toLowerCase() || null) : null;
+
+      setProgress(t("nh.emailsec.checkingDkim"));
+      let dkim: { selector: string; record: string } | null = null;
+      for (const sel of DKIM_SELECTORS) {
+        const rows = await dohTxt(`${sel}._domainkey.${d}`);
+        const hit = rows.find(r => /v=dkim1|p=/i.test(r));
+        if (hit) { dkim = { selector: sel, record: hit }; break; }
+      }
+
+      const score = (spf ? 1 : 0) + (dmarc ? 1 : 0) + (dkim ? 1 : 0);
+      const r = { domain: d, spf, dmarc, dmarcPolicy, dkim, score };
+      setResult(r);
+      save({ domain: d, score });
+    } catch {
+      setError(t("nh.emailsec.error"));
+    }
+    setLoading(false); setProgress("");
+  };
+
+  const policyColor = dmarcPolicy => dmarcPolicy === "reject" ? T.green : dmarcPolicy === "quarantine" ? T.yellow : T.orange;
+
+  const ROWS = result ? [
+    { label: "SPF", found: !!result.spf, record: result.spf, extra: null,
+      why: t("nh.emailsec.spfWhy") },
+    { label: "DKIM", found: !!result.dkim, record: result.dkim?.record, extra: result.dkim ? `selector: ${result.dkim.selector}` : null,
+      why: t("nh.emailsec.dkimWhy") },
+    { label: "DMARC", found: !!result.dmarc, record: result.dmarc,
+      extra: result.dmarcPolicy ? <span style={{ ...S.badge(policyColor(result.dmarcPolicy)), marginLeft: 8 }}>p={result.dmarcPolicy}</span> : null,
+      why: t("nh.emailsec.dmarcWhy") },
+  ] : [];
+
+  return (
+    <div>
+      <div style={S.card}>
+        <div style={S.cardTitle}>{t("nh.emailsec.title")}</div>
+        <div style={S.row}>
+          <input style={{ ...S.input, flex: 1 }} placeholder={t("nh.emailsec.placeholder")}
+            value={domain} onChange={e => setDomain(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && check()} />
+          <button style={S.btn(T.cyan)} onClick={check} disabled={loading || !domain.trim()}>
+            {loading ? <><span style={{ animation: "spin-slow 1s linear infinite", display: "inline-block" }}>↻</span> {progress || t("nh.emailsec.checking")}</> : t("nh.emailsec.checkBtn")}
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
+        </div>
+      )}
+
+      {result && (
+        <div style={{ ...S.card, animation: "slide-in 0.3s ease" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+            <div style={S.cardTitle}>{t("nh.emailsec.resultsFor", { domain: result.domain })}</div>
+            <div style={{ fontFamily: "monospace", fontSize: "18px", fontWeight: 700, color: result.score === 3 ? T.green : result.score >= 1 ? T.yellow : T.red }}>{result.score}/3</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {ROWS.map(row => (
+              <div key={row.label} style={{ padding: "12px 14px", borderRadius: "10px", background: row.found ? `${T.green}08` : `${T.red}06`, border: `1px solid ${row.found ? T.green + "30" : T.red + "20"}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                  <span style={{ fontWeight: 700, fontSize: "12px", color: row.found ? T.green : T.textPrimary, display: "flex", alignItems: "center" }}>
+                    {row.label} {row.extra}
+                  </span>
+                  {row.found ? <IconCheck size={14} color={T.green} /> : <IconX size={14} color={T.red} />}
+                </div>
+                {row.record
+                  ? <div style={{ fontFamily: "monospace", fontSize: "11px", color: T.textSecondary, wordBreak: "break-all" }}>{row.record}</div>
+                  : <div style={{ fontSize: "11px", color: T.textSecondary }}>{row.why}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <HistoryPanel entries={entries} onClear={clear}
+        renderLabel={e => t("nh.emailsec.historyLabel", { domain: e.domain, score: e.score })} />
+    </div>
+  );
+}
+
+// ── Security Headers (letter-graded) ──
+
+const SEC_HEADERS_INFO = [
+  { key: "strict-transport-security", weight: 15, why: { en: "Forces browsers to only connect over HTTPS, blocking downgrade attacks.", fr: "Force les navigateurs à se connecter uniquement en HTTPS, bloquant les attaques de rétrogradation." } },
+  { key: "content-security-policy", weight: 20, why: { en: "Restricts which scripts and resources can run — the strongest defense against XSS.", fr: "Restreint les scripts et ressources autorisés — la meilleure défense contre le XSS." } },
+  { key: "x-frame-options", weight: 10, why: { en: "Prevents the page from being embedded in a hidden iframe (clickjacking).", fr: "Empêche la page d'être intégrée dans un iframe caché (clickjacking)." } },
+  { key: "x-content-type-options", weight: 10, why: { en: "Stops the browser from guessing file types, blocking MIME-sniffing attacks.", fr: "Empêche le navigateur de deviner les types de fichiers, bloquant le MIME-sniffing." } },
+  { key: "referrer-policy", weight: 10, why: { en: "Controls how much of your URL leaks to other sites via the Referer header.", fr: "Contrôle la fuite de votre URL vers d'autres sites via l'en-tête Referer." } },
+  { key: "permissions-policy", weight: 10, why: { en: "Restricts which browser features (camera, mic, geolocation) the page can use.", fr: "Restreint les fonctionnalités du navigateur (caméra, micro, géoloc) que la page peut utiliser." } },
+  { key: "x-xss-protection", weight: 5, why: { en: "Legacy XSS filter — superseded by CSP but still checked by many scanners.", fr: "Filtre XSS historique — remplacé par CSP mais encore vérifié par de nombreux scanners." } },
+  { key: "cross-origin-opener-policy", weight: 7, why: { en: "Isolates your page's browsing context from cross-origin windows (Spectre defense).", fr: "Isole le contexte de navigation de votre page des fenêtres cross-origin (défense Spectre)." } },
+  { key: "cross-origin-resource-policy", weight: 7, why: { en: "Blocks other sites from embedding your resources without permission.", fr: "Empêche d'autres sites d'intégrer vos ressources sans permission." } },
+  { key: "cross-origin-embedder-policy", weight: 6, why: { en: "Required alongside COOP for full cross-origin isolation.", fr: "Requis avec COOP pour une isolation cross-origin complète." } },
+];
+
+function gradeFromScore(pct: number) {
+  if (pct >= 90) return "A+"; if (pct >= 80) return "A"; if (pct >= 65) return "B";
+  if (pct >= 50) return "C"; if (pct >= 30) return "D"; return "F";
+}
+function gradeColor(grade: string, T: Theme) {
+  if (grade === "A+" || grade === "A") return T.green;
+  if (grade === "B") return T.cyan;
+  if (grade === "C") return T.yellow;
+  if (grade === "D") return T.orange;
+  return T.red;
+}
+
+function SecurityHeadersTab() {
+  const T = useNHTheme();
+  const S = mkStyles(T);
+  const { t, lang } = useTrans();
+  const [url, setUrl] = useState("");
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { entries, save, clear } = useNHHistory("secheaders");
+
+  const check = async () => {
+    let target = url.trim();
+    if (!target.startsWith("http")) target = "https://" + target;
+    setLoading(true); setError(null); setData(null);
+    try {
+      const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`, { cache: "no-store" });
+      const headers: Record<string, string> = {};
+      res.headers.forEach((v, k) => { headers[k.toLowerCase()] = v; });
+      const pct = SEC_HEADERS_INFO.reduce((sum, h) => sum + (headers[h.key] ? h.weight : 0), 0);
+      const grade = gradeFromScore(pct);
+      const d = { domain: cleanDomain(url), headers, pct, grade };
+      setData(d);
+      save({ url: d.domain, grade, pct });
+    } catch {
+      setError(t("nh.secheaders.error"));
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <div style={S.card}>
+        <div style={S.cardTitle}>{t("nh.secheaders.title")}</div>
+        <div style={S.row}>
+          <input style={{ ...S.input, flex: 1 }} placeholder={t("nh.secheaders.placeholder")}
+            value={url} onChange={e => setUrl(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && check()} />
+          <button style={S.btn(T.cyan)} onClick={check} disabled={loading || !url.trim()}>
+            {loading ? <><span style={{ animation: "spin-slow 1s linear infinite", display: "inline-block" }}>↻</span> {t("nh.secheaders.checking")}</> : t("nh.secheaders.checkBtn")}
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
+        </div>
+      )}
+
+      {data && (
+        <div style={{ ...S.card, animation: "slide-in 0.3s ease" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <div>
+              <div style={S.cardTitle}>{data.domain}</div>
+              <div style={{ fontSize: "11px", color: T.textSecondary, marginTop: "2px" }}>{t("nh.secheaders.scoreLabel", { pct: data.pct })}</div>
+            </div>
+            <div style={{
+              width: "56px", height: "56px", borderRadius: "50%",
+              border: `2px solid ${gradeColor(data.grade, T)}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "monospace", fontSize: "22px", fontWeight: 700, color: gradeColor(data.grade, T), flexShrink: 0,
+            }}>{data.grade}</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {SEC_HEADERS_INFO.map(h => {
+              const present = !!data.headers[h.key];
+              return (
+                <div key={h.key} style={{ padding: "10px 14px", borderRadius: "8px", background: present ? `${T.green}08` : `${T.red}06`, border: `1px solid ${present ? T.green + "30" : T.red + "20"}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontFamily: "monospace", fontSize: "12px", color: present ? T.green : T.textPrimary }}>{h.key}</span>
+                    {present ? <IconCheck size={13} color={T.green} /> : <IconX size={13} color={T.red} />}
+                  </div>
+                  {present
+                    ? <div style={{ fontSize: "11px", color: T.textSecondary, marginTop: "3px", wordBreak: "break-all" }}>{data.headers[h.key]}</div>
+                    : <div style={{ fontSize: "11px", color: T.textSecondary, marginTop: "3px" }}>{lang === "fr" ? h.why.fr : h.why.en}</div>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      <HistoryPanel entries={entries} onClear={clear}
+        renderLabel={e => t("nh.secheaders.historyLabel", { url: e.url, grade: e.grade })} />
+    </div>
+  );
+}
+
+// ── Blacklist Check (DNSBL) ──
+
+const DNSBL_ZONES = [
+  { zone: "zen.spamhaus.org", label: "Spamhaus ZEN" },
+  { zone: "b.barracudacentral.org", label: "Barracuda" },
+  { zone: "bl.spamcop.net", label: "SpamCop" },
+  { zone: "dnsbl.sorbs.net", label: "SORBS" },
+  { zone: "psbl.surriel.com", label: "PSBL" },
+];
+const reverseIp = (ip: string) => ip.split(".").reverse().join(".");
+
+async function dohA(name: string): Promise<any[]> {
+  const res = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(name)}&type=A`);
+  const j = await res.json();
+  return j.Answer || [];
+}
+
+function BlacklistTab() {
+  const T = useNHTheme();
+  const S = mkStyles(T);
+  const { t } = useTrans();
+  const [input, setInput] = useState("");
+  const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { entries, save, clear } = useNHHistory("blacklist");
+
+  const check = async () => {
+    const raw = input.trim();
+    if (!raw) return;
+    setLoading(true); setError(null); setResult(null);
+    try {
+      let ip = raw;
+      if (!IPV4_RE.test(raw)) {
+        const ans = await dohA(cleanDomain(raw));
+        if (!ans.length) throw new Error();
+        ip = ans[0].data;
+      }
+      const rev = reverseIp(ip);
+      const zoneResults = await Promise.all(DNSBL_ZONES.map(async z => {
+        try {
+          const ans = await dohA(`${rev}.${z.zone}`);
+          return { ...z, listed: ans.length > 0 };
+        } catch {
+          return { ...z, listed: false };
+        }
+      }));
+      const listedCount = zoneResults.filter(z => z.listed).length;
+      setResult({ ip, zoneResults, listedCount });
+      save({ ip, listedCount });
+    } catch {
+      setError(t("nh.blacklist.error"));
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <div style={S.card}>
+        <div style={S.cardTitle}>{t("nh.blacklist.title")}</div>
+        <div style={S.row}>
+          <input style={{ ...S.input, flex: 1 }} placeholder={t("nh.blacklist.placeholder")}
+            value={input} onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && check()} />
+          <button style={S.btn(T.cyan)} onClick={check} disabled={loading || !input.trim()}>
+            {loading ? <><span style={{ animation: "spin-slow 1s linear infinite", display: "inline-block" }}>↻</span> {t("nh.blacklist.checking")}</> : t("nh.blacklist.checkBtn")}
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
+        </div>
+      )}
+
+      {result && (
+        <div style={{ ...S.card, animation: "slide-in 0.3s ease" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+            <div style={S.cardTitle}>{t("nh.blacklist.resultsFor", { ip: result.ip })}</div>
+            <span style={S.badge(result.listedCount === 0 ? T.green : T.red)}>
+              {result.listedCount === 0 ? t("nh.blacklist.clean") : t("nh.blacklist.listedOn", { n: result.listedCount })}
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {result.zoneResults.map(z => (
+              <div key={z.zone} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: "8px", background: z.listed ? `${T.red}08` : `${T.green}06`, border: `1px solid ${z.listed ? T.red + "30" : T.green + "20"}` }}>
+                <div>
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: T.textPrimary }}>{z.label}</div>
+                  <div style={{ fontFamily: "monospace", fontSize: "10px", color: T.textSecondary }}>{z.zone}</div>
+                </div>
+                {z.listed ? <IconX size={14} color={T.red} /> : <IconCheck size={14} color={T.green} />}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <HistoryPanel entries={entries} onClear={clear}
+        renderLabel={e => t("nh.blacklist.historyLabel", { ip: e.ip, n: e.listedCount })} />
+    </div>
+  );
+}
+
+// ── IP Converter (dotted / hex / decimal / binary) ──
+// Kajy local tanteraka (tsy misy API), mampiasa ny ipStrToInt/intToIpStr
+// efa nomanina ho an'ny Subnet Calculator.
+
+function parseIpInput(raw: string): number | null {
+  const s = raw.trim();
+  if (!s) return null;
+  if (IPV4_RE.test(s)) return ipStrToInt(s);
+  if (/^0x[0-9a-fA-F]{1,8}$/.test(s)) return parseInt(s, 16) >>> 0;
+  const cleanBin = s.replace(/\s+/g, "");
+  if (/^[01]{8,32}$/.test(cleanBin)) return parseInt(cleanBin.padStart(32, "0"), 2) >>> 0;
+  if (/^\d{1,10}$/.test(s)) {
+    const v = Number(s);
+    if (v >= 0 && v <= 4294967295) return v >>> 0;
+  }
+  if (/^[0-9a-fA-F]{1,8}$/.test(s) && /[a-fA-F]/.test(s)) return parseInt(s, 16) >>> 0;
+  return null;
+}
+
+function IpConverterTab() {
+  const T = useNHTheme();
+  const S = mkStyles(T);
+  const { t } = useTrans();
+  const [input, setInput] = useState("");
+  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { entries, save, clear } = useNHHistory("ipconv");
+
+  const convert = () => {
+    const n = parseIpInput(input);
+    if (n === null) { setError(t("nh.ipconv.error")); setResult(null); return; }
+    setError(null);
+    const dotted = intToIpStr(n);
+    const hex = "0x" + n.toString(16).toUpperCase().padStart(8, "0");
+    const decimal = String(n >>> 0);
+    const binaryFlat = n.toString(2).padStart(32, "0");
+    const binaryOctets = binaryFlat.match(/.{8}/g)!.join(".");
+    const r = { dotted, hex, decimal, binaryOctets };
+    setResult(r);
+    save({ input: input.trim(), dotted });
+  };
+
+  return (
+    <div>
+      <div style={S.card}>
+        <div style={S.cardTitle}>{t("nh.ipconv.title")}</div>
+        <div style={S.row}>
+          <input style={{ ...S.input, flex: 1 }} placeholder={t("nh.ipconv.placeholder")}
+            value={input} onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && convert()} />
+          <button style={S.btn(T.cyan)} onClick={convert} disabled={!input.trim()}>{t("nh.ipconv.convertBtn")}</button>
+        </div>
+      </div>
+
+      {error && (
+        <div style={{ ...S.card, border: `1px solid ${T.red}40`, background: `${T.red}08` }}>
+          <div style={{ color: T.red, fontSize: "13px", display: "flex", alignItems: "center", gap: 6 }}><IconAlertTriangle size={13} /> {error}</div>
+        </div>
+      )}
+
+      {result && (
+        <div style={{ ...S.card, animation: "slide-in 0.3s ease" }}>
+          <div style={S.cardTitle}>{result.dotted}</div>
+          <div style={S.grid2}>
+            {[
+              [t("nh.ipconv.decimal"), result.dotted],
+              [t("nh.ipconv.hex"), result.hex],
+              [t("nh.ipconv.decInt"), result.decimal],
+              [t("nh.ipconv.binary"), result.binaryOctets],
+            ].map(([k, v]) => (
+              <div key={k as string}>
+                <div style={S.label}>{k}</div>
+                <div style={S.monoValueSm}>{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <HistoryPanel entries={entries} onClear={clear}
+        renderLabel={e => t("nh.ipconv.historyLabel", { input: e.input, dotted: e.dotted })} />
+    </div>
+  );
+}
+
+// ── Continuous Ping ──
+// Fanamarihana: tsy misy raw ICMP azo antsika avy amin'ny browser, ka
+// ity dia mampiasa ilay teknika fetch-timing efa ampiasain'ny Ping Test
+// (favicon.ico, mode "no-cors") fa averina isaky ny segondra iray, ary
+// mitahiry ny valiny 60 farany ho tahiry mivelona (sparkline + stats).
+// Tsy MTR marina (tsy misy fizarana isaky ny "hop") satria tsy azo
+// atao avy amin'ny browser ny traceroute ICMP marina.
+
+const CONTPING_MAX_SAMPLES = 60;
+
+async function pingSample(url: string): Promise<number | null> {
+  try {
+    const t0 = performance.now();
+    await fetch(url + "?r=" + Math.random(), { mode: "no-cors", cache: "no-store" });
+    return Math.round(performance.now() - t0);
+  } catch {
+    return null;
+  }
+}
+
+function ContinuousPingTab() {
+  const T = useNHTheme();
+  const S = mkStyles(T);
+  const { t } = useTrans();
+  const [host, setHost] = useState("");
+  const [running, setRunning] = useState(false);
+  const [samples, setSamples] = useState<(number | null)[]>([]);
+  const intervalRef = useRef<any>(null);
+  const urlRef = useRef("");
+  const samplesRef = useRef<(number | null)[]>([]);
+  const { entries, save, clear } = useNHHistory("contping");
+
+  useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current); }, []);
+
+  const tick = async () => {
+    const s = await pingSample(urlRef.current);
+    setSamples(prev => {
+      const next = [...prev, s].slice(-CONTPING_MAX_SAMPLES);
+      samplesRef.current = next;
+      return next;
+    });
+  };
+
+  const start = () => {
+    let url = host.trim();
+    if (!url) return;
+    if (!url.startsWith("http")) url = "https://" + url;
+    urlRef.current = url + "/favicon.ico";
+    setSamples([]);
+    samplesRef.current = [];
+    setRunning(true);
+    tick();
+    intervalRef.current = setInterval(tick, 1000);
+  };
+
+  const stop = () => {
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+    setRunning(false);
+    const finalSamples = samplesRef.current;
+    const valid = finalSamples.filter(s => s !== null) as number[];
+    if (valid.length) {
+      const avg = Math.round(valid.reduce((a, b) => a + b, 0) / valid.length);
+      const loss = Math.round(((finalSamples.length - valid.length) / finalSamples.length) * 100);
+      save({ host: cleanDomain(host), avg, loss, count: finalSamples.length });
+    }
+  };
+
+  const valid = samples.filter(s => s !== null) as number[];
+  const min = valid.length ? Math.min(...valid) : null;
+  const max = valid.length ? Math.max(...valid) : null;
+  const avg = valid.length ? Math.round(valid.reduce((a, b) => a + b, 0) / valid.length) : null;
+  const current = samples.length ? samples[samples.length - 1] : null;
+  const loss = samples.length ? Math.round(((samples.length - valid.length) / samples.length) * 100) : 0;
+
+  const quality = (v: number | null): [string, string] => {
+    if (v === null) return [T.textSecondary, "—"];
+    if (v < 50) return [T.green, t("nh.ping.qualityExcellent")];
+    if (v < 100) return [T.cyan, t("nh.ping.qualityGood")];
+    if (v < 200) return [T.yellow, t("nh.ping.qualityFair")];
+    return [T.red, t("nh.ping.qualityPoor")];
+  };
+  const [qColor, qLabel] = quality(avg);
+
+  return (
+    <div>
+      <div style={S.card}>
+        <div style={S.cardTitle}>{t("nh.contping.title")}</div>
+        <div style={S.row}>
+          <input style={{ ...S.input, flex: 1 }} placeholder={t("nh.contping.placeholder")}
+            value={host} onChange={e => setHost(e.target.value)} disabled={running}
+            onKeyDown={e => e.key === "Enter" && !running && start()} />
+          {!running
+            ? <button style={S.btn(T.green)} onClick={start} disabled={!host.trim()}>▶ {t("nh.contping.startBtn")}</button>
+            : <button style={S.btn(T.red)} onClick={stop}>■ {t("nh.contping.stopBtn")}</button>}
+        </div>
+      </div>
+
+      {samples.length > 0 && (
+        <div style={{ ...S.card, animation: "slide-in 0.3s ease" }}>
+          <div style={{ display: "flex", gap: "18px", marginBottom: "18px", flexWrap: "wrap", alignItems: "center" }}>
+            {[
+              [t("nh.contping.current"), current],
+              [t("nh.contping.min"), min],
+              [t("nh.contping.avg"), avg],
+              [t("nh.contping.max"), max],
+            ].map(([label, val]) => (
+              <div key={label as string}>
+                <div style={S.label}>{label}</div>
+                <div style={{ fontFamily: "monospace", fontSize: "18px", fontWeight: 700, color: val === null ? T.textSecondary : qColor }}>
+                  {val === null ? "—" : `${val} ms`}
+                </div>
+              </div>
+            ))}
+            <div>
+              <div style={S.label}>{t("nh.contping.packetLoss")}</div>
+              <div style={{ fontFamily: "monospace", fontSize: "18px", fontWeight: 700, color: loss === 0 ? T.green : loss < 20 ? T.yellow : T.red }}>{loss}%</div>
+            </div>
+            {avg !== null && <span style={S.badge(qColor)}>{qLabel}</span>}
+            {running && <span style={{ color: T.cyan, fontSize: "11px", animation: "blink 1s infinite" }}>● {t("nh.contping.running")}</span>}
+          </div>
+
+          <div style={{ display: "flex", alignItems: "flex-end", gap: "2px", height: "48px" }}>
+            {samples.map((s, i) => {
+              const h = s === null ? 4 : Math.min(48, Math.max(4, (s / 300) * 48));
+              const c = s === null ? T.red : s < 50 ? T.green : s < 100 ? T.cyan : s < 200 ? T.yellow : T.red;
+              return <div key={i} style={{ width: "6px", height: `${h}px`, background: c, borderRadius: "2px", flexShrink: 0 }} title={s === null ? t("nh.contping.timeout") : `${s} ms`} />;
+            })}
+          </div>
+          <div style={{ fontSize: "10px", color: T.textSecondary, marginTop: "8px" }}>{t("nh.contping.samplesCount", { n: samples.length })}</div>
+        </div>
+      )}
+      <HistoryPanel entries={entries} onClear={clear}
+        renderLabel={e => t("nh.contping.historyLabel", { host: e.host, avg: e.avg, loss: e.loss })} />
+    </div>
+  );
+}
+
 function TracerouteTab() {
   const T = useNHTheme();
   const S = mkStyles(T);
@@ -1924,11 +2757,11 @@ function NHFaqItem({ q, a, T, last }: { q: string; a: string; T: Theme; last?: b
       <button onClick={() => setOpen(o => !o)}
         style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center",
           gap: 12, padding: "14px 0", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}>
-        <span style={{ fontFamily: "Inter,sans-serif", fontWeight: 600, fontSize: 13, color: T.textPrimary }}>{q}</span>
+        <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: T.textPrimary }}>{q}</span>
         <span style={{ color: T.textSecondary, fontSize: 14, flexShrink: 0, transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }}>▾</span>
       </button>
       {open && (
-        <p style={{ fontFamily: "Inter,sans-serif", fontSize: 13, color: T.textSecondary, lineHeight: 1.7, margin: "0 0 16px" }}>{a}</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: T.textSecondary, lineHeight: 1.7, margin: "0 0 16px" }}>{a}</p>
       )}
     </div>
   );
@@ -1946,19 +2779,19 @@ function NetworkSeoContent({ toolId }: { toolId: string }) {
   const getFaq = () => (lang === "fr" && content.frFaq) ? content.frFaq : content.faq;
 
   const H2 = ({ children }: { children: React.ReactNode }) => (
-    <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 17, color: T.textPrimary, marginBottom: 10, marginTop: 26, lineHeight: 1.3 }}>
+    <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 22, color: T.textPrimary, marginBottom: 10, marginTop: 26, lineHeight: 1.3 }}>
       {children}
     </h2>
   );
   const P = ({ children }: { children: React.ReactNode }) => (
-    <p style={{ fontFamily: "Inter,sans-serif", fontSize: 13.5, color: T.textSecondary, lineHeight: 1.75, margin: 0 }}>
+    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13.5, color: T.textSecondary, lineHeight: 1.75, margin: 0 }}>
       {children}
     </p>
   );
 
   return (
-    <article style={{ marginTop: 24, padding: "24px 20px", background: T.bgCard, border: `1px solid ${T.border}`, borderRadius: 14 }}>
-      <h1 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 20, color: T.textPrimary, marginBottom: 14, lineHeight: 1.3 }}>
+    <article style={{ marginTop: 26, padding: "26px 24px", background: `linear-gradient(${T.cardGradFrom}, ${T.bgCard})`, border: `1px solid ${T.border}`, borderRadius: 16 }}>
+      <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 27, color: T.textPrimary, marginBottom: 12, lineHeight: 1.2 }}>
         {getText("title")}
       </h1>
 
@@ -1976,7 +2809,7 @@ function NetworkSeoContent({ toolId }: { toolId: string }) {
               {getFormula()!.expr}
             </code>
             {getFormula()!.note && (
-              <span style={{ fontFamily: "Inter,sans-serif", fontSize: 12, color: T.textSecondary }}>
+              <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: T.textSecondary }}>
                 {getFormula()!.note}
               </span>
             )}
@@ -1990,14 +2823,14 @@ function NetworkSeoContent({ toolId }: { toolId: string }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {getExamples().map((ex, i) => (
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 14px", background: T.bgSubtle, borderRadius: 9, border: `1px solid ${T.border}` }}>
-                <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, color: T.cyan, fontWeight: 700, flexShrink: 0, paddingTop: 2 }}>
+                <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, color: T.cyan, fontWeight: 700, flexShrink: 0, paddingTop: 2 }}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div style={{ flex: 1 }}>
-                  <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 12, color: T.textPrimary, display: "block", marginBottom: 2 }}>
+                  <span style={{ fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 12, color: T.textPrimary, display: "block", marginBottom: 2 }}>
                     {ex.label}
                   </span>
-                  <span style={{ fontFamily: "Inter,sans-serif", fontSize: 12, color: T.textSecondary }}>
+                  <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: T.textSecondary }}>
                     <code style={{ fontFamily: "'JetBrains Mono',monospace", color: T.textSecondary, fontSize: 11 }}>{ex.input}</code>
                     <span style={{ margin: "0 6px", color: T.textSecondary }}>→</span>
                     <span style={{ color: T.green, fontWeight: 500 }}>{ex.result}</span>
@@ -2023,19 +2856,215 @@ function NetworkSeoContent({ toolId }: { toolId: string }) {
   );
 }
 
-function NetworkHub({ dark = true, onBack }: { dark?: boolean; onBack?: () => void }) {
-  const { lang, t } = useTrans();
-  const [tab, setTab] = useState("ip");
+// ── Responsive shell CSS — mitovy classname amin'ny PdfHub.tsx
+// (chronos-shell / chronos-sidebar / chronos-main / ...) satria
+// tsy miara-miorina ireo hub roa ireo (routing-based, iray ihany
+// no miorina amin'ny pejy iray), ka tsy misy fifandonana CSS. ──
+function buildResponsiveStyle(T: Theme) { return `
+  .chronos-sidebar, .chronos-main, html, body {
+    scrollbar-width: thin;
+    scrollbar-color: ${T.border} transparent;
+  }
+  .chronos-sidebar::-webkit-scrollbar, .chronos-main::-webkit-scrollbar,
+  html::-webkit-scrollbar, body::-webkit-scrollbar {
+    width: 8px;
+  }
+  .chronos-sidebar::-webkit-scrollbar-track, .chronos-main::-webkit-scrollbar-track,
+  html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .chronos-sidebar::-webkit-scrollbar-thumb, .chronos-main::-webkit-scrollbar-thumb,
+  html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+    background: ${T.border};
+    border-radius: 8px;
+  }
+  .chronos-sidebar::-webkit-scrollbar-thumb:hover, .chronos-main::-webkit-scrollbar-thumb:hover,
+  html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+    background: ${T.muted2};
+  }
 
-  const T = getTheme(dark);
-  const S = mkStyles(T);
+  @media (max-width: ${BP.tablet}px) {
+    .chronos-shell {
+      grid-template-columns: 1fr !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+    .chronos-sidebar {
+      border-right: none !important;
+      border-bottom: 1px solid ${T.border};
+      padding: 12px !important;
+      height: auto !important;
+      overflow-y: visible !important;
+    }
+    .chronos-sidebar-groups {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      gap: 18px !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chronos-sidebar-groups > div { margin-top: 0 !important; flex: 0 0 auto; }
+    .chronos-sidebar-groups button { white-space: nowrap; }
+    .chronos-privacy-badge { display: none !important; }
+    .chronos-main { width: 100% !important; padding: 16px 16px 40px !important; height: auto !important; overflow-y: visible !important; }
+    .chronos-hero-title { font-size: 34px !important; }
+    .chronos-hero-row { flex-wrap: wrap; gap: 10px; }
+    .chronos-trust-badges { flex-wrap: wrap !important; gap: 16px !important; }
+    .chronos-howitworks-row { grid-template-columns: 1fr !important; }
+    .chronos-related-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+  @media (max-width: ${BP.mobile}px) {
+    .chronos-related-grid { grid-template-columns: 1fr !important; }
+    .chronos-hero-title { font-size: 28px !important; }
+  }
+` }
+
+// ── Sidebar ──
+
+function SideLink({ t: tabItem, active, lang, onSelect }: {
+  t: typeof TABS[0], active: boolean, lang: string, onSelect: (id: string) => void,
+}) {
+  const T = useNHTheme();
+  return (
+    <button
+      onClick={() => onSelect(tabItem.id)}
+      title={lang === "fr" ? tabItem.frDesc : tabItem.enDesc}
+      style={{
+        height: 42, width: "100%",
+        display: "flex", alignItems: "center", gap: 10,
+        padding: "0 12px",
+        color: active ? T.cyan : T.textPrimary,
+        textDecoration: "none",
+        borderRadius: 8, fontSize: 13,
+        background: active ? `${T.cyan}18` : "transparent",
+        border: "none",
+        borderLeft: active ? `2px solid ${T.cyan}` : "2px solid transparent",
+        cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+        textAlign: "left",
+        transition: "all .15s",
+      }}>
+      <Icon name={tabItem.icon} size={15} />
+      {lang === "fr" ? tabItem.fr : tabItem.en}
+    </button>
+  );
+}
+
+function SideGroup({ label, tabs, activeTab, lang, onSelect }: {
+  label: string, tabs: typeof TABS, activeTab: string, lang: string, onSelect: (id: string) => void,
+}) {
+  const T = useNHTheme();
+  return (
+    <div style={{ marginTop: 24 }}>
+      <div style={{ fontSize: 10, letterSpacing: "0.13em", textTransform: "uppercase", color: T.muted2, padding: "0 12px 8px" }}>
+        {label}
+      </div>
+      {tabs.map(tb => (
+        <SideLink key={tb.id} t={tb} active={activeTab === tb.id} lang={lang} onSelect={onSelect} />
+      ))}
+    </div>
+  );
+}
+
+// ── How it works card — ho an'ny tools misy dingana maromaro
+// (Subnet Calculator, DNS Propagation) ihany, tsy ny 15 rehetra ──
+
+const HOW_IT_WORKS: Record<string, { steps: { en: string; fr: string; descEn: string; descFr: string }[]; tip: { en: string; fr: string } }> = {
+  subnet: {
+    steps: [
+      { en: "Enter a CIDR address", fr: "Saisissez une adresse CIDR", descEn: "An IP + prefix, like 192.168.1.0/24", descFr: "Une IP + préfixe, comme 192.168.1.0/24" },
+      { en: "Calculate", fr: "Calculez", descEn: "Get every subnet value instantly", descFr: "Obtenez toutes les valeurs instantanément" },
+      { en: "Read the breakdown", fr: "Lisez le résultat", descEn: "Network, broadcast, usable range, and more", descFr: "Réseau, diffusion, plage utilisable, et plus" },
+    ],
+    tip: { en: "The number after the slash controls how many hosts fit — smaller number, bigger subnet.", fr: "Le chiffre après la barre contrôle le nombre d'hôtes — plus petit, plus grand est le sous-réseau." },
+  },
+  dnsprop: {
+    steps: [
+      { en: "Enter your domain", fr: "Saisissez votre domaine", descEn: "The domain whose DNS you just changed", descFr: "Le domaine dont vous venez de changer le DNS" },
+      { en: "Pick a record type", fr: "Choisissez un type", descEn: "A, AAAA, CNAME, MX, TXT or NS", descFr: "A, AAAA, CNAME, MX, TXT ou NS" },
+      { en: "Compare resolvers", fr: "Comparez les résolveurs", descEn: "See if Cloudflare, Google and Quad9 agree", descFr: "Voyez si Cloudflare, Google et Quad9 sont d'accord" },
+    ],
+    tip: { en: "If resolvers disagree, just wait — each cache expires on its own TTL countdown.", fr: "Si les résolveurs ne sont pas d'accord, patientez — chaque cache expire selon son propre TTL." },
+  },
+};
+
+function HowItWorksCard({ toolId, lang }: { toolId: string; lang: string }) {
+  const T = useNHTheme();
+  const cfg = HOW_IT_WORKS[toolId];
+  if (!cfg) return null;
+  return (
+    <div style={{
+      border: `1px solid ${T.border}`, borderRadius: 14,
+      background: `linear-gradient(${T.cardGradFrom}, ${T.bgCard})`, overflow: "hidden",
+      height: "fit-content",
+    }}>
+      <div style={{
+        padding: "12px 16px", borderBottom: `1px solid ${T.border}`,
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+      }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: T.textPrimary }}>
+          {lang === "fr" ? "Comment ça marche" : "How it works"}
+        </span>
+        <span style={{ fontSize: 10, color: T.textSecondary }}>{cfg.steps.length} {lang === "fr" ? "étapes" : "steps"}</span>
+      </div>
+      <div style={{ padding: "4px 16px 14px" }}>
+        {cfg.steps.map((step, i) => (
+          <div key={i} style={{ display: "flex", gap: 10, padding: "11px 0" }}>
+            <span style={{
+              width: 23, height: 23, flexShrink: 0,
+              border: `1px solid ${T.border}`, borderRadius: "50%",
+              display: "grid", placeItems: "center",
+              color: T.cyan, fontSize: 10,
+            }}>{i + 1}</span>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: T.textPrimary }}>
+                {lang === "fr" ? step.fr : step.en}
+              </div>
+              <div style={{ fontSize: 9, color: T.muted2, marginTop: 3 }}>
+                {lang === "fr" ? step.descFr : step.descEn}
+              </div>
+            </div>
+          </div>
+        ))}
+        {cfg.tip && (
+          <div style={{
+            padding: "10px 11px", border: `1px solid ${T.tipBorder}`,
+            background: `${T.cyan}06`, borderRadius: 9,
+            color: T.tipText, fontSize: 9,
+          }}>
+            <span style={{ color: T.cyan, fontWeight: 700, display: "block", marginBottom: 3 }}>
+              💡 {lang === "fr" ? "Conseil" : "Tip"}
+            </span>
+            {lang === "fr" ? cfg.tip.fr : cfg.tip.en}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── CHRONOS Hub shell ──
+
+function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: string }) {
+  const { lang, t } = useTrans();
+  const { dark } = useDark();
+  useChronosFonts();
+  const T = React.useMemo(() => buildPalette(dark), [dark]);
+  const S = React.useMemo(() => mkStyles(T), [T]);
+  const responsiveStyle = React.useMemo(() => buildResponsiveStyle(T), [T]);
+  const [tab, setTab] = useState(initialTab || "ip");
+  const cur = TABS.find(tb => tb.id === tab)!;
+  const hasHowItWorks = !!HOW_IT_WORKS[tab];
 
   const tabContent = {
     ip: <IPTab />,
+    iplookup: <IpLookupTab />,
+    subnet: <SubnetTab />,
     speed: <SpeedTab />,
     status: <StatusTab />,
     password: <PasswordTab />,
     dns: <DnsTab />,
+    dnsprop: <DnsPropagationTab />,
     whois: <WhoisTab />,
     ssl: <SslTab />,
     domainAge: <DomainAgeTab />,
@@ -2043,53 +3072,182 @@ function NetworkHub({ dark = true, onBack }: { dark?: boolean; onBack?: () => vo
     ports: <PortScannerTab />,
     headers: <HttpHeadersTab />,
     traceroute: <TracerouteTab />,
+    emailsec: <EmailSecurityTab />,
+    secheaders: <SecurityHeadersTab />,
+    blacklist: <BlacklistTab />,
+    ipconv: <IpConverterTab />,
+    contping: <ContinuousPingTab />,
   };
 
   return (
     <NHThemeCtx.Provider value={T}>
+    <div style={{
+      minHeight: "100vh",
+      background: `radial-gradient(circle at 65% 10%, ${T.cyan}0a, transparent 30%), ${T.bg}`,
+      fontFamily: "'DM Sans', sans-serif",
+      color: T.textPrimary,
+    }}>
       <GlobalStyles />
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+      <style>{responsiveStyle}</style>
 
-      <div style={S.app}>
-        <header style={S.header}>
+      {/* ── Layout: sidebar + content ── */}
+      <div className="chronos-shell" style={{ display: "grid", gridTemplateColumns: "240px 1fr", height: "calc(100vh - 64px)", overflow: "hidden" }}>
+
+        {/* Sidebar */}
+        <aside className="chronos-sidebar" style={{
+          borderRight: `1px solid ${T.border}`,
+          padding: "20px 16px",
+          background: T.sidebarBg,
+          height: "100%",
+          overflowY: "auto",
+        }}>
           {onBack && (
             <button onClick={onBack} style={{
               background: T.green, color: "#fff",
               border: "none", borderRadius: 10,
               padding: "8px 16px", cursor: "pointer",
-              fontSize: 13, fontWeight: 700,
+              fontSize: 12, fontWeight: 700,
               display: "flex", alignItems: "center", gap: 6,
-              flexShrink: 0,
+              marginBottom: 18,
             }}>← CHRONOS</button>
           )}
-          <div>
-            <div style={S.logo}>NET_HUB</div>
-            <div style={S.logoSub}>{lang === "fr" ? "DIAGNOSTIC RÉSEAU" : "NETWORK DIAGNOSTIC"}</div>
+          <div style={{ color: T.cyan, fontWeight: 700, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.06em" }}>NET_HUB</div>
+          <div style={{ color: T.textSecondary, fontSize: 11, marginTop: 4 }}>{TABS.length} {lang === "fr" ? "outils" : "tools"}</div>
+
+          <div className="chronos-sidebar-groups">
+            {TAB_GROUPS.map(group => (
+              <SideGroup key={group.id} label={lang === "fr" ? group.fr : group.en}
+                tabs={TABS.filter(tb => tb.group === group.id)} activeTab={tab} lang={lang} onSelect={setTab} />
+            ))}
           </div>
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ ...S.badge(T.green), fontSize: "10px" }}>● {lang === "fr" ? "EN LIGNE" : "ONLINE"}</span>
+
+          {/* Live-diagnostics badge */}
+          <div className="chronos-privacy-badge" style={{
+            marginTop: 30, padding: 15,
+            border: `1px solid ${T.border}`, borderRadius: 12,
+            background: T.bgCard,
+          }}>
+            <b style={{ fontSize: 11, display: "block" }}>
+              ● &nbsp; {t("nh.sidebar.liveTitle")}
+            </b>
+            <p style={{ color: T.muted2, fontSize: 10, lineHeight: 1.5, margin: "6px 0 0" }}>
+              {t("nh.sidebar.liveDesc")}
+            </p>
           </div>
-        </header>
+        </aside>
 
-        <nav style={S.nav}>
-          {TABS.map(tabItem => (
-            <button key={tabItem.id} style={S.tabBtn(tab === tabItem.id)} onClick={() => setTab(tabItem.id)}
-              title={lang === "fr" ? tabItem.frDesc : tabItem.enDesc}>
-              <Icon name={tabItem.icon} size={14} style={{marginRight:4,verticalAlign:-2}} /> {lang === "fr" ? tabItem.fr : tabItem.en}
-            </button>
-          ))}
-        </nav>
+        {/* Main content */}
+        <main className="chronos-main" style={{ width: "min(1100px, calc(100vw - 280px))", margin: "0 auto", padding: "20px 40px 65px", height: "100%", overflowY: "auto" }}>
 
-        <div style={{ padding: "16px 0 0" }}>
-          <NHAdBanner tab={tab} />
-        </div>
+          {/* Breadcrumb */}
+          <div style={{ fontSize: 11, color: T.muted2, marginBottom: 18 }}>
+            CHRONOS / {lang === "fr" ? "RÉSEAU" : "NETWORK"} / <b style={{ color: T.textSecondary }}>{lang === "fr" ? cur.fr : cur.en}</b>
+          </div>
 
-        <main style={S.content}>
-          {tabContent[tab]}
+          {/* Hero */}
+          <div className="chronos-hero-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 22 }}>
+            <div>
+              <div style={{ color: T.cyan, fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", marginBottom: 7 }}>
+                {lang === "fr" ? "RÉSEAU" : "NETWORK"} / {(lang === "fr" ? cur.fr : cur.en).toUpperCase()}
+              </div>
+              <h1 className="chronos-hero-title" style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontWeight: 600, fontSize: 54, lineHeight: 0.92,
+                letterSpacing: "-0.02em", margin: 0,
+              }}>
+                {lang === "fr" ? cur.fr : cur.en}
+              </h1>
+              <p style={{ color: T.textSecondary, fontSize: 14, margin: "9px 0 0" }}>
+                {lang === "fr" ? cur.frDesc : cur.enDesc}
+              </p>
+            </div>
+            <div style={{
+              border: `1px solid ${T.greenBorder}`, color: T.green,
+              background: `${T.green}0a`, borderRadius: 999,
+              padding: "8px 12px", fontSize: 10, whiteSpace: "nowrap",
+            }}>
+              ● &nbsp; {t("nh.hero.liveBadge")}
+            </div>
+          </div>
+
+          {/* Trust badges */}
+          <div className="chronos-trust-badges" style={{ display: "flex", gap: 32, marginBottom: 24 }}>
+            {[
+              { icon: "🚀", title: t("nh.badges.noSignupTitle"), sub: t("nh.badges.noSignupSub") },
+              { icon: "⚡", title: t("nh.badges.realtimeTitle"), sub: t("nh.badges.realtimeSub") },
+              { icon: "✓", title: t("nh.badges.easyTitle"), sub: t("nh.badges.easySub") },
+            ].map((item, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <div style={{
+                  width: 30, height: 30, border: `1px solid ${T.border}`,
+                  borderRadius: 9, display: "grid", placeItems: "center", color: T.cyan,
+                }}>
+                  {item.icon}
+                </div>
+                <div>
+                  <strong style={{ fontSize: 11, display: "block", color: T.textPrimary }}>{item.title}</strong>
+                  <small style={{ fontSize: 9, color: T.muted2 }}>{item.sub}</small>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Ad banner */}
+          <div style={{ marginBottom: "20px" }}>
+            <NHAdBanner tab={tab} />
+          </div>
+
+          {/* Tool panel (+ How it works, for the tools that have real multi-step flows) */}
+          {hasHowItWorks ? (
+            <div className="chronos-howitworks-row" style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20, alignItems: "start" }}>
+              <div>{tabContent[tab]}</div>
+              <HowItWorksCard toolId={tab} lang={lang} />
+            </div>
+          ) : (
+            <div>{tabContent[tab]}</div>
+          )}
+
+          {/* Deep SEO content — What is it / How it works / Formula / Examples / FAQ */}
           <NetworkSeoContent toolId={tab} />
+
+          {/* Related tools */}
+          <section style={{ marginTop: 26 }}>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 25, margin: "0 0 10px", color: T.textPrimary }}>
+              {lang === "fr" ? "Autres outils réseau dont vous pourriez avoir besoin" : "Other network tools you might need"}
+            </h3>
+            <div className="chronos-related-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 9 }}>
+              {TABS.filter(tb => tb.id !== tab).slice(0, 4).map(tb => (
+                <button
+                  key={tb.id}
+                  onClick={() => setTab(tb.id)}
+                  style={{
+                    border: `1px solid ${T.border}`, borderRadius: 10,
+                    padding: 13, background: T.bgCard,
+                    textAlign: "left", cursor: "pointer",
+                    transition: "border-color .15s",
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = T.cyan)}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = T.border)}
+                >
+                  <b style={{ fontSize: 11, color: T.textPrimary, display: "flex", alignItems: "center", gap: 6 }}>
+                    <Icon name={tb.icon} size={13} /> {lang === "fr" ? tb.fr : tb.en}
+                  </b>
+                  <p style={{ fontSize: 9, lineHeight: 1.45, color: T.muted2, margin: "4px 0 0" }}>
+                    {lang === "fr" ? tb.frDesc : tb.enDesc}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Footer */}
+          <div style={{ borderTop: `1px solid ${T.border}`, marginTop: 22, paddingTop: 14, textAlign: "center", color: T.muted2, fontSize: 9 }}>
+            ● &nbsp; {t("nh.footer.note")}
+          </div>
         </main>
       </div>
+    </div>
     </NHThemeCtx.Provider>
   );
 }

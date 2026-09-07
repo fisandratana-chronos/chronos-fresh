@@ -1,21 +1,24 @@
 'use client'
 
 // ── components/texttools/TTextToolsHub.tsx ─────────────────────
-// 8 text tool tabs (V1) — all in-browser, no dependencies.
-// Tabs: Word Counter, Case Converter, Text Cleaner, Find & Replace,
-//       Remove Duplicate Lines, Sort Lines, Text Diff, Slug Generator
+// 12 text tool tabs (Phase 1 + Phase 2) — all in-browser, no dependencies.
+//
+// Phase 1: Word Counter, Case Converter, Text Cleaner, Find & Replace,
+//          Remove Duplicate Lines, Sort Lines, Text Diff, Slug Generator
+// Phase 2: Text Statistics, Lorem Ipsum Generator, Markdown → HTML,
+//          HTML → Markdown
 //
 // Pattern mirrors components/converters/TConvertersHub.tsx exactly:
 // same theme context approach, same Label/inp helpers, same header
-// + tab-nav shell. No SEO content block in this V1 (per decision) —
-// that can be added later the same way CONVERTER_SEO_CONTENT was.
+// + tab-nav shell. No SEO content block in this version (per decision)
+// — that can be added later the same way CONVERTER_SEO_CONTENT was.
 
 import React from 'react'
 import { useLang } from '../../lib/hooks/useLang'
 import { useDark } from '../../lib/hooks/useDark'
 import { DARK, LIGHT } from '../../lib/theme'
 import { BP } from '../../lib/breakpoints'
-import { Icon, IconClipboard, IconLockClosed } from '../shared/Icons'
+import { Icon, IconClipboard } from '../shared/Icons'
 
 // ── Theme (identical approach to TConvertersHub) ──
 
@@ -46,6 +49,27 @@ const TEXT_TABS = [
   { id: 'sort-lines',     icon: 'sort',     en: 'Sort Lines',            fr: 'Trier les lignes',         enDesc: 'Sort lines alphabetically, numerically, or by length', frDesc: 'Trier par ordre alphabétique, numérique ou par longueur' },
   { id: 'text-diff',      icon: 'exchange', en: 'Text Diff',             fr: 'Comparateur de textes',    enDesc: 'Compare two texts and see what changed',      frDesc: 'Comparer deux textes et voir les différences' },
   { id: 'slug-generator', icon: 'link',     en: 'Slug Generator',        fr: 'Générateur de slug',       enDesc: 'Turn any text into a URL-friendly slug',      frDesc: 'Transformer un texte en slug pour URL' },
+  { id: 'text-statistics', icon: 'chart',   en: 'Text Statistics',       fr: 'Statistiques de texte',    enDesc: 'Word frequency, averages, and more',          frDesc: 'Fréquence des mots, moyennes, et plus' },
+  { id: 'lorem-ipsum',    icon: 'edit',     en: 'Lorem Ipsum Generator', fr: 'Générateur Lorem Ipsum',   enDesc: 'Generate placeholder text',                   frDesc: 'Générer du texte de remplissage' },
+  { id: 'markdown-to-html', icon: 'code',   en: 'Markdown → HTML',       fr: 'Markdown → HTML',          enDesc: 'Convert Markdown to HTML',                    frDesc: 'Convertir du Markdown en HTML' },
+  { id: 'html-to-markdown', icon: 'code',   en: 'HTML → Markdown',       fr: 'HTML → Markdown',          enDesc: 'Convert HTML to Markdown',                    frDesc: 'Convertir du HTML en Markdown' },
+  { id: 'remove-empty-lines', icon: 'layers', en: 'Remove Empty Lines',  fr: 'Supprimer les lignes vides', enDesc: 'Remove blank lines from a text',              frDesc: 'Supprimer les lignes vides d\u2019un texte' },
+  { id: 'remove-spaces',  icon: 'sparkle',  en: 'Remove Spaces',         fr: 'Supprimer les espaces',    enDesc: 'Strip, trim, or collapse whitespace',         frDesc: 'Supprimer, ajuster ou fusionner les espaces' },
+  { id: 'text-reverser',  icon: 'exchange', en: 'Text Reverser',        fr: 'Inverseur de texte',       enDesc: 'Reverse characters, words, or lines',         frDesc: 'Inverser les caractères, mots ou lignes' },
+  { id: 'text-to-list',   icon: 'layers',   en: 'Text → List',          fr: 'Texte → Liste',            enDesc: 'Turn lines into a numbered or bulleted list', frDesc: 'Transformer des lignes en liste numérotée ou à puces' },
+  { id: 'list-to-text',   icon: 'layers',   en: 'List → Text',          fr: 'Liste → Texte',            enDesc: 'Strip list markers back to plain lines',      frDesc: 'Retirer les puces/numéros pour du texte simple' },
+]
+
+// ── Sidebar categories — mitovy filaharana amin'ny PdfHub.tsx sidebar
+// (POPULAR / CONVERT / SECURITY, sns.) ──
+const TEXT_CATEGORIES = [
+  { en: 'Essential', fr: 'Essentiel', tools: ['word-counter', 'case-converter', 'text-cleaner', 'find-replace'] },
+  { en: 'Lists',     fr: 'Listes',    tools: ['remove-duplicates', 'sort-lines', 'remove-empty-lines', 'text-to-list', 'list-to-text'] },
+  { en: 'Format',    fr: 'Formater',  tools: ['remove-spaces', 'text-reverser'] },
+  { en: 'Compare',   fr: 'Comparer',  tools: ['text-diff'] },
+  { en: 'Generate',  fr: 'Générer',   tools: ['slug-generator', 'lorem-ipsum'] },
+  { en: 'Analyze',   fr: 'Analyser',  tools: ['text-statistics'] },
+  { en: 'Convert',   fr: 'Convertir', tools: ['markdown-to-html', 'html-to-markdown'] },
 ]
 
 // ── Shared helpers (same shape as TConvertersHub) ──
@@ -55,10 +79,6 @@ const inp = (C_T: ReturnType<typeof buildPalette>, extra: React.CSSProperties = 
   border: `1px solid ${C_T.border}`, background: C_T.bg, color: C_T.text,
   outline: 'none', boxSizing: 'border-box', fontFamily: "'Inter','Segoe UI',sans-serif",
   ...extra,
-})
-
-const sel = (C_T: ReturnType<typeof buildPalette>, extra: React.CSSProperties = {}): React.CSSProperties => ({
-  ...inp(C_T), cursor: 'pointer', ...extra,
 })
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -96,8 +116,6 @@ function CheckOption({ label, checked, onChange }: { label: string; checked: boo
 }
 
 // ── 1. Word Counter ──
-// Also covers Character Counter, Line Counter, and Sentence Counter
-// (merged in per the product decision — not built as separate tabs).
 
 function WordCounterTab({ lang }: { lang: string }) {
   const C_T = React.useContext(TextThemeCtx)
@@ -153,8 +171,6 @@ function WordCounterTab({ lang }: { lang: string }) {
 }
 
 // ── 2. Case Converter ──
-// Ported from the existing TextCaseTab in TConvertersHub.tsx, with the
-// 3 extra modes from the Text-Tools.docx spec (alternating, inverse).
 
 function CaseConverterTab({ lang }: { lang: string }) {
   const C_T = React.useContext(TextThemeCtx)
@@ -401,9 +417,8 @@ function SortLinesTab({ lang }: { lang: string }) {
   const isFr = lang === 'fr'
 
   const result = React.useMemo(() => {
-    let lines = text.split(/\r?\n/).filter(l => l.length > 0 || text === '')
     if (text === '') return []
-    lines = text.split(/\r?\n/)
+    let lines = text.split(/\r?\n/)
     if (dedupe) lines = Array.from(new Set(lines))
 
     const sorted = [...lines].sort((a, b) => {
@@ -457,8 +472,6 @@ function SortLinesTab({ lang }: { lang: string }) {
 }
 
 // ── 7. Text Diff ──
-// Simple line-based LCS diff — good enough for paragraph/line comparisons.
-// (A word-level diff is a possible V2 upgrade if needed.)
 
 type DiffOp = { type: 'equal' | 'add' | 'remove'; line: string }
 
@@ -537,13 +550,13 @@ function SlugGeneratorTab({ lang }: { lang: string }) {
 
   const slug = React.useMemo(() => {
     return text
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')     // remove accents
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')                          // remove special chars
+      .replace(/[^a-z0-9\s-]/g, '')
       .trim()
-      .replace(/[\s_-]+/g, separator)                        // spaces → separator
-      .replace(new RegExp(`\\${separator}{2,}`, 'g'), separator) // collapse duplicate separators
-      .replace(new RegExp(`^\\${separator}+|\\${separator}+$`, 'g'), '') // trim leading/trailing
+      .replace(/[\s_-]+/g, separator)
+      .replace(new RegExp(`\\${separator}{2,}`, 'g'), separator)
+      .replace(new RegExp(`^\\${separator}+|\\${separator}+$`, 'g'), '')
   }, [text, separator])
 
   return (
@@ -576,11 +589,565 @@ function SlugGeneratorTab({ lang }: { lang: string }) {
   )
 }
 
+// ── 9. Text Statistics (Phase 2) ──
+
+function TextStatisticsTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [text, setText] = React.useState('')
+  const isFr = lang === 'fr'
+
+  const STOP_WORDS = new Set([
+    'the','a','an','and','or','but','of','to','in','on','at','for','is','are','was','were','it','this','that','with','as','be','by','i','you','he','she','we','they',
+    'le','la','les','un','une','des','et','ou','de','du','à','en','pour','est','sont','était','étaient','ce','cette','avec','comme','être','par','je','tu','il','elle','nous','vous','ils','elles',
+  ])
+
+  const stats = React.useMemo(() => {
+    const words: string[] = text.toLowerCase().match(/[\p{L}''']+/gu) ?? []
+    const sentences = (text.match(/[.!?]+(?=\s|$)/g) || [])
+    const uniqueWords = new Set(words)
+    const freq = new Map<string, number>()
+    for (const w of words) {
+      if (STOP_WORDS.has(w) || w.length < 2) continue
+      freq.set(w, (freq.get(w) || 0) + 1)
+    }
+    const topWords = Array.from(freq.entries()).sort((a, b) => b[1] - a[1]).slice(0, 10)
+    const longestWord = words.reduce((a: string, w: string) => w.length > a.length ? w : a, '')
+    const avgWordLen = words.length ? words.join('').length / words.length : 0
+    const avgSentenceLen = sentences.length ? words.length / sentences.length : 0
+    const maxFreq = topWords.length ? topWords[0][1] : 1
+    return { totalWords: words.length, uniqueWords: uniqueWords.size, topWords, longestWord, avgWordLen, avgSentenceLen, maxFreq }
+  }, [text])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <Label>{isFr ? 'Votre texte' : 'Your text'}</Label>
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={9} style={{ ...inp(C_T), resize: 'vertical' }} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
+        <div style={{ border: `1px solid ${C_T.border}`, background: C_T.bg, borderRadius: 11, padding: '11px 12px' }}>
+          <div style={{ fontSize: 20, fontWeight: 800 }}>{stats.totalWords}</div>
+          <div style={{ fontSize: 10, color: C_T.muted, textTransform: 'uppercase' }}>{isFr ? 'Mots totaux' : 'Total words'}</div>
+        </div>
+        <div style={{ border: `1px solid ${C_T.border}`, background: C_T.bg, borderRadius: 11, padding: '11px 12px' }}>
+          <div style={{ fontSize: 20, fontWeight: 800 }}>{stats.uniqueWords}</div>
+          <div style={{ fontSize: 10, color: C_T.muted, textTransform: 'uppercase' }}>{isFr ? 'Mots uniques' : 'Unique words'}</div>
+        </div>
+        <div style={{ border: `1px solid ${C_T.border}`, background: C_T.bg, borderRadius: 11, padding: '11px 12px' }}>
+          <div style={{ fontSize: 20, fontWeight: 800 }}>{stats.avgWordLen.toFixed(1)}</div>
+          <div style={{ fontSize: 10, color: C_T.muted, textTransform: 'uppercase' }}>{isFr ? 'Longueur moy. mot' : 'Avg word length'}</div>
+        </div>
+        <div style={{ border: `1px solid ${C_T.border}`, background: C_T.bg, borderRadius: 11, padding: '11px 12px' }}>
+          <div style={{ fontSize: 20, fontWeight: 800 }}>{stats.avgSentenceLen.toFixed(1)}</div>
+          <div style={{ fontSize: 10, color: C_T.muted, textTransform: 'uppercase' }}>{isFr ? 'Mots/phrase' : 'Words/sentence'}</div>
+        </div>
+      </div>
+      {stats.longestWord && (
+        <div style={{ fontSize: 12, color: C_T.muted }}>
+          {isFr ? 'Mot le plus long' : 'Longest word'}: <span style={{ color: C_T.text, fontWeight: 700 }}>{stats.longestWord}</span> ({stats.longestWord.length} {isFr ? 'caractères' : 'characters'})
+        </div>
+      )}
+      {stats.topWords.length > 0 && (
+        <div>
+          <Label>{isFr ? 'Mots les plus fréquents' : 'Most frequent words'}</Label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {stats.topWords.map(([word, count]) => (
+              <div key={word} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 90, fontSize: 13, color: C_T.text, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{word}</div>
+                <div style={{ flex: 1, height: 8, background: C_T.bg, borderRadius: 4, overflow: 'hidden' }}>
+                  <div style={{ width: `${(count / stats.maxFreq) * 100}%`, height: '100%', background: C_T.accent }} />
+                </div>
+                <div style={{ width: 24, fontSize: 12, color: C_T.muted, textAlign: 'right', flexShrink: 0 }}>{count}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── 10. Lorem Ipsum Generator (Phase 2) ──
+
+const LOREM_WORDS = ('lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum').split(' ')
+
+function generateLoremWords(n: number): string[] {
+  const out: string[] = []
+  for (let i = 0; i < n; i++) out.push(LOREM_WORDS[Math.floor(Math.random() * LOREM_WORDS.length)])
+  return out
+}
+function capitalizeFirst(s: string) { return s.charAt(0).toUpperCase() + s.slice(1) }
+
+function generateLoremSentence(): string {
+  const len = 6 + Math.floor(Math.random() * 10)
+  const words = generateLoremWords(len)
+  return capitalizeFirst(words.join(' ')) + '.'
+}
+function generateLoremParagraph(): string {
+  const sentCount = 4 + Math.floor(Math.random() * 4)
+  return Array.from({ length: sentCount }, generateLoremSentence).join(' ')
+}
+
+function LoremIpsumTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [unit, setUnit] = React.useState<'paragraphs' | 'sentences' | 'words'>('paragraphs')
+  const [count, setCount] = React.useState(3)
+  const [startClassic, setStartClassic] = React.useState(true)
+  const isFr = lang === 'fr'
+
+  const result = React.useMemo(() => {
+    let parts: string[] = []
+    if (unit === 'paragraphs') parts = Array.from({ length: count }, generateLoremParagraph)
+    else if (unit === 'sentences') parts = Array.from({ length: count }, generateLoremSentence)
+    else return capitalizeFirst(generateLoremWords(count).join(' ')) + (count > 0 ? '.' : '')
+
+    if (startClassic && parts.length > 0) {
+      parts[0] = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' + parts[0]
+    }
+    return unit === 'paragraphs' ? parts.join('\n\n') : parts.join(' ')
+  }, [unit, count, startClassic])
+
+  const UNITS: [typeof unit, string, string][] = [
+    ['paragraphs', 'Paragraphs', 'Paragraphes'],
+    ['sentences', 'Sentences', 'Phrases'],
+    ['words', 'Words', 'Mots'],
+  ]
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-end' }}>
+        <div>
+          <Label>{isFr ? 'Unité' : 'Unit'}</Label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {UNITS.map(([id, en, fr]) => (
+              <button key={id} onClick={() => setUnit(id)}
+                style={{ padding: '7px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                  background: unit === id ? C_T.accent : 'transparent',
+                  color: unit === id ? '#fff' : C_T.muted,
+                  border: `1px solid ${unit === id ? C_T.accent : C_T.border}` }}>
+                {isFr ? fr : en}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <Label>{isFr ? 'Nombre' : 'Count'}</Label>
+          <input type="number" min={1} max={50} value={count}
+            onChange={e => setCount(Math.max(1, Math.min(50, Number(e.target.value) || 1)))}
+            style={{ ...inp(C_T), width: 90 }} />
+        </div>
+        <CheckOption label={isFr ? 'Commencer par "Lorem ipsum..."' : 'Start with "Lorem ipsum..."'} checked={startClassic} onChange={setStartClassic} />
+      </div>
+      <div>
+        <Label>{isFr ? 'Résultat' : 'Result'}</Label>
+        <textarea readOnly value={result} rows={12} style={{ ...inp(C_T), resize: 'vertical', lineHeight: 1.6 }} />
+        <div style={{ marginTop: 10 }}><CopyBtn getText={() => result} lang={lang} /></div>
+      </div>
+    </div>
+  )
+}
+
+// ── 11. Markdown → HTML (Phase 2) ──
+
+function markdownToHtml(md: string): string {
+  const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+  const codeBlocks: string[] = []
+  let src = md.replace(/```([\s\S]*?)```/g, (_, code) => {
+    codeBlocks.push(`<pre><code>${escapeHtml(code.trim())}</code></pre>`)
+    return `\u0000CODEBLOCK${codeBlocks.length - 1}\u0000`
+  })
+
+  const lines = src.split(/\r?\n/)
+  const html: string[] = []
+  let inList: 'ul' | 'ol' | null = null
+  let inBlockquote = false
+
+  const closeList = () => { if (inList) { html.push(`</${inList}>`); inList = null } }
+  const closeQuote = () => { if (inBlockquote) { html.push('</blockquote>'); inBlockquote = false } }
+
+  const inline = (line: string) => escapeHtml(line)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+
+  for (const raw of lines) {
+    const line = raw
+    const heading = line.match(/^(#{1,6})\s+(.*)$/)
+    const ulItem = line.match(/^[-*]\s+(.*)$/)
+    const olItem = line.match(/^\d+\.\s+(.*)$/)
+    const quote = line.match(/^>\s?(.*)$/)
+
+    if (heading) {
+      closeList(); closeQuote()
+      const level = heading[1].length
+      html.push(`<h${level}>${inline(heading[2])}</h${level}>`)
+    } else if (ulItem) {
+      closeQuote()
+      if (inList !== 'ul') { closeList(); html.push('<ul>'); inList = 'ul' }
+      html.push(`<li>${inline(ulItem[1])}</li>`)
+    } else if (olItem) {
+      closeQuote()
+      if (inList !== 'ol') { closeList(); html.push('<ol>'); inList = 'ol' }
+      html.push(`<li>${inline(olItem[1])}</li>`)
+    } else if (quote) {
+      closeList()
+      if (!inBlockquote) { html.push('<blockquote>'); inBlockquote = true }
+      html.push(`<p>${inline(quote[1])}</p>`)
+    } else if (line.trim() === '') {
+      closeList(); closeQuote()
+    } else if (line.includes('\u0000CODEBLOCK')) {
+      closeList(); closeQuote()
+      html.push(line)
+    } else {
+      closeList(); closeQuote()
+      html.push(`<p>${inline(line)}</p>`)
+    }
+  }
+  closeList(); closeQuote()
+
+  return html.join('\n').replace(/\u0000CODEBLOCK(\d+)\u0000/g, (_, i) => codeBlocks[Number(i)])
+}
+
+function MarkdownToHtmlTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [md, setMd] = React.useState('# Hello\n\nThis is **bold** and *italic* text with a [link](https://example.com).\n\n- Item one\n- Item two')
+  const isFr = lang === 'fr'
+  const html = React.useMemo(() => markdownToHtml(md), [md])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <Label>Markdown</Label>
+        <textarea value={md} onChange={e => setMd(e.target.value)} rows={10} style={{ ...inp(C_T), resize: 'vertical', fontFamily: 'monospace' }} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div>
+          <Label>HTML</Label>
+          <textarea readOnly value={html} rows={10} style={{ ...inp(C_T), resize: 'vertical', fontFamily: 'monospace', fontSize: 12.5 }} />
+          <div style={{ marginTop: 10 }}><CopyBtn getText={() => html} lang={lang} /></div>
+        </div>
+        <div>
+          <Label>{isFr ? 'Aperçu' : 'Preview'}</Label>
+          <div style={{ ...inp(C_T), minHeight: 240, overflow: 'auto' }} dangerouslySetInnerHTML={{ __html: html }} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── 12. HTML → Markdown (Phase 2) ──
+
+function htmlNodeToMarkdown(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return (node.textContent || '').replace(/\s+/g, ' ')
+  }
+  if (node.nodeType !== Node.ELEMENT_NODE) return ''
+  const el = node as HTMLElement
+  const children = Array.from(el.childNodes).map(htmlNodeToMarkdown).join('')
+  const tag = el.tagName.toLowerCase()
+
+  switch (tag) {
+    case 'h1': return `# ${children.trim()}\n\n`
+    case 'h2': return `## ${children.trim()}\n\n`
+    case 'h3': return `### ${children.trim()}\n\n`
+    case 'h4': return `#### ${children.trim()}\n\n`
+    case 'h5': return `##### ${children.trim()}\n\n`
+    case 'h6': return `###### ${children.trim()}\n\n`
+    case 'strong': case 'b': return `**${children}**`
+    case 'em': case 'i': return `*${children}*`
+    case 'code': return `\`${children}\``
+    case 'pre': return `\`\`\`\n${el.textContent}\n\`\`\`\n\n`
+    case 'a': return `[${children}](${el.getAttribute('href') || ''})`
+    case 'p': return `${children.trim()}\n\n`
+    case 'br': return '\n'
+    case 'li': {
+      const parent = el.parentElement?.tagName.toLowerCase()
+      const prefix = parent === 'ol' ? '1. ' : '- '
+      return `${prefix}${children.trim()}\n`
+    }
+    case 'ul': case 'ol': return `${children}\n`
+    case 'blockquote': return children.trim().split('\n').map(l => `> ${l}`).join('\n') + '\n\n'
+    default: return children
+  }
+}
+
+function htmlToMarkdown(html: string): string {
+  if (typeof window === 'undefined') return ''
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  return htmlNodeToMarkdown(doc.body).replace(/\n{3,}/g, '\n\n').trim()
+}
+
+function HtmlToMarkdownTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [html, setHtml] = React.useState('<h1>Hello</h1>\n<p>This is <strong>bold</strong> and <em>italic</em> text with a <a href="https://example.com">link</a>.</p>\n<ul>\n  <li>Item one</li>\n  <li>Item two</li>\n</ul>')
+  const [markdown, setMarkdown] = React.useState('')
+
+  React.useEffect(() => {
+    setMarkdown(htmlToMarkdown(html))
+  }, [html])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <Label>HTML</Label>
+        <textarea value={html} onChange={e => setHtml(e.target.value)} rows={10} style={{ ...inp(C_T), resize: 'vertical', fontFamily: 'monospace', fontSize: 12.5 }} />
+      </div>
+      <div>
+        <Label>Markdown</Label>
+        <textarea readOnly value={markdown} rows={10} style={{ ...inp(C_T), resize: 'vertical', fontFamily: 'monospace' }} />
+        <div style={{ marginTop: 10 }}><CopyBtn getText={() => markdown} lang={lang} /></div>
+      </div>
+    </div>
+  )
+}
+
+// ── 13. Remove Empty Lines (Phase 3) ──
+
+function RemoveEmptyLinesTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [text, setText] = React.useState('')
+  const [treatWhitespaceAsEmpty, setTreatWhitespaceAsEmpty] = React.useState(true)
+  const [collapseToOne, setCollapseToOne] = React.useState(false)
+  const isFr = lang === 'fr'
+
+  const result = React.useMemo(() => {
+    let lines = text.split(/\r?\n/)
+    lines = lines.filter(l => treatWhitespaceAsEmpty ? l.trim() !== '' : l !== '')
+    if (collapseToOne) {
+      // Keep at most one blank line between kept lines — only relevant
+      // when treatWhitespaceAsEmpty is off and some blanks survived.
+      const out: string[] = []
+      let prevBlank = false
+      for (const l of text.split(/\r?\n/)) {
+        const isBlank = l.trim() === ''
+        if (isBlank && (treatWhitespaceAsEmpty || prevBlank)) continue
+        out.push(l)
+        prevBlank = isBlank
+      }
+      return out
+    }
+    return lines
+  }, [text, treatWhitespaceAsEmpty, collapseToOne])
+
+  const removedCount = text ? text.split(/\r?\n/).length - result.length : 0
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <Label>{isFr ? 'Texte' : 'Text'}</Label>
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={9} style={{ ...inp(C_T), resize: 'vertical' }} />
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+        <CheckOption label={isFr ? 'Traiter les espaces seuls comme vides' : 'Treat whitespace-only lines as empty'} checked={treatWhitespaceAsEmpty} onChange={setTreatWhitespaceAsEmpty} />
+        <CheckOption label={isFr ? 'Ne garder qu\u2019une ligne vide entre les blocs' : 'Collapse to a single blank line between blocks'} checked={collapseToOne} onChange={setCollapseToOne} />
+      </div>
+      <div style={{ fontSize: 12, color: C_T.muted }}>
+        {removedCount} {isFr ? 'ligne(s) vide(s) supprimée(s)' : 'empty line(s) removed'}
+      </div>
+      <div>
+        <Label>{isFr ? 'Résultat' : 'Result'}</Label>
+        <textarea readOnly value={result.join('\n')} rows={9} style={{ ...inp(C_T), resize: 'vertical' }} />
+        <div style={{ marginTop: 10 }}><CopyBtn getText={() => result.join('\n')} lang={lang} /></div>
+      </div>
+    </div>
+  )
+}
+
+// ── 14. Remove Spaces / Whitespace (Phase 3) ──
+
+function RemoveSpacesTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [text, setText] = React.useState('')
+  const [mode, setMode] = React.useState<'trim' | 'collapse' | 'all' | 'tabs'>('collapse')
+  const isFr = lang === 'fr'
+
+  const result = React.useMemo(() => {
+    switch (mode) {
+      case 'trim':     return text.split('\n').map(l => l.trim()).join('\n')
+      case 'collapse': return text.replace(/[ \t]{2,}/g, ' ')
+      case 'all':      return text.replace(/\s+/g, '')
+      case 'tabs':      return text.replace(/\t/g, '    ')
+      default:          return text
+    }
+  }, [text, mode])
+
+  const MODES: [typeof mode, string, string][] = [
+    ['trim', 'Trim each line', 'Ajuster chaque ligne'],
+    ['collapse', 'Collapse multiple spaces', 'Fusionner les espaces multiples'],
+    ['all', 'Remove all whitespace', 'Supprimer tous les espaces'],
+    ['tabs', 'Tabs to spaces', 'Tabulations en espaces'],
+  ]
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <Label>{isFr ? 'Texte' : 'Text'}</Label>
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={9} style={{ ...inp(C_T), resize: 'vertical' }} />
+      </div>
+      <div>
+        <Label>{isFr ? 'Mode' : 'Mode'}</Label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {MODES.map(([id, en, fr]) => (
+            <button key={id} onClick={() => setMode(id)}
+              style={{ padding: '7px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                background: mode === id ? C_T.accent : 'transparent',
+                color: mode === id ? '#fff' : C_T.muted,
+                border: `1px solid ${mode === id ? C_T.accent : C_T.border}` }}>
+              {isFr ? fr : en}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <Label>{isFr ? 'Résultat' : 'Result'}</Label>
+        <textarea readOnly value={result} rows={9} style={{ ...inp(C_T), resize: 'vertical' }} />
+        <div style={{ marginTop: 10 }}><CopyBtn getText={() => result} lang={lang} /></div>
+      </div>
+    </div>
+  )
+}
+
+// ── 15. Text Reverser (Phase 3) ──
+
+function TextReverserTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [text, setText] = React.useState('')
+  const [mode, setMode] = React.useState<'chars' | 'words' | 'lines'>('chars')
+  const isFr = lang === 'fr'
+
+  const result = React.useMemo(() => {
+    if (mode === 'chars') return text.split('').reverse().join('')
+    if (mode === 'words') return text.split(/(\s+)/).reverse().join('')
+    return text.split(/\r?\n/).reverse().join('\n')
+  }, [text, mode])
+
+  const MODES: [typeof mode, string, string][] = [
+    ['chars', 'Characters', 'Caractères'],
+    ['words', 'Words', 'Mots'],
+    ['lines', 'Lines', 'Lignes'],
+  ]
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <Label>{isFr ? 'Texte' : 'Text'}</Label>
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={8} style={{ ...inp(C_T), resize: 'vertical' }} />
+      </div>
+      <div>
+        <Label>{isFr ? 'Inverser par' : 'Reverse by'}</Label>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {MODES.map(([id, en, fr]) => (
+            <button key={id} onClick={() => setMode(id)}
+              style={{ padding: '7px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                background: mode === id ? C_T.accent : 'transparent',
+                color: mode === id ? '#fff' : C_T.muted,
+                border: `1px solid ${mode === id ? C_T.accent : C_T.border}` }}>
+              {isFr ? fr : en}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <Label>{isFr ? 'Résultat' : 'Result'}</Label>
+        <textarea readOnly value={result} rows={8} style={{ ...inp(C_T), resize: 'vertical' }} />
+        <div style={{ marginTop: 10 }}><CopyBtn getText={() => result} lang={lang} /></div>
+      </div>
+    </div>
+  )
+}
+
+// ── 16. Text → List (Phase 3) ──
+
+function TextToListTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [text, setText] = React.useState('')
+  const [style, setStyle] = React.useState<'numbered' | 'bullet' | 'dash' | 'checkbox'>('bullet')
+  const [skipEmpty, setSkipEmpty] = React.useState(true)
+  const isFr = lang === 'fr'
+
+  const result = React.useMemo(() => {
+    let lines = text.split(/\r?\n/)
+    if (skipEmpty) lines = lines.filter(l => l.trim() !== '')
+    return lines.map((l, i) => {
+      if (style === 'numbered') return `${i + 1}. ${l}`
+      if (style === 'bullet') return `• ${l}`
+      if (style === 'dash') return `- ${l}`
+      return `- [ ] ${l}`
+    }).join('\n')
+  }, [text, style, skipEmpty])
+
+  const STYLES: [typeof style, string, string][] = [
+    ['numbered', '1. 2. 3.', '1. 2. 3.'],
+    ['bullet', '• Bullet', '• Puce'],
+    ['dash', '- Dash', '- Tiret'],
+    ['checkbox', '- [ ] Checkbox', '- [ ] Case à cocher'],
+  ]
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <Label>{isFr ? 'Lignes' : 'Lines'}</Label>
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={8} style={{ ...inp(C_T), resize: 'vertical' }} />
+      </div>
+      <div>
+        <Label>{isFr ? 'Style de liste' : 'List style'}</Label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {STYLES.map(([id, en, fr]) => (
+            <button key={id} onClick={() => setStyle(id)}
+              style={{ padding: '7px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                background: style === id ? C_T.accent : 'transparent',
+                color: style === id ? '#fff' : C_T.muted,
+                border: `1px solid ${style === id ? C_T.accent : C_T.border}` }}>
+              {isFr ? fr : en}
+            </button>
+          ))}
+        </div>
+      </div>
+      <CheckOption label={isFr ? 'Ignorer les lignes vides' : 'Skip empty lines'} checked={skipEmpty} onChange={setSkipEmpty} />
+      <div>
+        <Label>{isFr ? 'Résultat' : 'Result'}</Label>
+        <textarea readOnly value={result} rows={8} style={{ ...inp(C_T), resize: 'vertical' }} />
+        <div style={{ marginTop: 10 }}><CopyBtn getText={() => result} lang={lang} /></div>
+      </div>
+    </div>
+  )
+}
+
+// ── 17. List → Text (Phase 3) ──
+
+function ListToTextTab({ lang }: { lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [text, setText] = React.useState('')
+  const isFr = lang === 'fr'
+
+  const result = React.useMemo(() => {
+    return text.split(/\r?\n/)
+      .map(l => l.replace(/^\s*(?:\d+[.)]|[-*•]|\[[ xX]?\]|- \[[ xX]?\])\s*/, '').replace(/^\s*-\s*\[[ xX]?\]\s*/, ''))
+      .join('\n')
+  }, [text])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <Label>{isFr ? 'Liste (numérotée, à puces, ou cases à cocher)' : 'List (numbered, bulleted, or checkboxes)'}</Label>
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={8} style={{ ...inp(C_T), resize: 'vertical' }}
+          placeholder={isFr ? '1. Premier élément\n- Deuxième élément\n- [ ] Troisième élément' : '1. First item\n- Second item\n- [ ] Third item'} />
+      </div>
+      <div>
+        <Label>{isFr ? 'Résultat' : 'Result'}</Label>
+        <textarea readOnly value={result} rows={8} style={{ ...inp(C_T), resize: 'vertical' }} />
+        <div style={{ marginTop: 10 }}><CopyBtn getText={() => result} lang={lang} /></div>
+      </div>
+    </div>
+  )
+}
+
 // ── Hub shell ──
-// Simpler than TConvertersHub's shell: no SEO/related-tools side column
-// in this V1 (per decision) — just header, tab nav, and the tool panel.
-// The two-column SEO layout can be added later by following the same
-// pattern as ConverterSeoContent + RelatedConverters in TConvertersHub.
+// Redesigned to match components/pdf/PdfHub.tsx: a left sidebar with
+// tools grouped by category, instead of a horizontal tab strip — the
+// strip became hard to scan once the tool count grew past ~8.
 
 function TTextToolsHub({ onBack }: { onBack?: () => void }) {
   const { lang } = useLang()
@@ -588,6 +1155,7 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
   const C_T = React.useMemo(() => buildPalette(dark), [dark])
   const [tab, setTab] = React.useState('word-counter')
   const cur = TEXT_TABS.find(t => t.id === tab)
+  const isFr = lang === 'fr'
 
   const panels: Record<string, React.ReactNode> = {
     'word-counter':      <WordCounterTab lang={lang} />,
@@ -598,70 +1166,139 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
     'sort-lines':        <SortLinesTab lang={lang} />,
     'text-diff':         <TextDiffTab lang={lang} />,
     'slug-generator':    <SlugGeneratorTab lang={lang} />,
+    'text-statistics':   <TextStatisticsTab lang={lang} />,
+    'lorem-ipsum':       <LoremIpsumTab lang={lang} />,
+    'markdown-to-html':  <MarkdownToHtmlTab lang={lang} />,
+    'html-to-markdown':  <HtmlToMarkdownTab lang={lang} />,
+    'remove-empty-lines': <RemoveEmptyLinesTab lang={lang} />,
+    'remove-spaces':     <RemoveSpacesTab lang={lang} />,
+    'text-reverser':     <TextReverserTab lang={lang} />,
+    'text-to-list':      <TextToListTab lang={lang} />,
+    'list-to-text':      <ListToTextTab lang={lang} />,
   }
 
   return (
     <TextThemeCtx.Provider value={C_T}>
-    <div suppressHydrationWarning style={{ minHeight: '100vh', background: C_T.bg, fontFamily: "'Inter','Segoe UI',sans-serif", color: C_T.text }}>
+    <div suppressHydrationWarning className="texttools-shell" style={{
+      height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column',
+      background: C_T.bg, fontFamily: "'Inter','Segoe UI',sans-serif", color: C_T.text, overflow: 'hidden',
+    }}>
 
       <style>{`
+        .tt-scroll { scrollbar-width: thin; scrollbar-color: ${C_T.border} transparent; }
+        .tt-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .tt-scroll::-webkit-scrollbar-track { background: transparent; }
+        .tt-scroll::-webkit-scrollbar-thumb { background: ${C_T.border}; border-radius: 3px; }
+        .tt-scroll::-webkit-scrollbar-thumb:hover { background: ${C_T.muted}; }
         @media(max-width:${BP.tablet}px){
-          .texttools-tabs{overflow-x:auto;}
+          .texttools-shell { height: auto !important; overflow: visible !important; }
+          .texttools-layout { flex-direction: column !important; flex: none !important; overflow: visible !important; }
+          .texttools-sidebar { width: auto !important; height: auto !important;
+            display: flex !important; overflow-x: auto !important; overflow-y: hidden !important; gap: 4px !important;
+            border-right: none !important; border-bottom: 1px solid ${C_T.border}; }
+          .texttools-sidebar .side-title, .texttools-sidebar .sidebar-heading { display: none !important; }
+          .texttools-sidebar .tool-link { white-space: nowrap !important; }
+          .texttools-main { overflow: visible !important; }
         }
       `}</style>
 
-      {/* Header */}
-      <header style={{ background: C_T.card, borderBottom: `1px solid ${C_T.border}`, padding: '0 24px',
-        height: 60, display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 100 }}>
-        {onBack && (
-          <button onClick={onBack} style={{ background: C_T.success, color: '#fff', border: 'none',
-            borderRadius: 10, padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
-            ← CHRONOS
-          </button>
-        )}
-        <span style={{ fontWeight: 800, fontSize: 18, color: C_T.accent, letterSpacing: '-0.5px' }}>
-          TEXT TOOLS
-        </span>
-        <span style={{ background: `${C_T.accent}22`, color: C_T.accent, border: `1px solid ${C_T.accent}44`,
-          borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700, letterSpacing: '0.5px' }}>
-          {TEXT_TABS.length} TOOLS
-        </span>
-        <span style={{ marginLeft: 'auto', background: `${C_T.success}22`, color: C_T.success,
-          border: `1px solid ${C_T.success}44`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
-          <IconLockClosed size={13} style={{ marginRight: 4, verticalAlign: -2 }} /> 100% In-Browser
-        </span>
-      </header>
+      {/* Sidebar + content — each scrolls independently within this row.
+          No separate full-width header strip: the "TEXT TOOLS · N tools"
+          label lives at the top of the sidebar itself, exactly like
+          PdfHub's "PDF TOOLS / 14 tools" — matching that hub's structure
+          instead of duplicating the title in a header bar above it. */}
+      <div className="texttools-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%' }}>
 
-      {/* Tab nav */}
-      <nav className="texttools-tabs" style={{ display: 'flex', overflowX: 'auto', background: C_T.card,
-        borderBottom: `1px solid ${C_T.border}`, padding: '0 16px', gap: 4 }}>
-        {TEXT_TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            background: 'transparent', border: 'none',
-            borderBottom: tab === t.id ? `2px solid ${C_T.accent}` : '2px solid transparent',
-            color: tab === t.id ? C_T.accent : C_T.muted,
-            padding: '14px 16px', cursor: 'pointer',
-            fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', transition: 'all 0.15s',
-          }}>
-            {lang === 'fr' ? t.fr : t.en}
-          </button>
-        ))}
-      </nav>
+        <aside className="texttools-sidebar tt-scroll" style={{
+          width: 240, flexShrink: 0, overflowY: 'auto', borderRight: `1px solid ${C_T.border}`, padding: '20px 12px',
+        }}>
+          <div className="sidebar-heading" style={{ padding: '4px 10px 16px' }}>
+            {onBack && (
+              <button onClick={onBack} style={{ background: 'transparent', color: C_T.muted, border: 'none',
+                padding: 0, marginBottom: 10, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                ← CHRONOS
+              </button>
+            )}
+            <div style={{ fontSize: 15, fontWeight: 800, color: C_T.accent, letterSpacing: '-0.3px' }}>
+              {isFr ? 'OUTILS TEXTE' : 'TEXT TOOLS'}
+            </div>
+            <div style={{ fontSize: 12, color: C_T.muted, marginTop: 2 }}>
+              {TEXT_TABS.length} {isFr ? 'outils' : 'tools'}
+            </div>
+          </div>
+          {TEXT_CATEGORIES.map(cat => (
+            <React.Fragment key={cat.en}>
+              <div className="side-title" style={{ fontSize: 10.5, color: C_T.muted, textTransform: 'uppercase',
+                fontWeight: 800, letterSpacing: '.06em', padding: '10px 10px 6px' }}>
+                {isFr ? cat.fr : cat.en}
+              </div>
+              {cat.tools.map(toolId => {
+                const t = TEXT_TABS.find(x => x.id === toolId)
+                if (!t) return null
+                const active = tab === toolId
+                return (
+                  <button key={toolId} className="tool-link" onClick={() => setTab(toolId)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                      padding: '10px 10px', borderRadius: 9, margin: '2px 0',
+                      background: active ? `${C_T.accent}18` : 'transparent',
+                      border: 'none', borderLeft: active ? `2px solid ${C_T.accent}` : '2px solid transparent',
+                      color: active ? C_T.accent : C_T.muted,
+                      fontSize: 13, fontWeight: active ? 700 : 500, cursor: 'pointer', textAlign: 'left',
+                      transition: 'all .15s',
+                    }}>
+                    <Icon name={t.icon} size={16} />
+                    {isFr ? t.fr : t.en}
+                  </button>
+                )
+              })}
+            </React.Fragment>
+          ))}
+        </aside>
 
-      {/* Content */}
-      <main style={{ maxWidth: 780, margin: '0 auto', padding: '32px 24px' }}>
-        <div style={{ marginBottom: 20 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>
-            {lang === 'fr' ? cur?.fr : cur?.en}
-          </h1>
-          <p style={{ color: C_T.muted, fontSize: 14, margin: '6px 0 0' }}>
-            {lang === 'fr' ? cur?.frDesc : cur?.enDesc}
-          </p>
+        <main className="texttools-main tt-scroll" style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '32px 32px 64px' }}>
+        <div style={{ maxWidth: 900 }}>
+          <div style={{ fontSize: 12, color: C_T.muted, marginBottom: 12 }}>
+            CHRONOS / {isFr ? 'Outils Texte' : 'Text Tools'} / <span style={{ color: C_T.text, fontWeight: 600 }}>{isFr ? cur?.fr : cur?.en}</span>
+          </div>
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.06em', marginBottom: 10 }}>
+            <span style={{ color: C_T.accent }}>{isFr ? 'TEXTE' : 'TEXT'}</span>
+            <span style={{ color: C_T.muted }}> / </span>
+            <span style={{ color: C_T.text }}>{(isFr ? cur?.fr : cur?.en)?.toUpperCase()}</span>
+          </div>
+          <div style={{ marginBottom: 22 }}>
+            <h1 style={{ fontSize: 34, fontWeight: 800, margin: 0, lineHeight: 1.15, letterSpacing: '-0.5px' }}>
+              {isFr ? cur?.fr : cur?.en}
+            </h1>
+            <p style={{ color: C_T.muted, fontSize: 15, margin: '8px 0 0' }}>
+              {isFr ? cur?.frDesc : cur?.enDesc}
+            </p>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 24 }}>
+            {[
+              { icon: 'lock', en: '100% Private', fr: '100% Privé', enSub: 'Processed in your browser', frSub: 'Traité dans votre navigateur' },
+              { icon: 'bolt', en: 'Instant', fr: 'Instantané', enSub: 'No upload, no waiting', frSub: 'Sans envoi, sans attente' },
+              { icon: 'edit', en: 'Easy to Use', fr: 'Facile à utiliser', enSub: 'Just type or paste', frSub: 'Il suffit de taper ou coller' },
+            ].map(f => (
+              <div key={f.en} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${C_T.border}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: C_T.accent, flexShrink: 0 }}>
+                  <Icon name={f.icon} size={16} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: C_T.text }}>{isFr ? f.fr : f.en}</div>
+                  <div style={{ fontSize: 11, color: C_T.muted }}>{isFr ? f.frSub : f.enSub}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ background: C_T.card, border: `1px solid ${C_T.border}`, borderRadius: 16, padding: 24 }}>
+            {panels[tab]}
+          </div>
         </div>
-        <div style={{ background: C_T.card, border: `1px solid ${C_T.border}`, borderRadius: 16, padding: 24 }}>
-          {panels[tab]}
-        </div>
-      </main>
+        </main>
+
+      </div>
 
     </div>
     </TextThemeCtx.Provider>

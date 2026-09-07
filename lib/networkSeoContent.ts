@@ -14,6 +14,12 @@ export interface NetworkSeoFaq {
   a: string
 }
 
+export interface NetworkSeoExample {
+  label: string
+  input: string
+  result: string
+}
+
 export interface NetworkSeoEntry {
   title: string
   frTitle: string
@@ -23,6 +29,8 @@ export interface NetworkSeoEntry {
   frHow: string
   formula?: { expr: string; note: string }
   frFormula?: { expr: string; note: string }
+  examples?: NetworkSeoExample[]
+  frExamples?: NetworkSeoExample[]
   faq: NetworkSeoFaq[]
   frFaq: NetworkSeoFaq[]
 }
@@ -262,6 +270,196 @@ export const NETWORK_SEO_CONTENT: Record<string, NetworkSeoEntry> = {
       { q: "Pourquoi un saut affiche-t-il un temps de réponse bien plus élevé que les autres ?", a: "C'est courant et pas toujours un problème — certains routeurs dépriorisent volontairement les réponses aux requêtes de type traceroute pour des raisons de sécurité, causant une lecture artificiellement élevée ou absente à ce saut précis, même si le trafic continue normalement au-delà." },
       { q: "Que signifie « * * * » ou un délai dépassé à un saut ?", a: "Cela signifie que ce routeur particulier n'a pas répondu dans le délai imparti, souvent parce qu'il est configuré pour ignorer ou dépriorisier ces requêtes de diagnostic. Cela seul ne signifie pas que la connexion est rompue — le traceroute continue généralement avec succès vers les sauts suivants." },
       { q: "En quoi le traceroute diffère-t-il d'un test de ping ?", a: "Le ping indique seulement le temps aller-retour total vers la destination finale. Le traceroute découpe ce même trajet saut par saut, montrant chaque point intermédiaire — utile pour localiser précisément où dans le réseau un ralentissement se produit." },
+    ],
+  },
+
+  subnet: {
+    title: "Subnet / CIDR Calculator — Network, Broadcast & Usable Hosts",
+    frTitle: "Calculateur de Sous-réseau / CIDR — Réseau, Diffusion et Hôtes Utilisables",
+    what: "A subnet calculator breaks down an IP address written in CIDR notation (like 192.168.1.0/24) into every value a network engineer needs: the network address, the broadcast address, the subnet mask, the range of usable host addresses, and how many devices that range can hold. CIDR notation packs the subnet mask into a single number after the slash — a /24 means the first 24 bits identify the network, leaving the remaining 8 bits for host addresses.",
+    frWhat: "Un calculateur de sous-réseau décompose une adresse IP écrite en notation CIDR (comme 192.168.1.0/24) en toutes les valeurs dont un ingénieur réseau a besoin : l'adresse réseau, l'adresse de diffusion, le masque de sous-réseau, la plage d'adresses d'hôtes utilisables, et le nombre d'appareils que cette plage peut contenir. La notation CIDR condense le masque de sous-réseau en un seul nombre après la barre oblique — un /24 signifie que les 24 premiers bits identifient le réseau, laissant les 8 bits restants pour les adresses d'hôtes.",
+    how: "Enter an address and prefix length together, like 10.0.0.0/16. The tool applies the subnet mask to the address using binary math to find the network's lower boundary (network address) and upper boundary (broadcast address). Everything in between, minus those two reserved addresses, is usable by devices on that subnet — except for /31 and /32 blocks, which follow special point-to-point and single-host rules.",
+    frHow: "Saisissez une adresse et une longueur de préfixe ensemble, comme 10.0.0.0/16. L'outil applique le masque de sous-réseau à l'adresse via des calculs binaires pour trouver la borne inférieure du réseau (adresse réseau) et la borne supérieure (adresse de diffusion). Tout ce qui se trouve entre les deux, moins ces deux adresses réservées, est utilisable par les appareils de ce sous-réseau — sauf pour les blocs /31 et /32, qui suivent des règles spéciales point-à-point et hôte unique.",
+    formula: { expr: "usable hosts = 2^(32 − prefix) − 2", note: "Except for /31 (2 usable, point-to-point) and /32 (1 usable, single host)." },
+    frFormula: { expr: "hôtes utilisables = 2^(32 − préfixe) − 2", note: "Sauf pour /31 (2 utilisables, point-à-point) et /32 (1 utilisable, hôte unique)." },
+    examples: [
+      { label: "Small office LAN", input: "192.168.1.0/24", result: "254 usable hosts" },
+      { label: "Point-to-point link", input: "10.10.10.0/31", result: "2 usable hosts" },
+      { label: "Large internal range", input: "172.16.0.0/16", result: "65,534 usable hosts" },
+    ],
+    frExamples: [
+      { label: "Petit réseau de bureau", input: "192.168.1.0/24", result: "254 hôtes utilisables" },
+      { label: "Liaison point-à-point", input: "10.10.10.0/31", result: "2 hôtes utilisables" },
+      { label: "Grande plage interne", input: "172.16.0.0/16", result: "65 534 hôtes utilisables" },
+    ],
+    faq: [
+      { q: "Why does a /24 give 254 usable hosts instead of 256?", a: "A /24 has 256 total addresses, but the first (network address) and last (broadcast address) are reserved for the network itself and can't be assigned to a device, leaving 254 for actual hosts." },
+      { q: "What's different about /31 subnets?", a: "A /31 has only two addresses total, and neither is 'wasted' on a broadcast address — both are usable, which is why /31 is the standard choice for point-to-point links between two routers." },
+      { q: "What is a wildcard mask used for?", a: "It's the inverse of the subnet mask, and it's the format older networking equipment (like Cisco ACLs) expects when you specify which addresses a rule should match, instead of the more common subnet mask notation." },
+      { q: "Can I use this for IPv6?", a: "No — this calculator is IPv4-only. IPv6 subnetting follows the same CIDR concept but works with a much larger 128-bit address space and different conventions." },
+    ],
+    frFaq: [
+      { q: "Pourquoi un /24 donne-t-il 254 hôtes utilisables au lieu de 256 ?", a: "Un /24 compte 256 adresses au total, mais la première (adresse réseau) et la dernière (adresse de diffusion) sont réservées au réseau lui-même et ne peuvent pas être assignées à un appareil, laissant 254 adresses pour les hôtes réels." },
+      { q: "Qu'est-ce qui est différent avec les sous-réseaux /31 ?", a: "Un /31 ne compte que deux adresses au total, et aucune n'est « gaspillée » sur une adresse de diffusion — les deux sont utilisables, ce qui en fait le choix standard pour les liaisons point-à-point entre deux routeurs." },
+      { q: "À quoi sert un masque générique (wildcard) ?", a: "C'est l'inverse du masque de sous-réseau, et c'est le format attendu par les équipements réseau plus anciens (comme les ACL Cisco) pour spécifier quelles adresses une règle doit cibler, plutôt que la notation plus courante du masque de sous-réseau." },
+      { q: "Puis-je l'utiliser pour l'IPv6 ?", a: "Non — ce calculateur est réservé à l'IPv4. Le sous-réseautage IPv6 suit le même concept de CIDR mais fonctionne avec un espace d'adressage bien plus vaste (128 bits) et des conventions différentes." },
+    ],
+  },
+
+  dnsprop: {
+    title: "DNS Propagation Checker — Has Your DNS Change Gone Live?",
+    frTitle: "Vérificateur de Propagation DNS — Votre Changement DNS Est-il en Ligne ?",
+    what: "When you update a domain's DNS records — pointing it to a new server, adding a subdomain — that change doesn't reach every resolver on the internet instantly. Each DNS record has a TTL (time-to-live) that controls how long resolvers are allowed to cache the old answer before checking again, so different resolvers can show old and new results at the same time until every cache expires.",
+    frWhat: "Lorsque vous mettez à jour les enregistrements DNS d'un domaine — pointer vers un nouveau serveur, ajouter un sous-domaine — ce changement n'atteint pas instantanément tous les résolveurs d'internet. Chaque enregistrement DNS a un TTL (durée de vie) qui contrôle combien de temps les résolveurs sont autorisés à mettre en cache l'ancienne réponse avant de revérifier, si bien que différents résolveurs peuvent afficher simultanément d'anciens et de nouveaux résultats jusqu'à expiration de tous les caches.",
+    how: "This tool queries several major independent DNS resolver operators — Cloudflare, Google, and Quad9 — for the record type you choose, and compares what each one currently returns. If all resolvers agree, propagation is complete. If they disagree, or some fail to answer, propagation is still in progress. Note that a browser-based tool can only reach global resolver operators, not simulate a specific country or ISP's local resolver.",
+    frHow: "Cet outil interroge plusieurs opérateurs de résolveurs DNS indépendants majeurs — Cloudflare, Google et Quad9 — pour le type d'enregistrement choisi, et compare ce que chacun renvoie actuellement. Si tous les résolveurs sont d'accord, la propagation est complète. S'ils sont en désaccord, ou si certains ne répondent pas, la propagation est encore en cours. Notez qu'un outil basé navigateur ne peut interroger que des opérateurs de résolveurs globaux, sans simuler le résolveur local d'un pays ou d'un FAI précis.",
+    faq: [
+      { q: "Why do different resolvers show different results for my domain?", a: "Each resolver may have cached your old record at a different time, so it will keep serving that cached answer until its own TTL countdown finishes — this is normal and resolves itself as caches expire." },
+      { q: "How long does DNS propagation usually take?", a: "It depends entirely on the TTL you (or the previous record) had set — anywhere from a few minutes for a short TTL to 24-48 hours for a long one. Lowering the TTL a day before a planned change speeds up future propagation." },
+      { q: "Why does it say 'Failed' even though my DNS looks correct?", a: "This usually means none of the checked resolvers could find any record of that type for the domain — double-check the domain spelling and that the record type actually exists (e.g. don't check MX if you never set up a mail record)." },
+      { q: "Can I force propagation to happen faster?", a: "Not directly — you can't override other people's resolver caches. The most reliable way to speed up future changes is lowering the TTL in advance, so the next change propagates faster." },
+    ],
+    frFaq: [
+      { q: "Pourquoi différents résolveurs affichent-ils des résultats différents pour mon domaine ?", a: "Chaque résolveur a peut-être mis en cache votre ancien enregistrement à un moment différent, et continuera à servir cette réponse mise en cache jusqu'à la fin de son propre compte à rebours TTL — c'est normal et cela se résout de soi-même à l'expiration des caches." },
+      { q: "Combien de temps prend généralement la propagation DNS ?", a: "Cela dépend entièrement du TTL que vous (ou l'enregistrement précédent) aviez défini — de quelques minutes pour un TTL court à 24-48 heures pour un TTL long. Réduire le TTL la veille d'un changement planifié accélère la propagation future." },
+      { q: "Pourquoi le résultat indique-t-il « Échouée » alors que mon DNS semble correct ?", a: "Cela signifie généralement qu'aucun des résolveurs vérifiés n'a trouvé d'enregistrement de ce type pour le domaine — vérifiez l'orthographe du domaine et que le type d'enregistrement existe réellement (par exemple, ne vérifiez pas MX si vous n'avez jamais configuré d'enregistrement mail)." },
+      { q: "Puis-je forcer la propagation à se faire plus vite ?", a: "Pas directement — vous ne pouvez pas outrepasser les caches des résolveurs d'autrui. Le moyen le plus fiable d'accélérer de futurs changements est de réduire le TTL à l'avance, pour que le prochain changement se propage plus vite." },
+    ],
+  },
+
+  iplookup: {
+    title: "IP Address Lookup — Geolocation, ISP & Organization Info",
+    frTitle: "Recherche d'Adresse IP — Géolocalisation, FAI et Organisation",
+    what: "An IP lookup tool takes any public IPv4 address and returns what's publicly known about it: the approximate geographic location, the internet service provider or hosting company it belongs to, and the organization it's registered to. This is the same kind of information websites, ad networks, and security tools use to make decisions about a visitor before they even load a page.",
+    frWhat: "Un outil de recherche IP prend n'importe quelle adresse IPv4 publique et renvoie ce qui est publiquement connu à son sujet : la localisation géographique approximative, le fournisseur d'accès internet ou l'hébergeur auquel elle appartient, et l'organisation à laquelle elle est enregistrée. C'est le même type d'information que les sites web, régies publicitaires et outils de sécurité utilisent pour prendre des décisions sur un visiteur avant même le chargement d'une page.",
+    how: "Enter any public IPv4 address and the tool queries public IP-to-location and IP-to-organization databases to return the country, region, city, ISP, hosting organization, and (when available) the autonomous system number (ASN) that IP block belongs to. Unlike the My IP tool, which always detects your own address, this tool looks up any address you provide — useful for investigating traffic in server logs or verifying where a service is hosted.",
+    frHow: "Saisissez n'importe quelle adresse IPv4 publique et l'outil interroge des bases de données publiques IP-vers-localisation et IP-vers-organisation pour renvoyer le pays, la région, la ville, le FAI, l'organisation d'hébergement, et (si disponible) le numéro de système autonome (ASN) auquel appartient ce bloc d'IP. Contrairement à l'outil Mon IP, qui détecte toujours votre propre adresse, cet outil recherche n'importe quelle adresse que vous fournissez — utile pour examiner du trafic dans des journaux serveur ou vérifier où un service est hébergé.",
+    faq: [
+      { q: "Why is the location shown not exact?", a: "IP geolocation is based on the registered location of the ISP's network block, which is often centered on a regional hub — it typically narrows down to a city or region, not a precise street address." },
+      { q: "What is an ASN and why does it matter?", a: "An Autonomous System Number identifies a specific network operator on the internet — every ISP, cloud provider, and large company that manages its own routing has one. It's useful for identifying which organization actually controls an IP block, beyond just the ISP name." },
+      { q: "Why does the ISP field show a hosting company instead of a residential provider?", a: "If the IP belongs to a server rather than a home connection, the ISP/organization field will show the hosting or cloud provider (like a data center operator) rather than a consumer internet provider." },
+      { q: "Can I look up a private IP address like 192.168.1.1?", a: "No — private IP ranges (like 192.168.x.x, 10.x.x.x) are only meaningful inside a local network and have no public geolocation data, since they aren't routed on the public internet." },
+    ],
+    frFaq: [
+      { q: "Pourquoi la localisation affichée n'est-elle pas exacte ?", a: "La géolocalisation IP se base sur la localisation enregistrée du bloc réseau du FAI, souvent centrée sur un pôle régional — elle se limite généralement à une ville ou une région, pas une adresse précise." },
+      { q: "Qu'est-ce qu'un ASN et pourquoi est-ce important ?", a: "Un numéro de système autonome identifie un opérateur réseau spécifique sur internet — chaque FAI, fournisseur cloud et grande entreprise gérant son propre routage en possède un. Utile pour identifier quelle organisation contrôle réellement un bloc d'IP, au-delà du simple nom du FAI." },
+      { q: "Pourquoi le champ FAI affiche-t-il une société d'hébergement plutôt qu'un fournisseur résidentiel ?", a: "Si l'IP appartient à un serveur plutôt qu'à une connexion domestique, le champ FAI/organisation affichera l'hébergeur ou le fournisseur cloud (comme un opérateur de centre de données) plutôt qu'un fournisseur internet grand public." },
+      { q: "Puis-je rechercher une adresse IP privée comme 192.168.1.1 ?", a: "Non — les plages IP privées (comme 192.168.x.x, 10.x.x.x) n'ont de sens qu'à l'intérieur d'un réseau local et n'ont aucune donnée de géolocalisation publique, car elles ne sont pas routées sur l'internet public." },
+    ],
+  },
+
+  emailsec: {
+    title: "Email Security Checker — SPF, DKIM & DMARC",
+    frTitle: "Vérificateur de Sécurité Email — SPF, DKIM et DMARC",
+    what: "SPF, DKIM and DMARC are three DNS records that together prove an email actually came from your domain instead of being spoofed by a scammer. SPF lists which servers are allowed to send mail for your domain, DKIM cryptographically signs each message so it can't be tampered with in transit, and DMARC tells receiving mail servers what to do when a message fails those checks — and where to send reports about it.",
+    frWhat: "SPF, DKIM et DMARC sont trois enregistrements DNS qui, ensemble, prouvent qu'un email provient réellement de votre domaine plutôt que d'être usurpé par un escroc. SPF liste les serveurs autorisés à envoyer du courrier pour votre domaine, DKIM signe cryptographiquement chaque message pour qu'il ne puisse pas être altéré en transit, et DMARC indique aux serveurs receveurs quoi faire quand un message échoue ces contrôles — et où envoyer des rapports à ce sujet.",
+    how: "Enter a domain and the tool queries its DNS TXT records directly: the domain's own TXT records for an SPF entry starting with 'v=spf1', the '_dmarc' subdomain for a DMARC policy starting with 'v=DMARC1', and a list of common selector names (google, default, selector1...) under '_domainkey' to find a DKIM key. DKIM selectors aren't discoverable by design, so a domain can have DKIM configured under a selector this tool doesn't try — a 'not found' result there is not definitive.",
+    frHow: "Saisissez un domaine et l'outil interroge directement ses enregistrements DNS TXT : les enregistrements TXT du domaine lui-même pour une entrée SPF commençant par 'v=spf1', le sous-domaine '_dmarc' pour une politique DMARC commençant par 'v=DMARC1', et une liste de noms de sélecteurs courants (google, default, selector1...) sous '_domainkey' pour trouver une clé DKIM. Les sélecteurs DKIM ne sont pas découvrables par conception, donc un domaine peut avoir DKIM configuré sous un sélecteur que cet outil n'essaie pas — un résultat « introuvable » n'est donc pas définitif.",
+    faq: [
+      { q: "Why does DMARC matter if I already have SPF and DKIM?", a: "SPF and DKIM alone don't tell receiving servers what to actually do when a message fails — DMARC adds the enforcement policy (none, quarantine, or reject) plus reporting, so you find out about spoofing attempts instead of just hoping SPF/DKIM catch them." },
+      { q: "What's the difference between p=none, p=quarantine and p=reject?", a: "'none' only monitors and reports failures without blocking anything, 'quarantine' sends failing mail to spam, and 'reject' blocks it outright — most domains start at 'none' to gather data safely before tightening the policy." },
+      { q: "The tool says DKIM wasn't found, but I know I configured it — why?", a: "DKIM selectors are arbitrary strings chosen by your mail provider and aren't published anywhere discoverable — this tool only tries the dozen or so most common ones, so a real DKIM setup under an unusual selector name will show as 'not found' here." },
+      { q: "Do I need all three records?", a: "SPF alone offers weak protection since it doesn't survive email forwarding, DKIM alone doesn't stop spoofing without alignment checks, and DMARC needs at least one of the other two to function — using all three together is the standard recommended setup." },
+    ],
+    frFaq: [
+      { q: "Pourquoi DMARC est-il important si j'ai déjà SPF et DKIM ?", a: "SPF et DKIM seuls n'indiquent pas aux serveurs receveurs quoi faire réellement en cas d'échec — DMARC ajoute la politique d'application (none, quarantine ou reject) plus le reporting, pour que vous soyez informé des tentatives d'usurpation au lieu d'espérer que SPF/DKIM les bloquent seuls." },
+      { q: "Quelle est la différence entre p=none, p=quarantine et p=reject ?", a: "« none » ne fait que surveiller et rapporter les échecs sans rien bloquer, « quarantine » envoie les mails en échec vers les spams, et « reject » les bloque purement et simplement — la plupart des domaines commencent par « none » pour collecter des données en toute sécurité avant de durcir la politique." },
+      { q: "L'outil indique que DKIM est introuvable, mais je sais l'avoir configuré — pourquoi ?", a: "Les sélecteurs DKIM sont des chaînes arbitraires choisies par votre fournisseur de messagerie et ne sont publiées nulle part de façon découvrable — cet outil n'essaie qu'une douzaine des plus courants, donc une vraie configuration DKIM sous un nom de sélecteur inhabituel apparaîtra comme « introuvable » ici." },
+      { q: "Ai-je besoin des trois enregistrements ?", a: "SPF seul offre une protection faible car il ne survit pas au transfert d'email, DKIM seul n'empêche pas l'usurpation sans contrôles d'alignement, et DMARC a besoin d'au moins l'un des deux autres pour fonctionner — utiliser les trois ensemble est la configuration standard recommandée." },
+    ],
+  },
+
+  secheaders: {
+    title: "Security Headers Grader — Score Your Site's HTTP Defenses",
+    frTitle: "Notation des En-têtes de Sécurité — Notez les Défenses HTTP de Votre Site",
+    what: "HTTP security headers are instructions a server sends back to the browser, telling it to enforce extra protections — like refusing to load scripts from untrusted sources, or blocking the page from being embedded in someone else's iframe. A site can be perfectly secure at the application level and still be missing these headers, leaving otherwise-preventable attack surface open.",
+    frWhat: "Les en-têtes de sécurité HTTP sont des instructions qu'un serveur renvoie au navigateur, lui demandant d'appliquer des protections supplémentaires — comme refuser de charger des scripts depuis des sources non fiables, ou empêcher la page d'être intégrée dans l'iframe d'un autre site. Un site peut être parfaitement sécurisé au niveau applicatif et pourtant manquer ces en-têtes, laissant ouverte une surface d'attaque évitable.",
+    how: "Enter a URL and the tool fetches the page's actual HTTP response headers, then checks for ten headers a modern browser can enforce (CSP, HSTS, X-Frame-Options, and others), each weighted by how much protection it typically adds. The weighted total becomes a percentage, and that percentage maps to a letter grade from F to A+ — the same approach used by public security-header scanners.",
+    frHow: "Saisissez une URL et l'outil récupère les en-têtes de réponse HTTP réels de la page, puis vérifie dix en-têtes qu'un navigateur moderne peut appliquer (CSP, HSTS, X-Frame-Options, et d'autres), chacun pondéré selon la protection qu'il apporte généralement. Le total pondéré devient un pourcentage, qui correspond à une note de F à A+ — la même approche utilisée par les scanners d'en-têtes de sécurité publics.",
+    faq: [
+      { q: "Why is Content-Security-Policy weighted so much higher than the others?", a: "CSP is the single most effective defense against cross-site scripting (XSS), one of the most common and damaging web vulnerabilities — the other headers each close one specific gap, while CSP can prevent an entire category of attacks at once." },
+      { q: "My site got a low grade but I've never been hacked — should I still fix this?", a: "Missing headers are unused protection, not proof of a working defense — they matter most in the exact scenario where something else on your site has a bug (an XSS flaw, a rogue third-party script), which is precisely when you can't predict it in advance." },
+      { q: "Can I just add all ten headers and get an A+?", a: "Mostly yes, though Content-Security-Policy needs to be tailored to your actual site (which scripts, styles, and domains it legitimately uses) — copying someone else's CSP verbatim can break your site's functionality, so that one takes more care than the others." },
+      { q: "Why did the check fail for a site I know is online?", a: "Some servers block requests that don't come directly from a real browser, or the proxy this tool uses to read cross-origin headers may be rate-limited — try again in a moment, or check the headers directly via your browser's developer tools." },
+    ],
+    frFaq: [
+      { q: "Pourquoi Content-Security-Policy est-il tellement plus pondéré que les autres ?", a: "CSP est la défense la plus efficace contre le cross-site scripting (XSS), l'une des vulnérabilités web les plus courantes et dommageables — chaque autre en-tête comble une lacune spécifique, tandis que CSP peut prévenir toute une catégorie d'attaques à la fois." },
+      { q: "Mon site a une note faible mais je n'ai jamais été piraté — dois-je quand même corriger cela ?", a: "Les en-têtes manquants sont une protection inutilisée, pas une preuve de défense fonctionnelle — ils comptent le plus dans le scénario exact où autre chose sur votre site a un bug (une faille XSS, un script tiers compromis), précisément quand vous ne pouvez pas le prévoir à l'avance." },
+      { q: "Puis-je simplement ajouter les dix en-têtes et obtenir un A+ ?", a: "Globalement oui, mais Content-Security-Policy doit être adapté à votre site réel (quels scripts, styles et domaines il utilise légitimement) — copier le CSP de quelqu'un d'autre tel quel peut casser les fonctionnalités de votre site, donc celui-ci demande plus de soin que les autres." },
+      { q: "Pourquoi la vérification a-t-elle échoué pour un site que je sais en ligne ?", a: "Certains serveurs bloquent les requêtes qui ne proviennent pas directement d'un vrai navigateur, ou le proxy utilisé par cet outil pour lire les en-têtes cross-origin peut être limité en débit — réessayez dans un instant, ou vérifiez les en-têtes directement via les outils de développement de votre navigateur." },
+    ],
+  },
+
+  blacklist: {
+    title: "DNS Blacklist Check — Is Your IP Flagged as a Spam Source?",
+    frTitle: "Vérification Liste Noire DNS — Votre IP Est-elle Signalée comme Source de Spam ?",
+    what: "A DNS blacklist (DNSBL) is a list of IP addresses that mail servers around the world consult before accepting an email — if your sending IP is on one, your messages can silently land in spam folders or get rejected outright, even though nothing looks wrong on your end. IPs get listed for sending spam, being part of a botnet, or simply being handed to you by a hosting provider after a previous tenant misused it.",
+    frWhat: "Une liste noire DNS (DNSBL) est une liste d'adresses IP que les serveurs de messagerie du monde entier consultent avant d'accepter un email — si votre IP d'envoi y figure, vos messages peuvent atterrir silencieusement dans les spams ou être rejetés purement et simplement, même si rien ne semble anormal de votre côté. Les IP sont listées pour avoir envoyé du spam, avoir fait partie d'un botnet, ou simplement vous avoir été attribuées par un hébergeur après qu'un précédent locataire les ait mal utilisées.",
+    how: "Enter an IP address (or a domain, which gets resolved to its IP first) and the tool queries five major independent blacklist operators — Spamhaus, Barracuda, SpamCop, SORBS and PSBL — using the standard DNSBL lookup method: reversing the IP's octets and querying that string as a subdomain of each blacklist's zone. A response means the IP is currently listed there; no response means it's clean on that particular list.",
+    frHow: "Saisissez une adresse IP (ou un domaine, qui sera d'abord résolu en IP) et l'outil interroge cinq opérateurs de listes noires indépendants majeurs — Spamhaus, Barracuda, SpamCop, SORBS et PSBL — selon la méthode standard de consultation DNSBL : inverser les octets de l'IP et interroger cette chaîne comme sous-domaine de la zone de chaque liste noire. Une réponse signifie que l'IP y est actuellement listée ; aucune réponse signifie qu'elle est propre sur cette liste précise.",
+    faq: [
+      { q: "My IP is listed — how do I get it removed?", a: "Each blacklist operator runs its own delisting process, usually a free web form on that operator's own site — first fix whatever caused the listing (secure a compromised server, stop a spam campaign), then submit the removal request; most lists also expire entries automatically after a period of good behavior." },
+      { q: "Why would a brand-new server already be blacklisted?", a: "Many blacklists list IP ranges rather than individual addresses, and cloud/hosting providers frequently reuse IPs — you may have inherited an address that a previous customer got listed, which is common enough that it's worth checking before you even start sending mail from a new IP." },
+      { q: "Does being listed mean I've been hacked?", a: "Not necessarily — it's the most common cause, but shared hosting IPs, misconfigured mail servers, and even overly aggressive marketing email volume can trigger a listing without any compromise at all." },
+      { q: "Are these the only blacklists that matter?", a: "There are dozens of DNSBLs in use, but the ones checked here are the small handful most major receiving mail servers actually consult — being clean across these covers the great majority of real-world deliverability impact." },
+    ],
+    frFaq: [
+      { q: "Mon IP est listée — comment la faire retirer ?", a: "Chaque opérateur de liste noire gère son propre processus de retrait, généralement un formulaire web gratuit sur son propre site — corrigez d'abord ce qui a causé le listage (sécuriser un serveur compromis, arrêter une campagne de spam), puis soumettez la demande de retrait ; la plupart des listes expirent aussi automatiquement les entrées après une période de bon comportement." },
+      { q: "Pourquoi un serveur tout neuf serait-il déjà sur liste noire ?", a: "De nombreuses listes noires listent des plages d'IP plutôt que des adresses individuelles, et les hébergeurs cloud réutilisent fréquemment les IP — vous avez peut-être hérité d'une adresse qu'un précédent client a fait lister, ce qui est assez courant pour valoir la peine d'être vérifié avant même de commencer à envoyer du courrier depuis une nouvelle IP." },
+      { q: "Être listé signifie-t-il que j'ai été piraté ?", a: "Pas nécessairement — c'est la cause la plus courante, mais un hébergement mutualisé, un serveur mail mal configuré, ou même un volume d'emails marketing trop agressif peuvent déclencher un listage sans aucune compromission." },
+      { q: "Sont-ce les seules listes noires qui comptent ?", a: "Il existe des dizaines de DNSBL en usage, mais celles vérifiées ici sont la poignée que la plupart des grands serveurs de messagerie receveurs consultent réellement — être propre sur celles-ci couvre la grande majorité de l'impact réel sur la délivrabilité." },
+    ],
+  },
+
+  ipconv: {
+    title: "IP Address Converter — Decimal, Binary & Hexadecimal",
+    frTitle: "Convertisseur d'Adresse IP — Décimal, Binaire et Hexadécimal",
+    what: "An IPv4 address like 192.168.1.1 is really just a 32-bit number, dressed up in dotted-decimal notation for humans to read. That same number can be written just as validly as a plain decimal integer, a hexadecimal string, or raw binary — formats that show up in firewall rules, low-level networking code, subnet masks, and older system logs.",
+    frWhat: "Une adresse IPv4 comme 192.168.1.1 n'est en réalité qu'un nombre de 32 bits, habillé en notation décimale pointée pour que les humains puissent la lire. Ce même nombre peut tout aussi valablement s'écrire en entier décimal simple, en chaîne hexadécimale, ou en binaire brut — des formats que l'on retrouve dans les règles de pare-feu, le code réseau bas niveau, les masques de sous-réseau, et les anciens journaux système.",
+    how: "Paste an address in any of the four formats — dotted (192.168.1.1), plain decimal (3232235777), hex (0xC0A80101), or binary (11000000.10101000...) — and the tool auto-detects which one you used, converts it to a single 32-bit number internally, then renders all four representations side by side.",
+    frHow: "Collez une adresse dans l'un des quatre formats — pointé (192.168.1.1), décimal simple (3232235777), hexadécimal (0xC0A80101), ou binaire (11000000.10101000...) — et l'outil détecte automatiquement le format utilisé, le convertit en un seul nombre de 32 bits en interne, puis affiche les quatre représentations côte à côte.",
+    examples: [
+      { label: "Common private IP", input: "192.168.1.1", result: "0xC0A80101 / 3232235777" },
+      { label: "From a decimal integer", input: "134744072", result: "8.8.8.8" },
+      { label: "From hexadecimal", input: "0x08080808", result: "8.8.8.8" },
+    ],
+    frExamples: [
+      { label: "IP privée courante", input: "192.168.1.1", result: "0xC0A80101 / 3232235777" },
+      { label: "Depuis un entier décimal", input: "134744072", result: "8.8.8.8" },
+      { label: "Depuis l'hexadécimal", input: "0x08080808", result: "8.8.8.8" },
+    ],
+    faq: [
+      { q: "Why would an IP ever be written as a plain integer?", a: "Some databases, older APIs and legacy systems store IP addresses as a single 32-bit integer column instead of a string, since it's more compact and sorts/compares correctly — you'll run into this format when reading raw logs or database exports." },
+      { q: "Where do I actually see IPs in hexadecimal?", a: "Hex shows up in low-level networking contexts — packet captures, firewall and router configuration on some platforms, and IPv6 addresses themselves are written in hex groups, so getting comfortable with hex-to-decimal conversion carries over." },
+      { q: "Why is the binary shown in 4 groups of 8?", a: "Each group of 8 bits (an octet) corresponds exactly to one of the four dotted-decimal numbers — grouping it this way makes it easy to see, bit by bit, how a subnet mask actually carves up an address, which is much harder to read as one unbroken 32-character string." },
+      { q: "Can this tool convert IPv6 addresses?", a: "No — IPv6 uses a 128-bit address space with its own notation rules and is significantly more involved to convert; this tool is IPv4-only." },
+    ],
+    frFaq: [
+      { q: "Pourquoi une IP serait-elle écrite en simple entier ?", a: "Certaines bases de données, anciennes API et systèmes hérités stockent les adresses IP comme une seule colonne entière de 32 bits plutôt qu'une chaîne, car c'est plus compact et cela se trie/compare correctement — vous rencontrerez ce format en lisant des journaux bruts ou des exports de base de données." },
+      { q: "Où voit-on réellement des IP en hexadécimal ?", a: "L'hexadécimal apparaît dans des contextes réseau bas niveau — captures de paquets, configuration de pare-feu et routeur sur certaines plateformes, et les adresses IPv6 elles-mêmes s'écrivent en groupes hexadécimaux, donc être à l'aise avec la conversion hex-décimal est transférable." },
+      { q: "Pourquoi le binaire est-il affiché en 4 groupes de 8 ?", a: "Chaque groupe de 8 bits (un octet) correspond exactement à l'un des quatre nombres décimaux pointés — ce regroupement permet de voir facilement, bit par bit, comment un masque de sous-réseau découpe réellement une adresse, ce qui est bien plus difficile à lire en une chaîne continue de 32 caractères." },
+      { q: "Cet outil peut-il convertir des adresses IPv6 ?", a: "Non — l'IPv6 utilise un espace d'adressage de 128 bits avec ses propres règles de notation et est nettement plus complexe à convertir ; cet outil est réservé à l'IPv4." },
+    ],
+  },
+
+  contping: {
+    title: "Continuous Ping — Track Latency to a Host Over Time",
+    frTitle: "Ping Continu — Suivre la Latence vers un Hôte dans le Temps",
+    what: "A single ping only tells you how a connection is doing at one instant — continuous ping keeps sampling a host once per second so you can see whether latency is stable, gradually rising, or spiking intermittently, and how much packet loss builds up over a longer window. This is what you reach for to catch an intermittent problem a one-off ping would miss entirely.",
+    frWhat: "Un simple ping ne dit comment se comporte une connexion qu'à un instant donné — le ping continu échantillonne un hôte une fois par seconde, pour voir si la latence est stable, augmente progressivement, ou fait des pics intermittents, et quelle perte de paquets s'accumule sur une fenêtre plus longue. C'est l'outil à utiliser pour repérer un problème intermittent qu'un ping unique manquerait complètement.",
+    how: "Enter a host and start the test — the tool times a lightweight request to that host once every second, the same browser-based timing technique the regular Ping Test uses, and keeps a rolling window of the last 60 samples. Note that this measures round-trip time over HTTPS, not raw ICMP ping — a browser has no access to ICMP — so the numbers reflect real reachability and connection latency, just via a slightly different transport than a terminal 'ping' command uses.",
+    frHow: "Saisissez un hôte et démarrez le test — l'outil chronomètre une requête légère vers cet hôte une fois par seconde, la même technique de mesure basée navigateur que le Test de Ping classique, et conserve une fenêtre glissante des 60 derniers échantillons. Notez que ceci mesure le temps aller-retour via HTTPS, pas un ping ICMP brut — un navigateur n'a pas accès à l'ICMP — donc les chiffres reflètent l'accessibilité et la latence réelles, via un transport légèrement différent de celui qu'utilise une commande 'ping' de terminal.",
+    faq: [
+      { q: "Why isn't this a real MTR (My Traceroute)?", a: "A true MTR combines traceroute and ping to show loss and latency at every hop along the path, which requires sending raw ICMP packets — something browsers are sandboxed from doing entirely. This tool gives you the ping half (continuous latency + loss to the final destination) using what a browser can actually access." },
+      { q: "Why does packet loss show up even for sites that are clearly online?", a: "A 'timeout' here just means the timed request didn't complete quickly — this can happen from browser tab throttling in the background, temporary network hiccups on your own connection, or the target blocking rapid repeated requests, not only from the destination being down." },
+      { q: "Does stopping the test lose my data?", a: "No — when you stop, a summary (average latency and loss percentage) is saved to your local history, so you can compare runs over time even though the live sample window itself resets on the next start." },
+      { q: "Why does latency sometimes spike right when I start?", a: "The very first sample includes the time to establish a fresh HTTPS connection (DNS lookup, TLS handshake), which is naturally slower than the repeat requests that follow and reuse that connection — this is normal and not a sign of a problem." },
+    ],
+    frFaq: [
+      { q: "Pourquoi ce n'est pas un vrai MTR (My Traceroute) ?", a: "Un vrai MTR combine traceroute et ping pour montrer la perte et la latence à chaque saut du trajet, ce qui nécessite d'envoyer des paquets ICMP bruts — chose dont les navigateurs sont entièrement sandboxés. Cet outil vous donne la moitié « ping » (latence et perte continues vers la destination finale) avec ce à quoi un navigateur peut réellement accéder." },
+      { q: "Pourquoi de la perte de paquets apparaît-elle même pour des sites clairement en ligne ?", a: "Un « délai dépassé » ici signifie simplement que la requête chronométrée ne s'est pas terminée rapidement — cela peut venir du ralentissement d'un onglet en arrière-plan, de petits accrocs temporaires sur votre propre connexion, ou du blocage par la cible de requêtes répétées rapides, pas uniquement d'une destination hors service." },
+      { q: "Arrêter le test fait-il perdre mes données ?", a: "Non — en vous arrêtant, un résumé (latence moyenne et pourcentage de perte) est enregistré dans votre historique local, ce qui permet de comparer les sessions dans le temps même si la fenêtre d'échantillons en direct se réinitialise au prochain démarrage." },
+      { q: "Pourquoi la latence fait-elle parfois un pic juste au démarrage ?", a: "Le tout premier échantillon inclut le temps d'établir une nouvelle connexion HTTPS (résolution DNS, poignée de main TLS), naturellement plus lent que les requêtes suivantes qui réutilisent cette connexion — c'est normal et ne signale pas un problème." },
     ],
   },
 

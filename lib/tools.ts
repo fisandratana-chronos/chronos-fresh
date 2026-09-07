@@ -122,7 +122,7 @@ export const WIRED_SLUGS = new Set([
   'css-minifier',
   'javascript-minifier',
   'word-counter',
-  // ── Text Tools Hub (VAOVAO) ──────────────────────────────────
+  // ── Text Tools Hub (Phase 1 + Phase 2) ──────────────────────
   'text-tools-hub',
   'case-converter',
   'text-cleaner',
@@ -131,6 +131,15 @@ export const WIRED_SLUGS = new Set([
   'sort-lines',
   'text-diff',
   'slug-generator',
+  'text-statistics',
+  'lorem-ipsum',
+  'markdown-to-html',
+  'html-to-markdown',
+  'remove-empty-lines',
+  'remove-spaces',
+  'text-reverser',
+  'text-to-list',
+  'list-to-text',
 ])
 
 // ── TOOLS — the 7 tools that have a real /tools/<slug> page today ──
@@ -170,8 +179,15 @@ export const TOOLS: Tool[] = [
     slug: '/age-calculator', cat: 'health', icon: 'cake',
     keywords: ['age calculator', 'calculate age online', 'how old am i', 'birthday calculator'] },
   { id: 'scientific-calculator', label: 'Scientific Calculator', frLabel: 'Calculatrice Scientifique',
-    slug: '/scientific-calculator', cat: 'dev', icon: 'calculator',
+    slug: '/scientific-calculator', cat: 'finance', icon: 'calculator',
     keywords: ['scientific calculator online', 'advanced calculator free', 'math calculator', 'trig calculator'] },
+  // Unit Converter — combo 7-category converter (Length/Weight/Temperature/
+  // Volume/Speed/Area/Data) added to SmartCalcHub itself; component wired
+  // in Convert/ConvertHome.tsx's CONVERT_PANEL_MAP under the short key
+  // 'units' (see ID_ALIASES in SmartCalcHub.tsx for the long→short link).
+  { id: 'unit-converter', label: 'Unit Converter', frLabel: "Convertisseur d'Unités",
+    slug: '/unit-converter', cat: 'convert', icon: 'ruler',
+    keywords: ['unit converter', 'convert units online', 'length weight volume converter', 'metric imperial converter'] },
   // Network Hub entry points (all render NetworkHub component)
   { id: 'network-hub',          label: 'Network Hub',          frLabel: 'Hub Réseau',           slug: '/network-hub',          cat: 'dev', icon: 'antenna', keywords: ['network', 'internet', 'hub'] },
   { id: 'ip-lookup',            label: 'IP Lookup',            frLabel: 'Recherche IP',          slug: '/ip-lookup',            cat: 'dev', icon: 'antenna', keywords: ['ip', 'address', 'location'] },
@@ -190,7 +206,7 @@ export const TOOLS: Tool[] = [
   { id: 'jpg-to-pdf', label: 'JPG → PDF', frLabel: 'JPG → PDF',    slug: '/jpg-to-pdf', cat: 'dev', icon: 'camera', keywords: ['jpg', 'image', 'pdf'] },
   // Smart Calculator
   { id: 'smart-calculator', label: 'Smart Calculator', frLabel: 'Calculatrice Intelligente', slug: '/smart-calculator', cat: 'finance', icon: 'calculator', keywords: ['calculator', 'smart', 'all-in-one'] },
-  // Text Tools Hub entry points (all render TTextToolsHub component) — VAOVAO
+  // Text Tools Hub entry points (all render TTextToolsHub component)
   { id: 'text-tools-hub',    label: 'Text Tools',              frLabel: 'Outils Texte',              slug: '/text-tools-hub',    cat: 'text', icon: 'edit',      keywords: ['text tools', 'outils texte', 'hub'] },
   { id: 'word-counter',      label: 'Word Counter',            frLabel: 'Compteur de mots',          slug: '/word-counter',      cat: 'text', icon: 'hash',      keywords: ['word count', 'character count', 'compteur de mots'] },
   { id: 'case-converter',    label: 'Case Converter',          frLabel: 'Convertisseur de casse',    slug: '/case-converter',    cat: 'text', icon: 'typography',keywords: ['case converter', 'uppercase', 'lowercase', 'majuscule'] },
@@ -200,6 +216,15 @@ export const TOOLS: Tool[] = [
   { id: 'sort-lines',        label: 'Sort Lines',              frLabel: 'Trier les lignes',          slug: '/sort-lines',        cat: 'text', icon: 'sort',      keywords: ['sort lines', 'alphabetical', 'trier'] },
   { id: 'text-diff',         label: 'Text Diff',               frLabel: 'Comparateur de textes',     slug: '/text-diff',         cat: 'text', icon: 'exchange',  keywords: ['text diff', 'compare text', 'comparer'] },
   { id: 'slug-generator',    label: 'Slug Generator',          frLabel: 'Générateur de slug',        slug: '/slug-generator',    cat: 'text', icon: 'link',      keywords: ['slug generator', 'url slug', 'générateur de slug'] },
+  { id: 'text-statistics',   label: 'Text Statistics',         frLabel: 'Statistiques de texte',     slug: '/text-statistics',   cat: 'text', icon: 'chart',     keywords: ['text statistics', 'word frequency', 'statistiques de texte'] },
+  { id: 'lorem-ipsum',       label: 'Lorem Ipsum Generator',   frLabel: 'Générateur Lorem Ipsum',    slug: '/lorem-ipsum',       cat: 'text', icon: 'edit',      keywords: ['lorem ipsum', 'placeholder text', 'texte de remplissage'] },
+  { id: 'markdown-to-html',  label: 'Markdown to HTML',        frLabel: 'Markdown vers HTML',        slug: '/markdown-to-html',  cat: 'text', icon: 'code',      keywords: ['markdown to html', 'md converter', 'markdown vers html'] },
+  { id: 'html-to-markdown',  label: 'HTML to Markdown',        frLabel: 'HTML vers Markdown',        slug: '/html-to-markdown',  cat: 'text', icon: 'code',      keywords: ['html to markdown', 'html converter', 'html vers markdown'] },
+  { id: 'remove-empty-lines', label: 'Remove Empty Lines',     frLabel: 'Supprimer les lignes vides', slug: '/remove-empty-lines', cat: 'text', icon: 'layers',   keywords: ['remove empty lines', 'blank lines', 'lignes vides'] },
+  { id: 'remove-spaces',     label: 'Remove Spaces',           frLabel: 'Supprimer les espaces',     slug: '/remove-spaces',     cat: 'text', icon: 'sparkle',   keywords: ['remove spaces', 'trim whitespace', 'supprimer espaces'] },
+  { id: 'text-reverser',     label: 'Text Reverser',           frLabel: 'Inverseur de texte',        slug: '/text-reverser',     cat: 'text', icon: 'exchange',  keywords: ['reverse text', 'text reverser', 'inverseur de texte'] },
+  { id: 'text-to-list',      label: 'Text to List',            frLabel: 'Texte vers Liste',          slug: '/text-to-list',      cat: 'text', icon: 'layers',    keywords: ['text to list', 'bullet list', 'texte vers liste'] },
+  { id: 'list-to-text',      label: 'List to Text',            frLabel: 'Liste vers Texte',          slug: '/list-to-text',      cat: 'text', icon: 'layers',    keywords: ['list to text', 'remove bullets', 'liste vers texte'] },
 ]
 
 // ── registryCategories — all 7 categories (full SEO registry) ──

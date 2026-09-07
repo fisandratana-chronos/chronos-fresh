@@ -109,3 +109,32 @@ Rehefa hanampy tool vaovao ianao (ohatra ny PDF Hub), dia manampy
 
 Isaky ny dingana iray, `npm run dev` foana alohan'ny hanaovana ny
 manaraka.
+
+
+
+# CHRONOS (note)
+Ampiditra Ads: Leryto ( efa vita fa tohizana rehefa vita tsara ny site sy mahasokatra compte)
+palabe60: ..............................UI Mobil/tablet
+ilayraromima: ..........................fiteny ( tohizana)
+tahiantso: .............................manampy tools ao @ pdf ( tohizana ny calculator) 
+ledamasy: ..............................Icons.tsx
+lefangoka (chatgpt): ...................fanatsarana tools(manampy tools)
+lobonaivo:..............................texttools + imagehub + covertor [tohizana]
+mamasoa: ...............................manampy network tools [tohizan]
+ramarovahoaka..........................calculator    [tohizana]
+
+
+POLYMARKET
+thomasokx: .............................manatsra UI/UX
+
+
+
+
+git add .
+git commit -m "fix: mobile responsive breakpoints"
+git push
+
+
+Mandefa Vercel
+vercel --prod
+vercel --force --prod

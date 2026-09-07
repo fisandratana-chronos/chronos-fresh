@@ -38,6 +38,33 @@ const ADSENSE_CONFIG = {
 
 function useAdPush(ref: any, opts?: any) {}
 function PWAInstallBanner() { return null; }
+
+// ── CHRONOS fonts — Cormorant Garamond (serif hero titles) + DM Sans
+// (same pair PdfHub.tsx loads via useChronosFonts). SmartCalcHub kept
+// its own hero titles as Space Grotesk before this UI/UX alignment
+// pass; this hook only ADDS the two CHRONOS fonts alongside the
+// existing Space Grotesk/Inter/JetBrains Mono usage elsewhere in this
+// file — nothing else in this file is renamed or removed.
+const CALC_FONT_HREF =
+  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap";
+function useCalcFonts() {
+  useEffect(() => {
+    if (document.getElementById("chronos-fonts")) return; // PdfHub may have already loaded it
+    if (document.getElementById("calc-fonts")) return;
+    const pre1 = document.createElement("link");
+    pre1.rel = "preconnect";
+    pre1.href = "https://fonts.googleapis.com";
+    const pre2 = document.createElement("link");
+    pre2.rel = "preconnect";
+    pre2.href = "https://fonts.gstatic.com";
+    pre2.crossOrigin = "anonymous";
+    const sheet = document.createElement("link");
+    sheet.id = "calc-fonts";
+    sheet.rel = "stylesheet";
+    sheet.href = CALC_FONT_HREF;
+    document.head.append(pre1, pre2, sheet);
+  }, []);
+}
 const getToolLabel = (t: any, lang: string) => lang === "fr" ? t?.frLabel || t?.label : t?.label || "";
 const getToolKeywords = (t: any, lang: string) => t?.keywords || [];
 const ID_TO_SLUG = Object.fromEntries(TOOLS.map(t => [t.id, "/tools" + t.slug]));
@@ -75,9 +102,34 @@ const ID_ALIASES: Record<string, string> = {
   'vat-calculator': 'vat',
   'date-difference-calculator': 'datediff',
   'gpa-calculator': 'gpa',
+  'unit-converter': 'units',
 };
 for (const [longId, shortId] of Object.entries(ID_ALIASES)) {
   if (PANEL_MAP[shortId] && !PANEL_MAP[longId]) PANEL_MAP[longId] = PANEL_MAP[shortId];
+}
+
+// CALC_TOOLS — the subset of the SITE-WIDE `TOOLS` registry that actually
+// belongs to THIS hub (i.e. has a real PANEL_MAP entry, short key or long
+// alias above). `TOOLS[].cat` ('health'/'finance'/'dev'/'convert') is a
+// coarse, SITE-WIDE bucket reused across every hub — every PDF Hub tool AND
+// every Network Hub tool is tagged cat:'dev', same as Scientific Calculator
+// — so filtering SmartCalcHub's own grid/search/categories by `cat` was
+// exactly why PDF/Network/Converters/Developer tools were showing up (and
+// were clickable → navigated away to a different hub entirely) from inside
+// Calculators. CALC_TOOLS is the correct, self-maintaining scope: anything
+// with a working PANEL_MAP entry belongs here, anything else never will.
+const CALC_TOOLS = TOOLS.filter(t => !!PANEL_MAP[t.id]);
+
+// A tool id is only ever safe to render if it actually has a PANEL_MAP
+// entry (short key or long alias). Every place that sets `activeTool`
+// below is funneled through this guard — without it, an id that slips
+// through (e.g. from a stale popstate URL, or "smart-calculator" itself,
+// which deliberately has no panel) leaves `activeTool` truthy with no
+// matching `Panel`. That hid the grid (since the grid only shows when
+// `!activeTool`) AND rendered no panel (since `PANEL_MAP[activeTool]` is
+// undefined) — the page going fully blank after Back was exactly this.
+function resolveActiveTool(id: string | null | undefined): string | null {
+  return id && PANEL_MAP[id] ? id : null;
 }
 
 // ── Hub shell ──
@@ -85,6 +137,7 @@ for (const [longId, shortId] of Object.entries(ID_ALIASES)) {
 function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }: { darkProp?: any; favsProp?: any; onFavsChange?: any; onBack?: () => void; initialTool?: string }) {
   const { lang, t } = useLang();
   const router = useRouter();
+  useCalcFonts();
   const CATS = useMemo(() => getCats(t), [t]);
   const [activeTool, setActiveTool] = useState(()=>{
     // Priority 1: explicit prop from the router (ex: /tools/age-calculator
@@ -92,10 +145,10 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
     // amin'ny ToolPageClient.tsx. Marina kokoa noho ny resolveToolFromPath()
     // satria io farany io dia mamerina ny URL segment FENO (ohatra
     // "age-calculator") izay tsy mitovy amin'ny PANEL_MAP id fohy ("age").
-    if(initialTool) return initialTool;
+    if(initialTool) return resolveActiveTool(initialTool);
     // Priority 2: URL contains a tool slug (direct link / refresh on tool page)
     const fromUrl = resolveToolFromPath();
-    if(fromUrl) return fromUrl;
+    if(fromUrl) return resolveActiveTool(fromUrl);
     // Priority 3 (localStorage "recent") dia tsy azo atao eto — SSR
     // dia tsy manana localStorage, ka raha novakiana teto ity dia
     // hiteraka HYDRATION MISMATCH (server=null, client=avy amin'ny
@@ -113,7 +166,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
     if(initialTool || resolveToolFromPath()) return; // efa voafaritra avy amin'ny URL/prop
     try {
       const recent = JSON.parse(localStorage.getItem("sc-recent")||"[]");
-      if(recent.length > 0 && TOOLS.find(t=>t.id===recent[0])) {
+      if(recent.length > 0 && CALC_TOOLS.find(t=>t.id===recent[0])) {
         setActiveTool(recent[0]);
       }
     } catch{}
@@ -206,9 +259,21 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
   const panelRef = useRef(null);
 
   const openTool = useCallback((id)=>{
-    setActiveTool(id);
+    const safeId = resolveActiveTool(id);
+    if (!safeId) return;
+    setActiveTool(safeId);
+    // Push a real history entry so the browser Back button has somewhere
+    // to land: without this, switching panels locally never touched
+    // `window.history`, so pressing Back skipped straight past this hub
+    // to whatever page was open before it — never back to the gallery.
+    // The popstate listener below already expects `e.state?.toolId`, this
+    // is simply what was missing to actually produce that state.
+    const slug = ID_TO_SLUG[safeId];
+    if (slug && typeof window !== 'undefined') {
+      window.history.pushState({ toolId: safeId }, '', slug);
+    }
     setRecent(prev=>{
-      const next = [id, ...prev.filter(x=>x!==id)].slice(0,8);
+      const next = [safeId, ...prev.filter(x=>x!==safeId)].slice(0,8);
       try { localStorage.setItem("sc-recent", JSON.stringify(next)); } catch{}
       return next;
     });
@@ -217,11 +282,55 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
     }, 80);
   },[]);
 
+  const closeTool = useCallback(() => {
+    setActiveTool(null);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ toolId: null }, '', '/tools/smart-calculator');
+    }
+  }, []);
+
+  // Single shared "open this tool" resolver for every click surface
+  // (RelatedTools, CalcHistory, the main grid). Prefers a local, instant
+  // panel swap (openTool, above) when the target actually lives in THIS
+  // hub's PANEL_MAP — no full page reload, and Back now works correctly.
+  // Only falls back to a real page navigation (router.push) for tools that
+  // genuinely live in a different hub (e.g. a RelatedTools suggestion
+  // linking from Smart Calculator to BMI Calculator, which is by design a
+  // separate standalone page, not part of this PANEL_MAP).
+  const navigateToTool = useCallback((id)=>{
+    if (PANEL_MAP[id]) { openTool(id); return; }
+    const slug = ID_TO_SLUG[id];
+    if (slug) router.push(slug);
+  },[openTool, router]);
+
+  // Sync activeTool when the `initialTool` PROP changes on a later
+  // client-side navigation. Clicking a sibling calculator card in the grid
+  // below does `router.push('/tools/<other-calculator>')` — since that URL
+  // still resolves to this same SmartCalcHub component (just a different
+  // `initialTool` prop), Next.js reuses THIS SAME component instance
+  // instead of unmounting/remounting it. But `activeTool` was set via
+  // `useState(() => initialTool || ...)` above, whose initializer function
+  // only ever runs once, at the very first mount — so it never picks up
+  // the new `initialTool` value on that later navigation, and the visible
+  // panel stays frozen on whichever tool was open first. Cross-hub clicks
+  // (e.g. to a Converters tool) don't show this symptom only because that
+  // destination is a genuinely different top-level component, which React
+  // always remounts regardless. A ref tracks the last-seen `initialTool` so
+  // this also correctly resets to the gallery (activeTool=null) when
+  // navigating from a specific tool back to a slug with no initialTool.
+  const lastInitialTool = useRef(initialTool);
+  useEffect(() => {
+    if (initialTool !== lastInitialTool.current) {
+      lastInitialTool.current = initialTool;
+      setActiveTool(resolveActiveTool(initialTool));
+    }
+  }, [initialTool]);
+
   // ── Browser Back / Forward button support
   useEffect(()=>{
     const onPop = (e)=>{
-      const id = e.state?.toolId || resolveToolFromPath();
-      setActiveTool(id); // null → gallery
+      const id = e.state?.toolId ?? resolveToolFromPath();
+      setActiveTool(resolveActiveTool(id)); // null (or unrecognized) → gallery
     };
     window.addEventListener("popstate", onPop);
     return ()=> window.removeEventListener("popstate", onPop);
@@ -246,7 +355,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
     } else {
       const entry = SEO_CONTENT[activeTool];
       const seoTitle = (lang === "fr" && entry?.frTitle) ? entry.frTitle : entry?.title;
-      const toolMeta = TOOLS.find(tl=>tl.id===activeTool);
+      const toolMeta = CALC_TOOLS.find(tl=>tl.id===activeTool);
       const toolLabel = getToolLabel(toolMeta, lang);
       document.title = seoTitle
         ? `${seoTitle} | SmartCalc Hub`
@@ -288,28 +397,30 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
     document.addEventListener("mousedown",h); return ()=>document.removeEventListener("mousedown",h);
   },[]);
 
-  // ── Filtered tools
+  // ── Filtered tools — scoped to CALC_TOOLS (this hub's own tools only),
+  // not the site-wide TOOLS, so a PDF/Network/Converters/Developer tool
+  // can never appear (or be clicked into) from inside this grid.
   const filtered = useMemo(()=>{
-    if(activeCat==="favorites") return TOOLS.filter(t=>favorites.includes(t.id));
-    if(activeCat==="recent")    return recent.map(id=>TOOLS.find(t=>t.id===id)).filter(Boolean);
+    if(activeCat==="favorites") return CALC_TOOLS.filter(t=>favorites.includes(t.id));
+    if(activeCat==="recent")    return recent.map(id=>CALC_TOOLS.find(t=>t.id===id)).filter(Boolean);
     const q=query.toLowerCase().trim();
-    return TOOLS.filter(t=>{
+    return CALC_TOOLS.filter(t=>{
       const catOk = activeCat==="all" || t.cat===activeCat;
       const searchOk = !q || getToolLabel(t,lang).toLowerCase().includes(q) || getToolKeywords(t,lang).some(k=>k.toLowerCase().includes(q));
       return catOk && searchOk;
     });
   },[query,activeCat,favorites,recent,lang]);
 
-  // ── Search suggestions (cross-category, max 6)
+  // ── Search suggestions (cross-category WITHIN this hub only, max 6)
   const suggestions = useMemo(()=>{
     const q=query.toLowerCase().trim();
     if(!q||q.length<1) return [];
-    return TOOLS.filter(t=>
+    return CALC_TOOLS.filter(t=>
       getToolLabel(t,lang).toLowerCase().includes(q)||getToolKeywords(t,lang).some(k=>k.toLowerCase().includes(q))
     ).slice(0,6);
   },[query,lang]);
 
-  const tool = TOOLS.find(t=>t.id===activeTool);
+  const tool = CALC_TOOLS.find(t=>t.id===activeTool);
   const Panel = PANEL_MAP[activeTool];
 
   // ── Insert native ad card at adaptive position in grid
@@ -334,12 +445,12 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
     "@type": "WebApplication",
     "name": tool ? `${getToolLabel(tool, lang)} — SmartCalc Hub` : "SmartCalc Hub",
     "url": currentUrl,
-    "description": "25 free online calculators — Finance, Health, Dev Tools, Converters and more. No signup, no tracking, works offline.",
+    "description": `${CALC_TOOLS.length} free online calculators — Finance, Health, and more. No signup, no tracking, works offline.`,
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Any",
     "browserRequirements": "Requires JavaScript",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "featureList": TOOLS.map(t => getToolLabel(t, lang)).join(", "),
+    "featureList": CALC_TOOLS.map(t => getToolLabel(t, lang)).join(", "),
     "screenshot": `${SITE_URL}/icons/icon-512.png`,
   };
 
@@ -389,7 +500,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
       {
         "@type": "Question",
         "name": "What tools are available?",
-        "acceptedAnswer": { "@type": "Answer", "text": `SmartCalc Hub offers 25 free tools: ${TOOLS.map(t=>getToolLabel(t, lang)).join(", ")}.` }
+        "acceptedAnswer": { "@type": "Answer", "text": `SmartCalc Hub offers ${CALC_TOOLS.length} free tools: ${CALC_TOOLS.map(t=>getToolLabel(t, lang)).join(", ")}.` }
       }
     ]
   };
@@ -428,6 +539,9 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           .sidebar{width:100%!important;border-right:none!important;border-bottom:1px solid ${T.border}!important;padding:12px!important;max-height:none!important;position:relative!important;top:auto!important;overflow-y:visible!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;}
           .sidebar-ad{display:none!important;}
           .tool-grid{grid-template-columns:repeat(3,1fr)!important;}
+          .chronos-hero-title{font-size:38px!important;}
+          .chronos-hero-row{flex-wrap:wrap;gap:10px;}
+          .chronos-trust-badges{flex-wrap:wrap!important;gap:16px!important;}
         }
         @media(max-width:${BP.mobile}px){
           .tool-grid{grid-template-columns:repeat(2,1fr)!important;}
@@ -478,27 +592,58 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           padding:"18px 14px",display:"flex",flexDirection:"column",gap:4,
           alignSelf:"start",position:"sticky",top:64,overflowY:"auto",maxHeight:"calc(100vh - 80px)"}}>
 
-          {CATS.map(cat=>(
-            <button key={cat.id} onClick={()=>{setActiveCat(cat.id);setQuery("");}}
-              style={{display:"flex",alignItems:"center",gap:9,padding:"9px 12px",
-                borderRadius:8,border:"none",textAlign:"left",cursor:"pointer",
-                background:activeCat===cat.id?`${T.amber}15`:"transparent",
-                color:activeCat===cat.id?T.amber:T.txt2,
-                fontFamily:"'Space Grotesk',sans-serif",fontWeight:activeCat===cat.id?600:400,
-                fontSize:13,transition:"all .12s"}}>
-              <Icon name={cat.icon} size={14} />
-              <span>{cat.label}</span>
-              <span style={{marginLeft:"auto",fontSize:10,fontWeight:600,
-                padding:"1px 7px",borderRadius:10,
-                background:activeCat===cat.id?`${T.amber}22`:T.bg3,
-                color:activeCat===cat.id?T.amber:T.txt3}}>
-                {cat.id==="all"?TOOLS.length
-                  :cat.id==="favorites"?favorites.length
-                  :cat.id==="recent"?recent.length
-                  :TOOLS.filter(t=>t.cat===cat.id).length}
-              </span>
-            </button>
-          ))}
+          {/* ── Category list, grouped into labeled sections like PdfHub's
+              SideGroup (fontSize:10, letterSpacing:0.13em, uppercase, C.muted2,
+              padding "0 12px 8px", marginTop 24 between groups). Known
+              category ids are placed explicitly; anything else CATS returns
+              (future categories) falls into a final "OTHER" group instead of
+              silently disappearing — this file has no access to lib/tools.ts's
+              full category list, so this stays correct if that list grows. */}
+          {(() => {
+            const SIDEBAR_SECTIONS: {label:string|null,ids:string[]}[] = [
+              { label: null,          ids: ["all","favorites","recent"] },
+              { label: "BY CATEGORY", ids: ["health","finance","convert","dev"] },
+            ];
+            const placed = new Set<string>();
+            const groups = SIDEBAR_SECTIONS.map(sec=>{
+              const items = sec.ids.map(id=>CATS.find((c:any)=>c.id===id)).filter(Boolean) as any[];
+              items.forEach(c=>placed.add(c.id));
+              return {label:sec.label, items};
+            });
+            const rest = CATS.filter((c:any)=>!placed.has(c.id));
+            if (rest.length) groups.push({label:"OTHER", items:rest});
+            return groups.map((g,gi)=> g.items.length===0 ? null : (
+              <div key={gi} style={{marginTop:gi===0?0:24}}>
+                {g.label && (
+                  <div style={{fontFamily:"Inter,sans-serif",fontSize:10,letterSpacing:"0.13em",
+                    textTransform:"uppercase",color:T.txt3,padding:"0 12px 8px"}}>
+                    {g.label}
+                  </div>
+                )}
+                {g.items.map((cat:any)=>(
+                  <button key={cat.id} onClick={()=>{setActiveCat(cat.id);setQuery("");}}
+                    style={{display:"flex",alignItems:"center",gap:9,padding:"9px 12px",width:"100%",
+                      borderRadius:8,border:"none",textAlign:"left",cursor:"pointer",
+                      background:activeCat===cat.id?`${T.amber}15`:"transparent",
+                      color:activeCat===cat.id?T.amber:T.txt2,
+                      fontFamily:"'Space Grotesk',sans-serif",fontWeight:activeCat===cat.id?600:400,
+                      fontSize:13,transition:"all .12s"}}>
+                    <Icon name={cat.icon} size={14} />
+                    <span>{cat.label}</span>
+                    <span style={{marginLeft:"auto",fontSize:10,fontWeight:600,
+                      padding:"1px 7px",borderRadius:10,
+                      background:activeCat===cat.id?`${T.amber}22`:T.bg3,
+                      color:activeCat===cat.id?T.amber:T.txt3}}>
+                      {cat.id==="all"?CALC_TOOLS.length
+                        :cat.id==="favorites"?favorites.length
+                        :cat.id==="recent"?recent.length
+                        :CALC_TOOLS.filter(t=>t.cat===cat.id).length}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ));
+          })()}
 
           {/* ── Quick access box ── */}
           <div style={{marginTop:"auto",paddingTop:16,borderTop:`1px solid ${T.border}`}}>
@@ -527,6 +672,67 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
         {/* ── MAIN CONTENT ─────────────────────────────────────── */}
         <main style={{flex:1,padding:"20px",minWidth:0}}>
 
+          {/* ── Browsing UI (ad, sort controls, tool grid) — hidden while a
+              tool is open. Previously this stayed visible above the open
+              panel, pushing the actual calculator (and its explanation/
+              related-tools content below it) further down the page for no
+              reason once you'd already picked a tool. ── */}
+          {!activeTool && (
+          <>
+          {/* ── HERO — breadcrumb + accent caps label + serif title + status pill
+              + trust badges (CHRONOS/PdfHub style — matches PdfHub's hero block
+              exactly: muted breadcrumb, small bold accent label, big serif
+              title, pill, then a 3-item trust-badge row). ── */}
+          {(() => {
+            const catLabel = (activeCat==="all"||activeCat==="favorites"||activeCat==="recent")
+              ? "SmartCalc Hub" : (CATS.find(c=>c.id===activeCat)?.label || "SmartCalc Hub");
+            return (
+          <div style={{marginBottom:24}}>
+            <div style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3,marginBottom:18}}>
+              CHRONOS / {"<calc/>"} / <b style={{color:T.txt2}}>{catLabel}</b>
+            </div>
+            <div className="chronos-hero-row" style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:22}}>
+              <div>
+                <div style={{fontFamily:"Inter,sans-serif",color:T.amber,fontSize:10,fontWeight:700,
+                  letterSpacing:"0.15em",marginBottom:7}}>
+                  CALCULATORS / {catLabel.toUpperCase()}
+                </div>
+                <h1 className="chronos-hero-title" style={{fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:54,
+                  lineHeight:0.92,letterSpacing:"-0.02em",color:T.txt,margin:0}}>
+                  {catLabel}
+                </h1>
+                <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:T.txt3,margin:"9px 0 0"}}>
+                  {CALC_TOOLS.length} free calculators — no signup, no tracking, works offline.
+                </p>
+              </div>
+              <div style={{border:`1px solid ${T.emerald}40`,color:T.emerald,background:`${T.emerald}0a`,
+                borderRadius:999,padding:"8px 12px",fontSize:10,whiteSpace:"nowrap",
+                fontFamily:"Inter,sans-serif",fontWeight:600}}>
+                ● &nbsp; 100% Free
+              </div>
+            </div>
+            {/* Trust badges — same 3-item row style as PdfHub's hero */}
+            <div className="chronos-trust-badges" style={{display:"flex",gap:32,flexWrap:"wrap"}}>
+              {[
+                {icon:"♧",title:"100% Private",sub:"Your data stays on your device"},
+                {icon:"↯",title:"Fast & Accurate",sub:"Instant results, no waiting"},
+                {icon:"✓",title:"Easy to Use",sub:"No signup, just calculate"},
+              ].map((item,i)=>(
+                <div key={i} style={{display:"flex",gap:8,alignItems:"center"}}>
+                  <div style={{width:30,height:30,border:`1px solid ${T.border}`,borderRadius:9,
+                    display:"grid",placeItems:"center",color:T.amber,flexShrink:0}}>
+                    {item.icon}
+                  </div>
+                  <div>
+                    <strong style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,display:"block",color:T.txt}}>{item.title}</strong>
+                    <small style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:T.txt3}}>{item.sub}</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+            );
+          })()}
           {/* ── TOP BANNER AD — 728×90 leaderboard ── */}
           <div style={{marginBottom:16}}>
             <AdSlot size="728×90" label="Advertisement" slot={ADSENSE_CONFIG.slots.leaderboard.id} minH={90}/>
@@ -578,11 +784,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                       background:activeTool===item.data.id?`${T.amber}08`:T.bg1,
                       borderRadius:12,overflow:"hidden",transition:"transform .15s, box-shadow .15s, border-color .15s",
                       cursor:"pointer"}}
-                    onClick={() => {
-                      const slug = ID_TO_SLUG[item.data.id];
-                      if (slug) { router.push(slug); }
-                      else { openTool(item.data.id); }
-                    }}>
+                    onClick={() => navigateToTool(item.data.id)}>
                     {/* ⭐ Favorite toggle */}
                    <button
                       onClick={e=>toggleFav(item.data.id,e)}
@@ -636,18 +838,40 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
               </div>
             )}
           </div>
+          </>
+          )}
 
           {/* ── Active tool panel ── */}
           {Panel && (
             <div ref={panelRef} style={{background:T.bg1,border:`1px solid ${T.border}`,borderRadius:14,overflow:"hidden"}}>
-              {/* Panel header */}
-              <div style={{padding:"16px 22px",borderBottom:`1px solid ${T.border}`,
-                display:"flex",alignItems:"center",gap:10}}>
-                <Icon name={tool?.icon || ''} size={20} />
-                <div>
-                  <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:16,color:T.txt}}>{getToolLabel(tool,lang)}</div>
-                  <div style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3,marginTop:1}}>
-                    {getToolKeywords(tool,lang).slice(0,3).join(" · ")}
+              {/* Panel header — CHRONOS hero style: breadcrumb row + serif title,
+                  mirroring PdfHub's hero (small label above, big serif title
+                  below). Back button and all data (icon, keywords) unchanged. */}
+              <div style={{padding:"18px 22px",borderBottom:`1px solid ${T.border}`}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,gap:10,flexWrap:"wrap"}}>
+                  <span style={{fontFamily:"Inter,sans-serif",fontSize:10,color:T.txt3,
+                    letterSpacing:"0.1em",textTransform:"uppercase"}}>
+                    {"<calc/>"} / {getToolLabel(tool,lang)}
+                  </span>
+                  <button onClick={closeTool} aria-label="Back to all tools" style={{
+                    display:"flex",alignItems:"center",gap:4,flexShrink:0,
+                    background:"none",border:`1px solid ${T.border}`,borderRadius:8,
+                    padding:"6px 10px",cursor:"pointer",color:T.txt2,
+                    fontFamily:"Inter,sans-serif",fontSize:12,fontWeight:600,
+                  }}>← <span>All tools</span></button>
+                </div>
+                <div style={{display:"flex",alignItems:"flex-end",gap:12}}>
+                  <Icon name={tool?.icon || ''} size={26} />
+                  <div>
+                    <div style={{fontFamily:"Inter,sans-serif",color:T.amber,fontSize:9,fontWeight:700,
+                      letterSpacing:"0.15em",marginBottom:4}}>
+                      CALCULATORS / {getToolLabel(tool,lang).toUpperCase()}
+                    </div>
+                    <div style={{fontFamily:"'Cormorant Garamond',serif",fontWeight:600,
+                      fontSize:34,lineHeight:1,color:T.txt}}>{getToolLabel(tool,lang)}</div>
+                    <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,color:T.txt3,marginTop:5}}>
+                      {getToolKeywords(tool,lang).slice(0,3).join(" · ")}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -663,11 +887,11 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                 {/* ── SEO CONTENT PAGE — 500–1000 words per tool ── */}
                 <ToolSeoPage toolId={activeTool}/>
                 {/* ── RELATED TOOLS — internal linking / page views ── */}
-                <RelatedTools currentId={activeTool} onOpen={openTool}/>
+                <RelatedTools currentId={activeTool} onOpen={navigateToTool}/>
                 {/* ── SCENARIO COMPARE — shown when 2 entries pinned ── */}
                 <ScenarioCompare/>
                 {/* ── CALC HISTORY — last 10 calculations ── */}
-                <CalcHistory onOpen={openTool}/>
+                <CalcHistory onOpen={navigateToTool}/>
               </div>
             </div>
           )}
@@ -920,7 +1144,7 @@ function CalcHistory({ onOpen }) {
       {open && (
         <div style={{display:"flex",flexDirection:"column",gap:5}}>
           {entries.map((entry) => {
-            const toolMeta = TOOLS.find(t=>t.id===entry.id);
+            const toolMeta = CALC_TOOLS.find(t=>t.id===entry.id);
             const isPinned = pinned.some(p=>p.ts===entry.ts);
             return (
               <div key={entry.ts}
@@ -986,7 +1210,7 @@ function ScenarioCompare() {
   if(pinned.length < 2) return null;
 
   const [a, b] = pinned;
-  const toolMeta = TOOLS.find(t=>t.id===a.id);
+  const toolMeta = CALC_TOOLS.find(t=>t.id===a.id);
 
   // Build unified row keys (preserve order from first entry, add any extras from second)
   const keysA = a.rows.map(r=>r.k);

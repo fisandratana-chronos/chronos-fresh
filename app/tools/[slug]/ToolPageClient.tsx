@@ -126,6 +126,15 @@ const COMPONENT_MAP: Record<string, ComponentType<any>> = {
   'sort-lines':        TTextToolsHub,
   'text-diff':         TTextToolsHub,
   'slug-generator':    TTextToolsHub,
+  'text-statistics':   TTextToolsHub,
+  'lorem-ipsum':       TTextToolsHub,
+  'markdown-to-html':  TTextToolsHub,
+  'html-to-markdown':  TTextToolsHub,
+  'remove-empty-lines': TTextToolsHub,
+  'remove-spaces':     TTextToolsHub,
+  'text-reverser':     TTextToolsHub,
+  'text-to-list':      TTextToolsHub,
+  'list-to-text':      TTextToolsHub,
 }
 
 // Hub-level slugs that render full-screen (own header/nav — skip the wrapper)
@@ -149,6 +158,8 @@ const FULLSCREEN_SLUGS = new Set([
   // Text Tools Hub (VAOVAO)
   'text-tools-hub','case-converter','text-cleaner','find-replace',
   'remove-duplicates','sort-lines','text-diff','slug-generator',
+  'text-statistics','lorem-ipsum','markdown-to-html','html-to-markdown',
+  'remove-empty-lines','remove-spaces','text-reverser','text-to-list','list-to-text',
 ])
 
 // Slug (URL /tools/xxx) → props ho an'ny ImageHub.tsx (tab + format

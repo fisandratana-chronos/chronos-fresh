@@ -312,17 +312,14 @@ const FAMILIES: FamilyDef[] = [
 // Flat lookup helpers
 const ALL_TOOLS: SubTool[] = FAMILIES.flatMap(f => f.tools)
 const findTool = (id: Tab) => ALL_TOOLS.find(t => t.id === id)!
-const findFamily = (id: Tab): Family => FAMILIES.find(f => f.tools.some(t => t.id === id))!.id
 
 // ── Main Component ────────────────────────────────────────────
 export default function ImageHub({ initialTab, initialFormat }: { initialTab?: Tab; initialFormat?: string } = {}) {
   const { dark } = useDark()
   const { lang } = useLang()
   const [tab, setTab] = useState<Tab>(initialTab || 'compress')
-  const [openFamily, setOpenFamily] = useState<Family | null>(null)
 
-  const selectTool = (id: Tab) => { setTab(id); setOpenFamily(null) }
-  const toggleFamily = (fid: Family) => setOpenFamily((prev: Family | null) => prev === fid ? null : fid)
+  const selectTool = (id: Tab) => setTab(id)
 
   // CSS variables via inline style
   const T = {
@@ -339,14 +336,12 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
     radiusSm: 8,
   }
 
+  const cur = findTool(tab)
+
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, fontFamily: "'DM Sans', sans-serif", transition: 'background .2s, color .2s' }}>
+    <div className="ih-shell" style={{ height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', background: T.bg, color: T.text, fontFamily: "'DM Sans', sans-serif", overflow: 'hidden' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
-        .ih-fam-nav-wrap { flex-wrap: nowrap; }
-        @media (max-width: ${BP.tablet}px) {
-          .ih-fam-nav-wrap { flex-wrap: wrap; row-gap: 4px; padding-top: 6px; padding-bottom: 2px; }
-        }
         .ih-dropzone {
           min-height: 360px;
           display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -375,131 +370,137 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         .ih-fmt-btn { background: ${T.surface}; border: 1.5px solid ${T.border}; border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: all .15s; flex: 1; }
         .ih-fmt-btn.selected, .ih-fmt-btn:hover { border-color: ${T.accent}; background: rgba(6,182,212,.06); }
         .ih-upload-icon { width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 22px; border: 1px solid ${T.border}; border-radius: 18px; background: ${T.surface2}; color: ${T.accent}; font-size: 28px; }
-        .ih-fam-btn { position: relative; display: flex; align-items: center; gap: 6px; padding: 18px 20px; color: ${T.muted}; font-size: 13.5px; white-space: nowrap; cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: color .15s; flex-shrink: 0; letter-spacing: .01em; }
-        .ih-fam-btn:hover { color: ${T.text}; }
-        .ih-fam-btn.fam-active { color: ${T.text}; font-weight: 600; }
-        .ih-fam-btn.fam-active::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 2px; background: ${T.accent}; border-radius: 2px 2px 0 0; }
-        .ih-fam-btn .fam-caret { font-size: 9px; opacity: .55; transition: transform .18s; }
-        .ih-fam-btn.fam-open .fam-caret { transform: rotate(180deg); opacity: .8; }
-        .ih-dropdown { position: absolute; top: calc(100% + 1px); left: 0; min-width: 200px; background: ${dark ? '#1c1c1f' : '#ffffff'}; border: 1px solid ${T.border}; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,${dark ? '.45' : '.12'}); padding: 6px; z-index: 9999; animation: ih-fade-in .12s ease; }
-        @keyframes ih-fade-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-        .ih-drop-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; background: none; border: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; font-size: .85rem; color: ${T.muted}; transition: background .12s, color .12s; }
-        .ih-drop-item:hover { background: ${T.surface2}; color: ${T.text}; }
-        .ih-drop-item.tool-active { background: rgba(6,182,212,.1); color: ${T.accent}; font-weight: 600; }
-        .ih-drop-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
-        .ih-breadcrumb { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: ${T.accent}; margin-bottom: 4px; }
-        .ih-free-badge { position: absolute; top: 48px; right: 6vw; display: inline-flex; align-items: center; padding: 7px 12px; border: 1px solid rgba(6,182,212,.35); border-radius: 999px; background: rgba(6,182,212,.10); color: ${T.accent}; font-size: 12px; font-weight: 600; white-space: nowrap; }
-        @media (max-width: ${BP.tablet}px) {
-          .ih-free-badge { position: static; margin-top: 20px; }
-        }
+
+        /* ── Sidebar nav — matches TTextToolsHub / PdfHub structure ── */
+        .ih-scroll { scrollbar-width: thin; scrollbar-color: ${T.border} transparent; }
+        .ih-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .ih-scroll::-webkit-scrollbar-track { background: transparent; }
+        .ih-scroll::-webkit-scrollbar-thumb { background: ${T.border}; border-radius: 3px; }
+        .ih-scroll::-webkit-scrollbar-thumb:hover { background: ${T.muted}; }
+        .ih-tool-link { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 10px; border-radius: 9px; margin: 2px 0; background: transparent; border: none; border-left: 2px solid transparent; color: ${T.muted}; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; transition: all .15s; font-family: 'DM Sans', sans-serif; }
+        .ih-tool-link:hover { color: ${T.text}; }
+        .ih-tool-link.active { background: rgba(6,182,212,.1); border-left-color: ${T.accent}; color: ${T.accent}; font-weight: 700; }
+        .ih-side-title { font-size: 10.5px; color: ${T.muted}; text-transform: uppercase; font-weight: 800; letter-spacing: .06em; padding: 10px 10px 6px; }
+
         @media (max-width: ${BP.mobile}px) {
-          .ih-page-header { padding: 32px 5vw 24px !important; }
-          .ih-main { padding: 36px 5vw 80px !important; }
+          .ih-main-inner { padding: 32px 5vw 80px !important; }
           .ih-dropzone { min-height: 280px !important; padding: 32px 20px !important; }
           .ih-fmt-grid { grid-template-columns: repeat(2,1fr) !important; }
           .ih-export-grid, .ih-passport-grid { grid-template-columns: 1fr !important; }
         }
+        @media (max-width: ${BP.tablet}px) {
+          .ih-shell { height: auto !important; overflow: visible !important; }
+          .ih-layout { flex-direction: column !important; flex: none !important; overflow: visible !important; }
+          .ih-sidebar { width: auto !important; height: auto !important;
+            display: flex !important; overflow-x: auto !important; overflow-y: hidden !important; gap: 4px !important;
+            border-right: none !important; border-bottom: 1px solid ${T.border}; }
+          .ih-sidebar .ih-side-title, .ih-sidebar .ih-sidebar-heading { display: none !important; }
+          .ih-sidebar .ih-tool-link { white-space: nowrap !important; }
+          .ih-main { overflow: visible !important; }
+        }
       `}</style>
 
-      {/* ── Page Header ── */}
-      <section className="ih-page-header" style={{ padding: '48px 6vw 34px', borderBottom: `1px solid ${T.border}`, position: 'relative' }}>
-        <div className="ih-free-badge">
-          {lang === 'fr' ? '100% Gratuit · Sans Upload' : '100% Free · No Upload'}
-        </div>
-        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: T.accent, marginBottom: 10 }}>
-          CHRONOS / IMAGE
-        </div>
-        <h1 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(48px, 5vw, 68px)', lineHeight: .95, fontWeight: 600, letterSpacing: '-.03em', color: T.text }}>
-          {lang === 'fr' ? 'Outils Image' : 'Image Tools'}
-        </h1>
-        <div style={{ marginTop: 14, color: T.muted, fontSize: 15 }}>
-          {lang === 'fr' ? 'Compressez, transformez et améliorez vos images.' : 'Compress, transform & enhance your images.'}
-        </div>
-      </section>
+      {/* ── Sidebar + content — each scrolls independently, matching
+           TTextToolsHub.tsx / PdfHub.tsx structure ── */}
+      <div className="ih-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%' }}>
 
-      {/* ── Family Nav ── */}
-      <nav className="ih-fam-nav-wrap" style={{ position: 'relative', padding: '0 6vw', borderBottom: `1px solid ${T.border}`, display: 'flex', zIndex: 20 }}
-        onMouseLeave={() => setOpenFamily(null)}>
-        {FAMILIES.map(fam => {
-          const isActiveFam = fam.tools.some(t => t.id === tab)
-          const isOpen = openFamily === fam.id
-          const hasSingle = fam.tools.length === 1
-          return (
-            <div key={fam.id} style={{ position: 'relative' }}>
-              <button
-                className={`ih-fam-btn${isActiveFam ? ' fam-active' : ''}${isOpen ? ' fam-open' : ''}`}
-                onClick={() => hasSingle ? selectTool(fam.tools[0].id) : toggleFamily(fam.id)}
-                onMouseEnter={() => !hasSingle && setOpenFamily(fam.id)}
-              >
-                {lang === 'fr' ? fam.frLabel : fam.label}
-                {!hasSingle && <span className="fam-caret">▼</span>}
-              </button>
-              {!hasSingle && isOpen && (
-                <div className="ih-dropdown">
-                  {fam.tools.map(tool => (
-                    <button
-                      key={tool.id}
-                      className={`ih-drop-item${tab === tool.id ? ' tool-active' : ''}`}
-                      onClick={() => selectTool(tool.id)}
-                    >
-                      <span className="ih-drop-icon"><Icon name={tool.icon} size={20} /></span>
-                      <div>
-                        <div style={{ fontWeight: tab === tool.id ? 600 : 500 }}>{lang === 'fr' ? tool.frLabel : tool.label}</div>
-                        <div style={{ fontSize: '.73rem', color: T.muted, marginTop: 1 }}>{lang === 'fr' ? tool.frDesc : tool.desc}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+        <aside className="ih-sidebar ih-scroll" style={{ width: 240, flexShrink: 0, overflowY: 'auto', borderRight: `1px solid ${T.border}`, padding: '20px 12px' }}>
+          <div className="ih-sidebar-heading" style={{ padding: '4px 10px 16px' }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: T.accent, letterSpacing: '-0.3px' }}>
+              {lang === 'fr' ? 'OUTILS IMAGE' : 'IMAGE TOOLS'}
             </div>
-          )
-        })}
-        {/* Active tool breadcrumb — right side */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', paddingRight: 4 }}>
-          <span style={{ fontSize: '.72rem', color: T.muted, fontWeight: 500 }}>
-            <Icon name={findTool(tab).icon} size={14} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? findTool(tab).frLabel : findTool(tab).label}
-          </span>
-        </div>
-      </nav>
+            <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>
+              {ALL_TOOLS.length} {lang === 'fr' ? 'outils' : 'tools'}
+            </div>
+          </div>
+          {FAMILIES.map(fam => (
+            <React.Fragment key={fam.id}>
+              <div className="ih-side-title">{lang === 'fr' ? fam.frLabel : fam.label}</div>
+              {fam.tools.map(tool => {
+                const active = tab === tool.id
+                return (
+                  <button key={tool.id} className={`ih-tool-link${active ? ' active' : ''}`} onClick={() => selectTool(tool.id)}>
+                    <Icon name={tool.icon} size={16} />
+                    {lang === 'fr' ? tool.frLabel : tool.label}
+                  </button>
+                )
+              })}
+            </React.Fragment>
+          ))}
+        </aside>
 
-      {/* ── Main ── */}
-      <div className="ih-main" style={{ width: 'min(1100px, 88vw)', margin: '0 auto', padding: '70px 0 120px' }}>
-        {/* Section heading */}
-        <div style={{ marginBottom: 22 }}>
-          <div className="ih-breadcrumb">{lang === 'fr' ? FAMILIES.find(f => f.id === findFamily(tab))?.frLabel : FAMILIES.find(f => f.id === findFamily(tab))?.label}</div>
-          <h2 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: 34, fontWeight: 600, color: T.text }}>
-            {lang === 'fr' ? findTool(tab).frHeading : findTool(tab).heading}
-          </h2>
-          <p style={{ margin: '5px 0 0', color: T.muted, fontSize: 14 }}>
-            {lang === 'fr' ? findTool(tab).frDesc : findTool(tab).desc}
-          </p>
-        </div>
+        <main className="ih-main ih-scroll" style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
+          <div className="ih-main-inner" style={{ padding: '32px 32px 80px' }}>
+            <div style={{ maxWidth: 900 }}>
 
-        {tab === 'compress'        && <CompressPanel        T={T} />}
-        {tab === 'convert'         && <ConvertPanel         T={T} initialFormat={initialFormat} />}
-        {tab === 'resize'          && <ResizePanel          T={T} />}
-        {tab === 'crop'            && <CropPanel            T={T} />}
-        {tab === 'flip'            && <FlipPanel            T={T} />}
-        {tab === 'watermark'       && <WatermarkPanel       T={T} />}
-        {tab === 'colorpicker'     && <ColorPickerPanel     T={T} />}
-        {tab === 'upscale'         && <UpscalePanel         T={T} />}
-        {tab === 'bgremove'        && <BgRemovePanel        T={T} />}
-        {tab === 'removemetadata'  && <RemoveMetadataPanel  T={T} />}
-        {tab === 'exifviewer'      && <ExifViewerPanel      T={T} />}
-        {tab === 'screenshotredact'&& <ScreenshotRedactPanel T={T} />}
-        {tab === 'paletteextractor'&& <PaletteExtractorPanel T={T} />}
-        {tab === 'passportphoto'   && <PassportPhotoPanel   T={T} />}
-        {tab === 'favicon'         && <FaviconPanel         T={T} />}
-        {tab === 'base64'          && <Base64Panel          T={T} />}
+              <div style={{ fontSize: 12, color: T.muted, marginBottom: 12 }}>
+                CHRONOS / {lang === 'fr' ? 'Outils Image' : 'Image Tools'} / <span style={{ color: T.text, fontWeight: 600 }}>{lang === 'fr' ? cur.frLabel : cur.label}</span>
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.06em', marginBottom: 10 }}>
+                <span style={{ color: T.accent }}>{lang === 'fr' ? 'IMAGE' : 'IMAGE'}</span>
+                <span style={{ color: T.muted }}> / </span>
+                <span style={{ color: T.text }}>{(lang === 'fr' ? cur.frLabel : cur.label).toUpperCase()}</span>
+              </div>
 
-        {/* Deep SEO content — What is it / How it works / Examples / FAQ */}
-        <ImageSeoContent toolId={tab} lang={lang} T={T} />
+              {/* Section heading */}
+              <div style={{ marginBottom: 22 }}>
+                <h2 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: 34, fontWeight: 600, color: T.text }}>
+                  {lang === 'fr' ? cur.frHeading : cur.heading}
+                </h2>
+                <p style={{ margin: '5px 0 0', color: T.muted, fontSize: 14 }}>
+                  {lang === 'fr' ? cur.frDesc : cur.desc}
+                </p>
+              </div>
 
-        {/* Footer note */}
-        <div style={{ marginTop: 20, display: 'flex', justifyContent: 'space-between', color: '#55565c', fontSize: 12, flexWrap: 'wrap', gap: 8 }}>
-          <span>{lang === 'fr' ? 'Le traitement se fait localement dans votre navigateur.' : 'Processing happens locally in your browser.'}</span>
-          <span style={{ color: '#77787f' }}>{lang === 'fr' ? 'Privé · Rapide · Sans upload' : 'Private · Fast · No upload'}</span>
-        </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 24 }}>
+                {[
+                  { icon: 'lock', en: '100% Free', fr: '100% Gratuit', enSub: 'No upload needed', frSub: 'Sans envoi requis' },
+                  { icon: 'bolt', en: 'Instant', fr: 'Instantané', enSub: 'Processed in your browser', frSub: 'Traité dans votre navigateur' },
+                  { icon: 'sparkles', en: 'Private', fr: 'Privé', enSub: 'Nothing leaves your device', frSub: 'Rien ne quitte votre appareil' },
+                ].map(f => (
+                  <div key={f.en} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${T.border}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.accent, flexShrink: 0 }}>
+                      <Icon name={f.icon} size={16} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 12.5, fontWeight: 700, color: T.text }}>{lang === 'fr' ? f.fr : f.en}</div>
+                      <div style={{ fontSize: 11, color: T.muted }}>{lang === 'fr' ? f.frSub : f.enSub}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {tab === 'compress'        && <CompressPanel        T={T} />}
+              {tab === 'convert'         && <ConvertPanel         T={T} initialFormat={initialFormat} />}
+              {tab === 'resize'          && <ResizePanel          T={T} />}
+              {tab === 'crop'            && <CropPanel            T={T} />}
+              {tab === 'flip'            && <FlipPanel            T={T} />}
+              {tab === 'watermark'       && <WatermarkPanel       T={T} />}
+              {tab === 'colorpicker'     && <ColorPickerPanel     T={T} />}
+              {tab === 'upscale'         && <UpscalePanel         T={T} />}
+              {tab === 'bgremove'        && <BgRemovePanel        T={T} />}
+              {tab === 'removemetadata'  && <RemoveMetadataPanel  T={T} />}
+              {tab === 'exifviewer'      && <ExifViewerPanel      T={T} />}
+              {tab === 'screenshotredact'&& <ScreenshotRedactPanel T={T} />}
+              {tab === 'paletteextractor'&& <PaletteExtractorPanel T={T} />}
+              {tab === 'passportphoto'   && <PassportPhotoPanel   T={T} />}
+              {tab === 'favicon'         && <FaviconPanel         T={T} />}
+              {tab === 'base64'          && <Base64Panel          T={T} />}
+
+              {/* Deep SEO content — What is it / How it works / Examples / FAQ */}
+              <ImageSeoContent toolId={tab} lang={lang} T={T} />
+
+              {/* Footer note */}
+              <div style={{ marginTop: 20, display: 'flex', justifyContent: 'space-between', color: '#55565c', fontSize: 12, flexWrap: 'wrap', gap: 8 }}>
+                <span>{lang === 'fr' ? 'Le traitement se fait localement dans votre navigateur.' : 'Processing happens locally in your browser.'}</span>
+                <span style={{ color: '#77787f' }}>{lang === 'fr' ? 'Privé · Rapide · Sans upload' : 'Private · Fast · No upload'}</span>
+              </div>
+
+            </div>
+          </div>
+        </main>
+
       </div>
     </div>
   )
