@@ -10,7 +10,7 @@ import { useLang } from '../../lib/hooks/useLang'
 import { useDark } from '../../lib/hooks/useDark'
 import { DARK, LIGHT } from '../../lib/theme'
 import { BP } from '../../lib/breakpoints'
-import { Icon, IconClipboard, IconExchange, IconLockClosed, IconX } from '../shared/Icons'
+import { Icon, IconClipboard, IconX } from '../shared/Icons'
 
 // ── Theme ──
 
@@ -926,12 +926,22 @@ function TextCaseTab({ lang }: { lang: string }) {
 
 // ── Hub shell ──
 
+// ── Sidebar categories — mitovy filaharana amin'ny PdfHub.tsx /
+// TTextToolsHub.tsx / ImageHub.tsx sidebar ──
+const CONV_CATEGORIES = [
+  { en: 'Units',    fr: 'Unités',    tools: ['length', 'weight', 'area', 'volume', 'speed', 'temperature'] },
+  { en: 'Currency', fr: 'Devise',    tools: ['currency'] },
+  { en: 'Colors',   fr: 'Couleurs',  tools: ['rgb2hex', 'hex2rgb'] },
+  { en: 'Text',     fr: 'Texte',     tools: ['textcase'] },
+]
+
 function TConvertersHub({ onBack }: { onBack?: () => void }) {
   const { lang } = useLang()
   const { dark } = useDark()
   const C_T = React.useMemo(() => buildPalette(dark), [dark])
   const [tab, setTab] = React.useState('length')
   const cur = CONV_TABS.find(t => t.id === tab)
+  const isFr = lang === 'fr'
 
   const panels: Record<string, React.ReactNode> = {
     length:      <LengthTab lang={lang} />,
@@ -947,7 +957,6 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
   }
 
   const seoEntry = CONVERTER_SEO_CONTENT[tab]
-  const isFr = lang === 'fr'
   const faqList = seoEntry ? (isFr ? seoEntry.frFaq : seoEntry.faq) : []
 
   // ── FAQPage structured data (JSON-LD) — mba haseho ho "Rich Result"
@@ -965,89 +974,114 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
 
   return (
     <ConvThemeCtx.Provider value={C_T}>
-    <div suppressHydrationWarning style={{ minHeight: '100vh', background: C_T.bg, fontFamily: "'Inter','Segoe UI',sans-serif", color: C_T.text }}>
+    <div suppressHydrationWarning className="conv-shell" style={{
+      height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column',
+      background: C_T.bg, fontFamily: "'Inter','Segoe UI',sans-serif", color: C_T.text, overflow: 'hidden',
+    }}>
 
       {schemaFAQ && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaFAQ) }} />
       )}
 
-      {/* Responsive rules for the two-column layout — ajanona ao anaty
-          <style> satria tsy azo atao amin'ny inline style ny @media ── */}
+      {/* Sidebar + content — each scrolls independently, matching
+          TTextToolsHub.tsx / ImageHub.tsx / PdfHub.tsx structure.
+          Inside main, the article (SEO content + related converters)
+          and the sticky tool card keep their original two-column
+          layout, now relative to main's own scroll instead of the
+          page's ── */}
       <style>{`
+        .conv-scroll { scrollbar-width: thin; scrollbar-color: ${C_T.border} transparent; }
+        .conv-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .conv-scroll::-webkit-scrollbar-track { background: transparent; }
+        .conv-scroll::-webkit-scrollbar-thumb { background: ${C_T.border}; border-radius: 3px; }
+        .conv-scroll::-webkit-scrollbar-thumb:hover { background: ${C_T.muted}; }
+        .conv-tool-link { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 10px; border-radius: 9px; margin: 2px 0; background: transparent; border: none; border-left: 2px solid transparent; color: ${C_T.muted}; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; transition: all .15s; }
+        .conv-tool-link:hover { color: ${C_T.text}; }
+        .conv-tool-link.active { background: ${C_T.accent}18; border-left-color: ${C_T.accent}; color: ${C_T.accent}; font-weight: 700; }
+        .conv-side-title { font-size: 10.5px; color: ${C_T.muted}; text-transform: uppercase; font-weight: 800; letter-spacing: .06em; padding: 10px 10px 6px; }
         .conv-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:flex-start;}
-        .conv-tool{position:sticky;top:76px;}
+        .conv-tool{position:sticky;top:0;}
         @media(max-width:${BP.tablet}px){
+          .conv-shell { height: auto !important; overflow: visible !important; }
+          .conv-page-layout { flex-direction: column !important; flex: none !important; overflow: visible !important; }
+          .conv-sidebar { width: auto !important; height: auto !important;
+            display: flex !important; overflow-x: auto !important; overflow-y: hidden !important; gap: 4px !important;
+            border-right: none !important; border-bottom: 1px solid ${C_T.border}; }
+          .conv-sidebar .conv-side-title, .conv-sidebar .conv-sidebar-heading { display: none !important; }
+          .conv-sidebar .conv-tool-link { white-space: nowrap !important; }
+          .conv-main { overflow: visible !important; }
           .conv-layout{grid-template-columns:1fr;}
           .conv-tool{position:static;order:-1;}
         }
       `}</style>
 
-      {/* Header */}
-      <header style={{ background: C_T.card, borderBottom: `1px solid ${C_T.border}`, padding: '0 24px',
-        height: 60, display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 100 }}>
-        {onBack && (
-          <button onClick={onBack} style={{ background: C_T.success, color: '#fff', border: 'none',
-            borderRadius: 10, padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
-            ← CHRONOS
-          </button>
-        )}
-        <IconExchange size={20} />
-        <span style={{ fontWeight: 800, fontSize: 18, color: C_T.accent, letterSpacing: '-0.5px' }}>
-          CONVERTERS
-        </span>
-        <span style={{ background: `${C_T.accent}22`, color: C_T.accent, border: `1px solid ${C_T.accent}44`,
-          borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700, letterSpacing: '0.5px' }}>
-          10 TOOLS
-        </span>
-        <span style={{ marginLeft: 'auto', background: `${C_T.success}22`, color: C_T.success,
-          border: `1px solid ${C_T.success}44`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
-          <IconLockClosed size={13} style={{marginRight:4,verticalAlign:-2}} /> 100% In-Browser
-        </span>
-      </header>
+      <div className="conv-page-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%' }}>
 
-      {/* Tab nav */}
-      <nav style={{ display: 'flex', overflowX: 'auto', background: C_T.card,
-        borderBottom: `1px solid ${C_T.border}`, padding: '0 16px', gap: 4 }}>
-        {CONV_TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            background: 'transparent', border: 'none',
-            borderBottom: tab === t.id ? `2px solid ${C_T.accent}` : '2px solid transparent',
-            color: tab === t.id ? C_T.accent : C_T.muted,
-            padding: '14px 16px', cursor: 'pointer',
-            fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', transition: 'all 0.15s',
-          }}>
-            <Icon name={t.icon} size={14} style={{marginRight:4,verticalAlign:-2}} /> {lang === 'fr' ? t.fr : t.en}
-          </button>
-        ))}
-      </nav>
-
-      {/* Content — 2 column: tool (sticky, havanana) + article (mihetsika, havia) */}
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: C_T.muted, marginBottom: 8 }}>
-            <Icon name={cur?.icon || 'exchange'} size={16} />
-            <span>{lang === 'fr' ? cur?.fr : cur?.en}</span>
-          </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>
-            {seoEntry ? (isFr ? seoEntry.frTitle : seoEntry.title) : (lang === 'fr' ? cur?.fr : cur?.en)}
-          </h1>
-          <p style={{ color: C_T.muted, fontSize: 14, margin: '6px 0 0' }}>
-            {lang === 'fr' ? cur?.frDesc : cur?.enDesc}
-          </p>
-        </div>
-
-        <div className="conv-layout">
-          <div>
-            <ConverterSeoContent toolId={tab} lang={lang} />
-            <RelatedConverters currentId={tab} lang={lang} onSelect={setTab} />
-          </div>
-          <div className="conv-tool">
-            <div style={{ background: C_T.card, border: `1px solid ${C_T.border}`, borderRadius: 16, padding: 24 }}>
-              {panels[tab]}
+        <aside className="conv-sidebar conv-scroll" style={{ width: 240, flexShrink: 0, overflowY: 'auto', borderRight: `1px solid ${C_T.border}`, padding: '20px 12px' }}>
+          <div className="conv-sidebar-heading" style={{ padding: '4px 10px 16px' }}>
+            {onBack && (
+              <button onClick={onBack} style={{ background: 'transparent', color: C_T.muted, border: 'none',
+                padding: 0, marginBottom: 10, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                ← CHRONOS
+              </button>
+            )}
+            <div style={{ fontSize: 15, fontWeight: 800, color: C_T.accent, letterSpacing: '-0.3px' }}>
+              {isFr ? 'CONVERTISSEURS' : 'CONVERTERS'}
+            </div>
+            <div style={{ fontSize: 12, color: C_T.muted, marginTop: 2 }}>
+              {CONV_TABS.length} {isFr ? 'outils' : 'tools'}
             </div>
           </div>
-        </div>
-      </main>
+          {CONV_CATEGORIES.map(cat => (
+            <React.Fragment key={cat.en}>
+              <div className="conv-side-title">{isFr ? cat.fr : cat.en}</div>
+              {cat.tools.map(toolId => {
+                const t = CONV_TABS.find(x => x.id === toolId)
+                if (!t) return null
+                const active = tab === toolId
+                return (
+                  <button key={toolId} className={`conv-tool-link${active ? ' active' : ''}`} onClick={() => setTab(toolId)}>
+                    <Icon name={t.icon} size={16} />
+                    {isFr ? t.fr : t.en}
+                  </button>
+                )
+              })}
+            </React.Fragment>
+          ))}
+        </aside>
+
+        <main className="conv-main conv-scroll" style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '32px 32px 64px' }}>
+          <div style={{ fontSize: 12, color: C_T.muted, marginBottom: 12 }}>
+            CHRONOS / {isFr ? 'Convertisseurs' : 'Converters'} / <span style={{ color: C_T.text, fontWeight: 600 }}>{isFr ? cur?.fr : cur?.en}</span>
+          </div>
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.06em', marginBottom: 10 }}>
+            <span style={{ color: C_T.accent }}>{isFr ? 'CONVERTIR' : 'CONVERT'}</span>
+            <span style={{ color: C_T.muted }}> / </span>
+            <span style={{ color: C_T.text }}>{(isFr ? cur?.fr : cur?.en)?.toUpperCase()}</span>
+          </div>
+          <div style={{ marginBottom: 22 }}>
+            <h1 style={{ fontSize: 30, fontWeight: 800, margin: 0, lineHeight: 1.2, letterSpacing: '-0.5px' }}>
+              {seoEntry ? (isFr ? seoEntry.frTitle : seoEntry.title) : (isFr ? cur?.fr : cur?.en)}
+            </h1>
+            <p style={{ color: C_T.muted, fontSize: 15, margin: '8px 0 0' }}>
+              {isFr ? cur?.frDesc : cur?.enDesc}
+            </p>
+          </div>
+
+          <div className="conv-layout">
+            <div>
+              <ConverterSeoContent toolId={tab} lang={lang} />
+              <RelatedConverters currentId={tab} lang={lang} onSelect={setTab} />
+            </div>
+            <div className="conv-tool">
+              <div style={{ background: C_T.card, border: `1px solid ${C_T.border}`, borderRadius: 16, padding: 24 }}>
+                {panels[tab]}
+              </div>
+            </div>
+          </div>
+        </main>
+
+      </div>
 
     </div>
     </ConvThemeCtx.Provider>

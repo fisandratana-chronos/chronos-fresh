@@ -6,15 +6,18 @@
 import BmiCalculator from './BmiCalculator'
 import AgeCalculator from './AgeCalculator'
 import CalorieCalculator from './CalorieCalculator'
+import BmrTdeeCalculator from './BmrTdeeCalculator'
 
 export const HEALTH_PANEL_MAP = {
   bmi: BmiCalculator,
   age: AgeCalculator,
-  calories: CalorieCalculator
+  calories: CalorieCalculator,
+  bmrtdee: BmrTdeeCalculator
 }
 
 export const HEALTH_TOOLS = [
   { key: "bmi", label: "BMI Calculator", icon: "scale", Component: BmiCalculator },
   { key: "age", label: "Age Calculator", icon: "cake", Component: AgeCalculator },
-  { key: "calories", label: "Calorie Calculator", icon: "flame", Component: CalorieCalculator }
+  { key: "calories", label: "Calorie Calculator", icon: "flame", Component: CalorieCalculator },
+  { key: "bmrtdee", label: "BMR / TDEE Calculator", icon: "bolt", Component: BmrTdeeCalculator }
 ]

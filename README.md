@@ -119,9 +119,9 @@ ilayraromima: ..........................fiteny ( tohizana)
 tahiantso: .............................manampy tools ao @ pdf ( tohizana ny calculator) 
 ledamasy: ..............................Icons.tsx
 lefangoka (chatgpt): ...................fanatsarana tools(manampy tools)
-lobonaivo:..............................texttools + imagehub + covertor [tohizana]
+lobonaivo:..............................texttools + imagehub + covertor [manaobe-UI]
 mamasoa: ...............................manampy network tools [tohizan]
-ramarovahoaka..........................calculator    [tohizana]
+ramarovahoaka..........................calculator    [tohizana] 4:00
 
 
 POLYMARKET

@@ -12,6 +12,10 @@ import TipCalculator from './TipCalculator'
 import CompoundInterestCalculator from './CompoundInterestCalculator'
 import LoanCalculator from './LoanCalculator'
 import CurrencyConverter from './CurrencyConverter'
+import FuelCostCalculator from './FuelCostCalculator'
+import SalaryCalculator from './SalaryCalculator'
+import ProfitMarginCalculator from './ProfitMarginCalculator'
+import ROICalculator from './ROICalculator'
 
 export const FINANCE_PANEL_MAP = {
   mortgage: MortgageCalculator,
@@ -22,7 +26,11 @@ export const FINANCE_PANEL_MAP = {
   tip: TipCalculator,
   compound: CompoundInterestCalculator,
   loan: LoanCalculator,
-  currency: CurrencyConverter
+  currency: CurrencyConverter,
+  fuel: FuelCostCalculator,
+  salary: SalaryCalculator,
+  margin: ProfitMarginCalculator,
+  roi: ROICalculator
 }
 
 export const FINANCE_TOOLS = [
@@ -34,5 +42,9 @@ export const FINANCE_TOOLS = [
   { key: "tip", label: "Tip Calculator", icon: "banknote", Component: TipCalculator },
   { key: "compound", label: "Compound Interest Calculator", icon: "trending-up", Component: CompoundInterestCalculator },
   { key: "loan", label: "Loan Calculator", icon: "bank", Component: LoanCalculator },
-  { key: "currency", label: "Currency Converter", icon: "exchange", Component: CurrencyConverter }
+  { key: "currency", label: "Currency Converter", icon: "exchange", Component: CurrencyConverter },
+  { key: "fuel", label: "Fuel Cost Calculator", icon: "droplet", Component: FuelCostCalculator },
+  { key: "salary", label: "Salary Calculator", icon: "briefcase", Component: SalaryCalculator },
+  { key: "margin", label: "Profit Margin Calculator", icon: "percent", Component: ProfitMarginCalculator },
+  { key: "roi", label: "ROI Calculator", icon: "rocket", Component: ROICalculator }
 ]

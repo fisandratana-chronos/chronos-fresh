@@ -42,9 +42,8 @@ function PWAInstallBanner() { return null; }
 // ── CHRONOS fonts — Cormorant Garamond (serif hero titles) + DM Sans
 // (same pair PdfHub.tsx loads via useChronosFonts). SmartCalcHub kept
 // its own hero titles as Space Grotesk before this UI/UX alignment
-// pass; this hook only ADDS the two CHRONOS fonts alongside the
-// existing Space Grotesk/Inter/JetBrains Mono usage elsewhere in this
-// file — nothing else in this file is renamed or removed.
+// pass; this hook only ADDS the two CHRONOS fonts — the rest of this
+// file now uses Inter throughout, unified with the other hubs.
 const CALC_FONT_HREF =
   "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap";
 function useCalcFonts() {
@@ -95,14 +94,56 @@ const PANEL_MAP = {
 // so both the direct-URL path and the in-hub click path resolve the same
 // component.
 const ID_ALIASES: Record<string, string> = {
+  // Finance
   'percentage-calculator': 'percentage',
   'loan-calculator': 'loan',
-  'age-calculator': 'age',
-  'scientific-calculator': 'scientific',
   'vat-calculator': 'vat',
-  'date-difference-calculator': 'datediff',
+  'mortgage-calculator': 'mortgage',
+  'emi-calculator': 'emi',
+  'discount-calculator': 'discount',
+  'tip-calculator': 'tip',
+  'compound-interest-calculator': 'compound',
+  'currency-converter': 'currency',
+  'fuel-cost-calculator': 'fuel',
+  'salary-calculator': 'salary',
+  'profit-margin-calculator': 'margin',
+  'roi-calculator': 'roi',
+  // Health
+  'age-calculator': 'age',
+  'bmi-calculator': 'bmi',
+  'calories-calculator': 'calories',
+  'bmr-tdee-calculator': 'bmrtdee',
+  // Education
+  'scientific-calculator': 'scientific',
   'gpa-calculator': 'gpa',
+  // DateTime
+  'date-difference-calculator': 'datediff',
+  'timezone-converter': 'timezone',
+  // Developer
+  'password-generator': 'password',
+  'uuid-generator': 'uuid',
+  'json-formatter': 'json',
+  'qr-code-generator': 'qr',
+  'sha256-generator': 'sha256',
+  'base64-encoder-decoder': 'base64',
+  // Developer, reusing components already registered for the Text
+  // Tools hub (cat:'text') — same component either way, so aliasing
+  // just lets it also open in-panel here instead of only standalone.
+  'word-counter': 'wordcount',
+  'text-diff': 'textdiff',
+  'lorem-ipsum': 'lorem',
+  'case-converter': 'casegen',
+  // Convert
   'unit-converter': 'units',
+  'temperature-converter': 'temp',
+  'binary-converter': 'binary',
+  'rgb-hex-converter': 'rgb',
+  'roman-numeral-converter': 'roman',
+  // Misc
+  'random-picker': 'randompick',
+  'statistics-calculator': 'stats',
+  'ratio-calculator': 'ratio',
+  'area-calculator': 'area',
 };
 for (const [longId, shortId] of Object.entries(ID_ALIASES)) {
   if (PANEL_MAP[shortId] && !PANEL_MAP[longId]) PANEL_MAP[longId] = PANEL_MAP[shortId];
@@ -508,7 +549,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
   return (
     <HistoryCtx.Provider value={{ entries:histEntries, pinned:histPinned, pushHistory, togglePin, clearHistory }}>
     <ThemeCtx.Provider value={{ T, isDark, toggle }}>
-    <div style={{minHeight:"100vh",background:T.bg0,color:T.txt,fontFamily:"'Space Grotesk',sans-serif",transition:"background .2s,color .2s"}}>
+    <div className="sc-shell" style={{height:"calc(100vh - 64px)",display:"flex",flexDirection:"column",background:T.bg0,color:T.txt,fontFamily:"'Inter','Segoe UI',sans-serif",transition:"background .2s,color .2s",overflow:"hidden"}}>
 
       {/* ── STRUCTURED DATA — JSON-LD (SEO Rich Results) ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(schemaWebApp)}}/>
@@ -528,15 +569,21 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
         ::-webkit-scrollbar-thumb{background:${T.scrollThumb};border-radius:99px;}
         input[type=number]::-webkit-inner-spin-button{opacity:1;}
         input[type=range]{width:100%;height:4px;border-radius:99px;}
-        textarea{font-family:'JetBrains Mono',monospace;}
+        textarea{font-family:'Inter','Segoe UI',sans-serif;}
         select option{background:${T.selectOption};color:${T.txt};}
+        .sc-scroll{scrollbar-width:thin;scrollbar-color:${T.border} transparent;}
+        .sc-scroll::-webkit-scrollbar{width:6px;height:6px;}
+        .sc-scroll::-webkit-scrollbar-track{background:transparent;}
+        .sc-scroll::-webkit-scrollbar-thumb{background:${T.border};border-radius:3px;}
+        .sc-scroll::-webkit-scrollbar-thumb:hover{background:${T.txt3};}
         @media(max-width:${BP.laptop}px){
-          .layout{grid-template-columns:220px 1fr!important;}
           .right-panel{display:none!important;}
         }
         @media(max-width:${BP.tablet}px){
-          .layout{grid-template-columns:1fr!important;}
-          .sidebar{width:100%!important;border-right:none!important;border-bottom:1px solid ${T.border}!important;padding:12px!important;max-height:none!important;position:relative!important;top:auto!important;overflow-y:visible!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;}
+          .sc-shell{height:auto!important;overflow:visible!important;}
+          .layout{flex-direction:column!important;flex:none!important;overflow:visible!important;}
+          .main-col{overflow:visible!important;}
+          .sidebar{width:100%!important;border-right:none!important;border-bottom:1px solid ${T.border}!important;padding:12px!important;overflow-y:visible!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;}
           .sidebar-ad{display:none!important;}
           .tool-grid{grid-template-columns:repeat(3,1fr)!important;}
           .chronos-hero-title{font-size:38px!important;}
@@ -549,9 +596,8 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
       `}</style>
 
       {/* ── TOP HEADER ─────────────────────────────────────────── */}
-      <header style={{borderBottom:`1px solid ${T.border}`,background:`${T.bg1}E8`,
-        backdropFilter:"blur(10px)",position:"sticky",top:64,zIndex:200}}>
-        <div style={{maxWidth:1100,margin:"0 auto",padding:"12px 20px",
+      <header style={{borderBottom:`1px solid ${T.border}`,background:T.bg1,flexShrink:0}}>
+        <div style={{padding:"12px 20px",
           display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
           {/* Back to CHRONOS */}
           {onBack && (
@@ -564,7 +610,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           )}
           {/* Logo */}
           <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:18,color:T.amber}}>{"<calc/>"}</span>
+            <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:700,fontSize:18,color:T.cyan}}>{"<calc/>"}</span>
             <span style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3,letterSpacing:"0.05em"}}>{t("sc.toolCount")}</span>
           </div>
           {/* Search */}
@@ -574,7 +620,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
               onChange={e=>setQuery(e.target.value)}
               placeholder={t("sc.searchPlaceholder")}
               style={{width:"100%",padding:"9px 36px 9px 36px",borderRadius:9,
-                background:T.bg3,border:`1px solid ${query?T.amber:T.border}`,
+                background:T.bg3,border:`1px solid ${query?T.cyan:T.border}`,
                 color:T.txt,fontFamily:"Inter,sans-serif",fontSize:13,outline:"none",
                 transition:"border-color .15s"}}
             />
@@ -584,13 +630,16 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
 
       </header>
 
-      {/* ── BODY LAYOUT ────────────────────────────────────────── */}
-      <div className="layout" style={{maxWidth:1280,margin:"0 auto",display:"grid",gridTemplateColumns:"220px 1fr 260px",minHeight:"calc(100vh - 64px)",alignItems:"start",gap:0}}>
+      {/* ── BODY LAYOUT — edge-to-edge, flex:1 fills the shell's
+          remaining height; each column scrolls independently via its
+          own overflowY:auto (sidebar / main / right-panel), matching
+          TTextToolsHub.tsx / ImageHub.tsx / TConvertersHub.tsx ── */}
+      <div className="layout" style={{display:"flex",flex:1,minHeight:0,width:"100%"}}>
 
         {/* ── SIDEBAR ──────────────────────────────────────────── */}
-        <aside className="sidebar" style={{width:220,flexShrink:0,borderRight:`1px solid ${T.border}`,
+        <aside className="sidebar sc-scroll" style={{width:220,flexShrink:0,borderRight:`1px solid ${T.border}`,
           padding:"18px 14px",display:"flex",flexDirection:"column",gap:4,
-          alignSelf:"start",position:"sticky",top:64,overflowY:"auto",maxHeight:"calc(100vh - 80px)"}}>
+          overflowY:"auto"}}>
 
           {/* ── Category list, grouped into labeled sections like PdfHub's
               SideGroup (fontSize:10, letterSpacing:0.13em, uppercase, C.muted2,
@@ -602,7 +651,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           {(() => {
             const SIDEBAR_SECTIONS: {label:string|null,ids:string[]}[] = [
               { label: null,          ids: ["all","favorites","recent"] },
-              { label: "BY CATEGORY", ids: ["health","finance","convert","dev"] },
+              { label: "BY CATEGORY", ids: ["health","finance","convert","dev","education","datetime","misc"] },
             ];
             const placed = new Set<string>();
             const groups = SIDEBAR_SECTIONS.map(sec=>{
@@ -621,19 +670,21 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                   </div>
                 )}
                 {g.items.map((cat:any)=>(
-                  <button key={cat.id} onClick={()=>{setActiveCat(cat.id);setQuery("");}}
+                  <button key={cat.id} onClick={()=>{setActiveCat(cat.id);setQuery("");if(activeTool)closeTool();}}
                     style={{display:"flex",alignItems:"center",gap:9,padding:"9px 12px",width:"100%",
-                      borderRadius:8,border:"none",textAlign:"left",cursor:"pointer",
-                      background:activeCat===cat.id?`${T.amber}15`:"transparent",
-                      color:activeCat===cat.id?T.amber:T.txt2,
-                      fontFamily:"'Space Grotesk',sans-serif",fontWeight:activeCat===cat.id?600:400,
+                      borderRadius:8,border:"none",
+                      borderLeft:activeCat===cat.id?`2px solid ${T.cyan}`:"2px solid transparent",
+                      textAlign:"left",cursor:"pointer",
+                      background:activeCat===cat.id?`${T.cyan}18`:"transparent",
+                      color:activeCat===cat.id?T.cyan:T.txt2,
+                      fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:activeCat===cat.id?700:400,
                       fontSize:13,transition:"all .12s"}}>
                     <Icon name={cat.icon} size={14} />
                     <span>{cat.label}</span>
                     <span style={{marginLeft:"auto",fontSize:10,fontWeight:600,
                       padding:"1px 7px",borderRadius:10,
-                      background:activeCat===cat.id?`${T.amber}22`:T.bg3,
-                      color:activeCat===cat.id?T.amber:T.txt3}}>
+                      background:activeCat===cat.id?`${T.cyan}22`:T.bg3,
+                      color:activeCat===cat.id?T.cyan:T.txt3}}>
                       {cat.id==="all"?CALC_TOOLS.length
                         :cat.id==="favorites"?favorites.length
                         :cat.id==="recent"?recent.length
@@ -647,16 +698,16 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
 
           {/* ── Quick access box ── */}
           <div style={{marginTop:"auto",paddingTop:16,borderTop:`1px solid ${T.border}`}}>
-            <div style={{background:`${T.amber}10`,border:`1px solid ${T.amber}30`,borderRadius:10,padding:"12px"}}>
+            <div style={{background:`${T.cyan}10`,border:`1px solid ${T.cyan}30`,borderRadius:10,padding:"12px"}}>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
-                <IconBolt size={14} color={T.amber} />
-                <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,fontSize:12,color:T.txt}}>Quick access</span>
+                <IconBolt size={14} color={T.cyan} />
+                <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,fontSize:12,color:T.txt}}>Quick access</span>
               </div>
               <p style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3,lineHeight:1.5,marginBottom:8}}>
                 Pin your favorite tools for faster access.
               </p>
-              <button style={{background:"none",border:`1px solid ${T.amber}50`,borderRadius:7,
-                padding:"5px 10px",color:T.amber,cursor:"pointer",
+              <button style={{background:"none",border:`1px solid ${T.cyan}50`,borderRadius:7,
+                padding:"5px 10px",color:T.cyan,cursor:"pointer",
                 fontFamily:"Inter,sans-serif",fontSize:11,fontWeight:600}}>
                 Learn how →
               </button>
@@ -670,7 +721,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
         </aside>
 
         {/* ── MAIN CONTENT ─────────────────────────────────────── */}
-        <main style={{flex:1,padding:"20px",minWidth:0}}>
+        <main className="main-col sc-scroll" style={{flex:1,padding:"20px",minWidth:0,overflowY:"auto"}}>
 
           {/* ── Browsing UI (ad, sort controls, tool grid) — hidden while a
               tool is open. Previously this stayed visible above the open
@@ -693,7 +744,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
             </div>
             <div className="chronos-hero-row" style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:22}}>
               <div>
-                <div style={{fontFamily:"Inter,sans-serif",color:T.amber,fontSize:10,fontWeight:700,
+                <div style={{fontFamily:"Inter,sans-serif",color:T.cyan,fontSize:10,fontWeight:700,
                   letterSpacing:"0.15em",marginBottom:7}}>
                   CALCULATORS / {catLabel.toUpperCase()}
                 </div>
@@ -720,7 +771,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
               ].map((item,i)=>(
                 <div key={i} style={{display:"flex",gap:8,alignItems:"center"}}>
                   <div style={{width:30,height:30,border:`1px solid ${T.border}`,borderRadius:9,
-                    display:"grid",placeItems:"center",color:T.amber,flexShrink:0}}>
+                    display:"grid",placeItems:"center",color:T.cyan,flexShrink:0}}>
                     {item.icon}
                   </div>
                   <div>
@@ -772,16 +823,16 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                     onMouseEnter={e=>{
                       e.currentTarget.style.transform="translateY(-2px)";
                       e.currentTarget.style.boxShadow="0 8px 20px rgba(0,0,0,0.12)";
-                      e.currentTarget.style.borderColor=activeTool===item.data.id?T.amber:`${T.amber}60`;
+                      e.currentTarget.style.borderColor=activeTool===item.data.id?T.cyan:`${T.cyan}60`;
                     }}
                     onMouseLeave={e=>{
                       e.currentTarget.style.transform="none";
                       e.currentTarget.style.boxShadow="none";
-                      e.currentTarget.style.borderColor=activeTool===item.data.id?T.amber:T.border;
+                      e.currentTarget.style.borderColor=activeTool===item.data.id?T.cyan:T.border;
                     }}
                     style={{display:"flex",flexDirection:"column",position:"relative",
-                      border:`1px solid ${activeTool===item.data.id?T.amber:T.border}`,
-                      background:activeTool===item.data.id?`${T.amber}08`:T.bg1,
+                      border:`1px solid ${activeTool===item.data.id?T.cyan:T.border}`,
+                      background:activeTool===item.data.id?`${T.cyan}08`:T.bg1,
                       borderRadius:12,overflow:"hidden",transition:"transform .15s, box-shadow .15s, border-color .15s",
                       cursor:"pointer"}}
                     onClick={() => navigateToTool(item.data.id)}>
@@ -792,7 +843,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                       aria-pressed={favorites.includes(item.data.id)}
                       title={favorites.includes(item.data.id)?t("toolCard.removeFromFavorites"):t("toolCard.addToFavorites")}
                       style={{position:"absolute",top:8,right:8,fontSize:13,
-                        color:favorites.includes(item.data.id)?T.amber:T.txt4,
+                        color:favorites.includes(item.data.id)?T.cyan:T.txt4,
                         cursor:"pointer",lineHeight:1,transition:"color .15s",
                         background:"none",border:"none",padding:"2px",borderRadius:4,
                         userSelect:"none",zIndex:1}}>
@@ -801,13 +852,13 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                     {/* Card body */}
                     <div style={{padding:"20px 16px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:10,flex:1}}>
                       <div style={{width:52,height:52,borderRadius:"50%",
-                        background:activeTool===item.data.id?`${T.amber}20`:`${T.bg3}`,
+                        background:activeTool===item.data.id?`${T.cyan}20`:`${T.bg3}`,
                         display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>
                         <Icon name={item.data.icon || "calculator"} size={24} />
                       </div>
                       <div style={{textAlign:"center"}}>
-                        <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,fontSize:13,
-                          color:activeTool===item.data.id?T.amber:T.txt,lineHeight:1.3,marginBottom:4}}>
+                        <div style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,fontSize:13,
+                          color:activeTool===item.data.id?T.cyan:T.txt,lineHeight:1.3,marginBottom:4}}>
                           {getToolLabel(item.data, lang)}
                         </div>
                         <div style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3,lineHeight:1.5,
@@ -822,8 +873,8 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                     <div style={{padding:"0 16px 14px"}}>
                       <div style={{display:"inline-flex",alignItems:"center",gap:4,
                         padding:"5px 10px",borderRadius:20,
-                        background:activeTool===item.data.id?`${T.amber}18`:`${T.blue}12`,
-                        color:activeTool===item.data.id?T.amber:T.blue,
+                        background:activeTool===item.data.id?`${T.cyan}18`:`${T.blue}12`,
+                        color:activeTool===item.data.id?T.cyan:T.blue,
                         fontFamily:"Inter,sans-serif",fontSize:12,fontWeight:600}}>
                         Open tool <span style={{fontSize:14}}>→</span>
                       </div>
@@ -863,7 +914,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                 <div style={{display:"flex",alignItems:"flex-end",gap:12}}>
                   <Icon name={tool?.icon || ''} size={26} />
                   <div>
-                    <div style={{fontFamily:"Inter,sans-serif",color:T.amber,fontSize:9,fontWeight:700,
+                    <div style={{fontFamily:"Inter,sans-serif",color:T.cyan,fontSize:9,fontWeight:700,
                       letterSpacing:"0.15em",marginBottom:4}}>
                       CALCULATORS / {getToolLabel(tool,lang).toUpperCase()}
                     </div>
@@ -904,16 +955,16 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
         </main>
 
         {/* ── RIGHT PANEL ──────────────────────────────────────── */}
-        <aside className="right-panel" style={{borderLeft:`1px solid ${T.border}`,
+        <aside className="right-panel sc-scroll" style={{borderLeft:`1px solid ${T.border}`,
           padding:"20px 16px",display:"flex",flexDirection:"column",gap:16,
-          alignSelf:"start",position:"sticky",top:64,overflowY:"auto",maxHeight:"calc(100vh - 80px)"}}>
+          width:260,flexShrink:0,overflowY:"auto"}}>
 
           {/* About box */}
           <div style={{background:T.bg1,border:`1px solid ${T.border}`,borderRadius:12,padding:"16px"}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
               <span style={{width:24,height:24,borderRadius:"50%",background:`${T.blue}20`,
                 display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>ℹ</span>
-              <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:14,color:T.txt}}>
+              <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:700,fontSize:14,color:T.txt}}>
                 About Smart Calculator
               </span>
             </div>
@@ -922,7 +973,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
             </p>
             {[
               {icon:IconCheckCircle,color:T.emerald,title:"100% Free",desc:"All calculators are free to use with no sign-up required."},
-              {icon:IconBolt,color:T.amber,  title:"Fast & Accurate",desc:"Get instant and reliable results with our smart calculators."},
+              {icon:IconBolt,color:T.cyan,  title:"Fast & Accurate",desc:"Get instant and reliable results with our smart calculators."},
               {icon:IconShield,color:T.blue,   title:"Private",desc:"Your data stays on your device. We respect your privacy."},
               {icon:IconDeviceMobile,color:T.purple, title:"Works Everywhere",desc:"Use on any device, anytime, anywhere."},
             ].map(({icon:IconCmp,color,title,desc})=>(
@@ -930,7 +981,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                 <span style={{width:22,height:22,borderRadius:"50%",background:`${color}20`,
                   display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><IconCmp size={12} color={color} /></span>
                 <div>
-                  <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,fontSize:12,color:T.txt,marginBottom:2}}>{title}</div>
+                  <div style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,fontSize:12,color:T.txt,marginBottom:2}}>{title}</div>
                   <div style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3,lineHeight:1.5}}>{desc}</div>
                 </div>
               </div>
@@ -941,7 +992,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           <div style={{background:"linear-gradient(135deg,#4F46E5,#7C3AED)",borderRadius:12,padding:"16px"}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <IconCrown size={18} color="#fff" />
-              <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:14,color:"#fff"}}>
+              <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:700,fontSize:14,color:"#fff"}}>
                 Unlock More
               </span>
             </div>
@@ -965,13 +1016,13 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
       </div>
 
       {/* ── FOOTER ── */}
-      <footer style={{borderTop:`1px solid ${T.border}`,padding:"16px 20px",
+      <footer style={{borderTop:`1px solid ${T.border}`,padding:"16px 20px",flexShrink:0,
         display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
         <span style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt4}}>
           © 2026 &lt;calc/&gt; · 25 free tools · No signup · No tracking
         </span>
         <span style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt4}}>
-          Press <kbd style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,
+          Press <kbd style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:10,
             padding:"1px 5px",border:`1px solid ${T.border}`,borderRadius:4,
             background:T.bg3,color:T.txt3}}>/</kbd> to search
         </span>
@@ -992,7 +1043,7 @@ function ToolSeoPage({ toolId }) {
   if (!content) return null;
 
   const H2 = ({ children }: { children: React.ReactNode }) => (
-    <h2 style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:18,
+    <h2 style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:700,fontSize:18,
       color:T.txt,marginBottom:10,marginTop:28,lineHeight:1.3}}>
       {children}
     </h2>
@@ -1014,7 +1065,7 @@ function ToolSeoPage({ toolId }) {
     <article style={{marginTop:36,paddingTop:28,borderTop:`1px solid ${T.border}`}}>
 
       {/* ── Title */}
-      <h1 style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:22,
+      <h1 style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:700,fontSize:22,
         color:T.txt,marginBottom:14,lineHeight:1.3}}>
         {getText("title")}
       </h1>
@@ -1033,8 +1084,8 @@ function ToolSeoPage({ toolId }) {
           <H2>{t("sc.seo.formula")}</H2>
           <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:10,
             padding:"14px 18px",marginBottom:8}}>
-            <code style={{fontFamily:"'JetBrains Mono',monospace",fontSize:13,
-              color:T.amber,display:"block",marginBottom:6}}>
+            <code style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:13,
+              color:T.cyan,display:"block",marginBottom:6}}>
               {getFormula().expr}
             </code>
             {getFormula().note && (
@@ -1055,17 +1106,17 @@ function ToolSeoPage({ toolId }) {
               <div key={i} style={{display:"flex",alignItems:"flex-start",gap:12,
                 padding:"10px 14px",background:T.bg2,borderRadius:9,
                 border:`1px solid ${T.border}`}}>
-                <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,
-                  color:T.amber,fontWeight:700,flexShrink:0,paddingTop:2}}>
+                <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:10,
+                  color:T.cyan,fontWeight:700,flexShrink:0,paddingTop:2}}>
                   {String(i+1).padStart(2,"0")}
                 </span>
                 <div style={{flex:1}}>
-                  <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,
+                  <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,
                     fontSize:12,color:T.txt,display:"block",marginBottom:2}}>
                     {ex.label}
                   </span>
                   <span style={{fontFamily:"Inter,sans-serif",fontSize:12,color:T.txt3}}>
-                    {t("sc.seo.inputLabel")} <code style={{fontFamily:"'JetBrains Mono',monospace",
+                    {t("sc.seo.inputLabel")} <code style={{fontFamily:"'Inter','Segoe UI',sans-serif",
                       color:T.txt2,fontSize:11}}>{ex.input}</code>
                     <span style={{margin:"0 6px",color:T.txt4}}>→</span>
                     <span style={{color:T.emerald,fontWeight:500}}>{ex.result}</span>
@@ -1118,12 +1169,12 @@ function CalcHistory({ onOpen }) {
         <button onClick={()=>setOpen(o=>!o)}
           style={{display:"flex",alignItems:"center",gap:8,background:"none",border:"none",
             cursor:"pointer",padding:0}}>
-          <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,fontSize:13,
+          <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,fontSize:13,
             color:T.txt2,letterSpacing:"0.03em"}}>
             <IconClock size={14} style={{marginRight:6,verticalAlign:-2}} />Calculation History
           </span>
-          <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,
-            background:`${T.amber}20`,color:T.amber,borderRadius:99,
+          <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:10,
+            background:`${T.cyan}20`,color:T.cyan,borderRadius:99,
             padding:"2px 7px",fontWeight:700}}>
             {entries.length}
           </span>
@@ -1150,8 +1201,8 @@ function CalcHistory({ onOpen }) {
               <div key={entry.ts}
                 style={{display:"flex",alignItems:"flex-start",gap:10,
                   padding:"10px 13px",borderRadius:10,
-                  border:`1px solid ${isPinned?T.amber:T.border}`,
-                  background:isPinned?`${T.amber}08`:T.bg2,
+                  border:`1px solid ${isPinned?T.cyan:T.border}`,
+                  background:isPinned?`${T.cyan}08`:T.bg2,
                   transition:"border-color .15s"}}>
 
                 {/* Tool icon + name */}
@@ -1160,7 +1211,7 @@ function CalcHistory({ onOpen }) {
                     border:"none",cursor:"pointer",padding:0,flexShrink:0}}>
                   <Icon name={toolMeta?.icon || ''} size={16} />
                   <div style={{textAlign:"left"}}>
-                    <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,
+                    <div style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,
                       fontSize:12,color:T.txt,lineHeight:1.2}}>
                       {getToolLabel(toolMeta, lang)}
                     </div>
@@ -1175,8 +1226,8 @@ function CalcHistory({ onOpen }) {
                   {entry.rows.map((row,i)=>(
                     <span key={i} style={{fontFamily:"Inter,sans-serif",fontSize:11,color:T.txt3}}>
                       <span style={{color:T.txt4}}>{row.k}: </span>
-                      <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,
-                        color:i===0?T.amber:T.txt2}}>{row.v}</span>
+                      <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,
+                        color:i===0?T.cyan:T.txt2}}>{row.v}</span>
                     </span>
                   ))}
                 </div>
@@ -1186,9 +1237,9 @@ function CalcHistory({ onOpen }) {
                   onClick={()=>togglePin(entry)}
                   title={isPinned?"Unpin from comparison":"Pin to compare"}
                   style={{flexShrink:0,padding:"4px 9px",borderRadius:7,
-                    border:`1px solid ${isPinned?T.amber:T.border}`,
-                    background:isPinned?`${T.amber}15`:"none",
-                    color:isPinned?T.amber:T.txt4,
+                    border:`1px solid ${isPinned?T.cyan:T.border}`,
+                    background:isPinned?`${T.cyan}15`:"none",
+                    color:isPinned?T.cyan:T.txt4,
                     fontFamily:"Inter,sans-serif",fontSize:10,fontWeight:600,
                     cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}}>
                   {isPinned ? <><IconPin size={12} style={{marginRight:4,verticalAlign:-1}} />Pinned</> : "Pin"}
@@ -1230,17 +1281,17 @@ function ScenarioCompare() {
 
   return (
     <div style={{marginTop:20,borderRadius:12,overflow:"hidden",
-      border:`1px solid ${T.amber}40`,
+      border:`1px solid ${T.cyan}40`,
       background:`linear-gradient(135deg,${T.bg1},${T.bg2})`}}>
 
       {/* Header */}
-      <div style={{padding:"12px 16px",borderBottom:`1px solid ${T.amber}25`,
+      <div style={{padding:"12px 16px",borderBottom:`1px solid ${T.cyan}25`,
         display:"flex",alignItems:"center",justifyContent:"space-between",
-        background:`${T.amber}08`}}>
+        background:`${T.cyan}08`}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <Icon name={toolMeta?.icon || ''} size={15} />
-          <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,
-            fontSize:13,color:T.amber}}>
+          <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:700,
+            fontSize:13,color:T.cyan}}>
             {t("sc.scenario.comparisonTitle")} {getToolLabel(toolMeta, lang)}
           </span>
         </div>
@@ -1262,14 +1313,14 @@ function ScenarioCompare() {
         ].map((col,i)=>(
           <div key={i} style={{padding:"10px 14px",
             borderRight:i<2?`1px solid ${T.border}`:"none",
-            background:i>0?`${T.amber}05`:"none"}}>
-            <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,
-              fontSize:11,color:i===0?T.txt3:T.amber,textTransform:"uppercase",
+            background:i>0?`${T.cyan}05`:"none"}}>
+            <div style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:700,
+              fontSize:11,color:i===0?T.txt3:T.cyan,textTransform:"uppercase",
               letterSpacing:"0.06em"}}>
               {col.label}
             </div>
             {col.sub && (
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,
+              <div style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:10,
                 color:T.txt2,marginTop:2,whiteSpace:"nowrap",overflow:"hidden",
                 textOverflow:"ellipsis"}}>
                 {col.sub}
@@ -1301,7 +1352,7 @@ function ScenarioCompare() {
 
             {/* Value A */}
             <div style={{padding:"10px 14px",borderRight:`1px solid ${T.border}`,
-              fontFamily:"'JetBrains Mono',monospace",fontSize:13,fontWeight:600,
+              fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:13,fontWeight:600,
               color:T.txt,display:"flex",alignItems:"center"}}>
               {va}
             </div>
@@ -1309,12 +1360,12 @@ function ScenarioCompare() {
             {/* Value B + delta */}
             <div style={{padding:"10px 14px",display:"flex",alignItems:"center",
               justifyContent:"space-between",gap:8}}>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:13,
+              <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:13,
                 fontWeight:600,color:T.txt}}>
                 {vb}
               </span>
               {d && d.dir !== "eq" && (
-                <span style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:11,
+                <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:11,
                   fontWeight:700,color:deltaColor,
                   background:`${deltaColor}18`,borderRadius:99,
                   padding:"2px 7px",whiteSpace:"nowrap"}}>
@@ -1341,7 +1392,7 @@ function RelatedTools({ currentId, onOpen }) {
       {/* Header */}
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
         <IconLink size={14} />
-        <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,
+        <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,
           fontSize:13,color:T.txt2,letterSpacing:"0.03em"}}>
           Related Tools
         </span>
@@ -1356,23 +1407,23 @@ function RelatedTools({ currentId, onOpen }) {
               background:T.bg2,cursor:"pointer",textAlign:"left",
               transition:"all .15s",width:"100%"}}
             onMouseEnter={e=>{
-              e.currentTarget.style.borderColor = T.amber;
-              e.currentTarget.style.background   = `${T.amber}08`;
+              e.currentTarget.style.borderColor = T.cyan;
+              e.currentTarget.style.background   = `${T.cyan}08`;
             }}
             onMouseLeave={e=>{
               e.currentTarget.style.borderColor = T.border;
               e.currentTarget.style.background   = T.bg2;
             }}>
             {/* Arrow chain indicator */}
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,
-              color:T.amber,fontWeight:700,flexShrink:0,width:16,textAlign:"center"}}>
+            <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:10,
+              color:T.cyan,fontWeight:700,flexShrink:0,width:16,textAlign:"center"}}>
               {i===0?"↓":"↓"}
             </span>
             {/* Icon */}
             <span style={{flexShrink:0,display:"flex"}}><Icon name={rt.icon} size={18} /></span>
             {/* Label + hint */}
             <div style={{flex:1,minWidth:0}}>
-              <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,
+              <div style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,
                 fontSize:13,color:T.txt,lineHeight:1.2}}>
                 {getToolLabel(rt, lang)}
               </div>
@@ -1399,11 +1450,11 @@ function FaqItem({ q, a, last }) {
         style={{width:"100%",display:"flex",justifyContent:"space-between",
           alignItems:"center",padding:"13px 0",background:"none",border:"none",
           cursor:"pointer",textAlign:"left",gap:12}}>
-        <span style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,
+        <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:600,
           fontSize:13,color:T.txt,lineHeight:1.4,flex:1}}>
           {q}
         </span>
-        <span style={{color:T.amber,fontSize:16,flexShrink:0,
+        <span style={{color:T.cyan,fontSize:16,flexShrink:0,
           transform:open?"rotate(180deg)":"rotate(0deg)",
           transition:"transform .2s"}}>
           ▾
@@ -1472,7 +1523,7 @@ function AfterResultAd({ toolId, visible }) {
       <div style={{display:"flex",flexDirection:"column",gap:2}}>
         <span style={{fontFamily:"Inter,sans-serif",fontSize:8,letterSpacing:"0.18em",
           color:T.txt4,textTransform:"uppercase"}}>Sponsored</span>
-        <span style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:12,color:T.txt3,fontStyle:"italic"}}>
+        <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:12,color:T.txt3,fontStyle:"italic"}}>
           Your most relevant ad appears here after calculation
         </span>
         <span style={{fontFamily:"Inter,sans-serif",fontSize:10,color:T.txt4}}>
@@ -1480,8 +1531,8 @@ function AfterResultAd({ toolId, visible }) {
         </span>
       </div>
       <div style={{flexShrink:0,width:48,height:48,borderRadius:8,
-        background:`linear-gradient(135deg,${T.amber}20,${T.amber}05)`,
-        border:`1px dashed ${T.amber}40`,
+        background:`linear-gradient(135deg,${T.cyan}20,${T.cyan}05)`,
+        border:`1px dashed ${T.cyan}40`,
         display:"flex",alignItems:"center",justifyContent:"center",
         }}><IconBanknote size={20} /></div>
     </div>
@@ -1510,7 +1561,7 @@ function NativeAdCard() {
   if(ADSENSE_CONFIG.placeholderMode) return (
     <div style={{display:"flex",flexDirection:"column",alignItems:"center",
       gap:4,padding:"12px 8px",borderRadius:10,
-      border:`1px dashed ${T.amber}30`,
+      border:`1px dashed ${T.cyan}30`,
       background:`linear-gradient(135deg,${T.bg1},${T.bg2})`,
       cursor:"default",position:"relative"}}>
       <span style={{position:"absolute",top:4,right:6,
@@ -1596,7 +1647,7 @@ function ShareResultBar({ tool, visible }) {
       marginTop:14,
       padding:"13px 16px",
       background:`linear-gradient(135deg,${T.bg2},${T.bg3})`,
-      border:`1px solid ${T.amber}30`,
+      border:`1px solid ${T.cyan}30`,
       borderRadius:11,
       opacity: show ? 1 : 0,
       transform: show ? "translateY(0)" : "translateY(8px)",
@@ -1612,7 +1663,7 @@ function ShareResultBar({ tool, visible }) {
 
         {/* Native share — mobile only */}
         {hasNativeShare && (
-          <BtnShare onClick={shareNative} bg={T.amber}>
+          <BtnShare onClick={shareNative} bg={T.cyan}>
             <IconUpload size={14} /><span>Share</span>
           </BtnShare>
         )}
@@ -1637,7 +1688,7 @@ function ShareResultBar({ tool, visible }) {
 
         {/* Twitter / X */}
         <BtnShare onClick={shareTwitter} bg={T.txt}>
-          <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:13}}>𝕏</span>
+          <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:700,fontSize:13}}>𝕏</span>
           <span>Twitter</span>
         </BtnShare>
 

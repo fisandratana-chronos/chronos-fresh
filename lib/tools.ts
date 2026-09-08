@@ -19,7 +19,7 @@ export interface Tool {
   label: string
   frLabel: string
   slug: string          // format: "/bmi-calculator" (ONE leading slash, no "/tools/" prefix)
-  cat: 'health' | 'finance' | 'dev' | 'text' | 'convert'
+  cat: 'health' | 'finance' | 'dev' | 'text' | 'convert' | 'education' | 'datetime' | 'misc'
   icon: string
   keywords: string[]
 }
@@ -179,7 +179,7 @@ export const TOOLS: Tool[] = [
     slug: '/age-calculator', cat: 'health', icon: 'cake',
     keywords: ['age calculator', 'calculate age online', 'how old am i', 'birthday calculator'] },
   { id: 'scientific-calculator', label: 'Scientific Calculator', frLabel: 'Calculatrice Scientifique',
-    slug: '/scientific-calculator', cat: 'finance', icon: 'calculator',
+    slug: '/scientific-calculator', cat: 'education', icon: 'calculator',
     keywords: ['scientific calculator online', 'advanced calculator free', 'math calculator', 'trig calculator'] },
   // Unit Converter — combo 7-category converter (Length/Weight/Temperature/
   // Volume/Speed/Area/Data) added to SmartCalcHub itself; component wired
@@ -188,6 +188,106 @@ export const TOOLS: Tool[] = [
   { id: 'unit-converter', label: 'Unit Converter', frLabel: "Convertisseur d'Unités",
     slug: '/unit-converter', cat: 'convert', icon: 'ruler',
     keywords: ['unit converter', 'convert units online', 'length weight volume converter', 'metric imperial converter'] },
+  // Fuel Cost Calculator — tool #2, wired in Finance/FinanceHome.tsx's
+  // FINANCE_PANEL_MAP under 'fuel'.
+  { id: 'fuel-cost-calculator', label: 'Fuel Cost Calculator', frLabel: "Calculateur de Coût de Carburant",
+    slug: '/fuel-cost-calculator', cat: 'finance', icon: 'droplet',
+    keywords: ['fuel cost calculator', 'gas cost calculator', 'trip fuel calculator', 'fuel consumption calculator'] },
+  // Salary Calculator — tool #4, wired in Finance/FinanceHome.tsx's
+  // FINANCE_PANEL_MAP under 'salary'.
+  { id: 'salary-calculator', label: 'Salary Calculator', frLabel: 'Calculateur de Salaire',
+    slug: '/salary-calculator', cat: 'finance', icon: 'briefcase',
+    keywords: ['salary calculator', 'hourly to salary calculator', 'salary converter', 'wage calculator'] },
+  // Profit Margin Calculator — tool #5, wired in Finance/FinanceHome.tsx's
+  // FINANCE_PANEL_MAP under 'margin'.
+  { id: 'profit-margin-calculator', label: 'Profit Margin Calculator', frLabel: 'Calculateur de Marge Bénéficiaire',
+    slug: '/profit-margin-calculator', cat: 'finance', icon: 'percent',
+    keywords: ['profit margin calculator', 'markup calculator', 'margin vs markup', 'profit calculator'] },
+  // ROI Calculator — tool #6, wired in Finance/FinanceHome.tsx's
+  // FINANCE_PANEL_MAP under 'roi'.
+  { id: 'roi-calculator', label: 'ROI Calculator', frLabel: 'Calculateur de ROI',
+    slug: '/roi-calculator', cat: 'finance', icon: 'rocket',
+    keywords: ['roi calculator', 'return on investment calculator', 'investment return calculator', 'annualized roi'] },
+  // Statistics Calculator — tool #7, wired in Misc/MiscHome.tsx's
+  // MISC_PANEL_MAP under 'stats'.
+  { id: 'statistics-calculator', label: 'Average / Statistics Calculator', frLabel: 'Calculateur de Statistiques',
+    slug: '/statistics-calculator', cat: 'misc', icon: 'chart-bar',
+    keywords: ['average calculator', 'statistics calculator', 'mean median calculator', 'list of numbers calculator'] },
+  // BMR/TDEE Calculator — tool #9, wired in Health/HealthHome.tsx's
+  // HEALTH_PANEL_MAP under 'bmrtdee'.
+  { id: 'bmr-tdee-calculator', label: 'BMR / TDEE Calculator', frLabel: 'Calculateur de BMR / TDEE',
+    slug: '/bmr-tdee-calculator', cat: 'health', icon: 'bolt',
+    keywords: ['bmr calculator', 'tdee calculator', 'basal metabolic rate', 'daily calorie needs calculator'] },
+  // Ratio Calculator — tool #10 (final tool), wired in Misc/MiscHome.tsx's
+  // MISC_PANEL_MAP under 'ratio'.
+  { id: 'ratio-calculator', label: 'Ratio Calculator', frLabel: 'Calculateur de Ratio',
+    slug: '/ratio-calculator', cat: 'misc', icon: 'scale',
+    keywords: ['ratio calculator', 'simplify ratio', 'proportion calculator', 'ratio to fraction'] },
+  // Area Calculator — tool #8, wired in Misc/MiscHome.tsx's
+  // MISC_PANEL_MAP under 'area'.
+  { id: 'area-calculator', label: 'Area Calculator', frLabel: 'Calculateur de Surface',
+    slug: '/area-calculator', cat: 'misc', icon: 'ruler',
+    keywords: ['area calculator', 'rectangle area calculator', 'circle area calculator', 'triangle area calculator'] },
+  // ── More calculators, same situation: components already exist and
+  // are already wired into a category Home.tsx's PANEL_MAP (Finance/
+  // Education/DateTime/Developer/Convert/Misc) — just missing from
+  // TOOLS, which is what makes SmartCalcHub fall through to
+  // router.push() (external navigation) for them instead of opening
+  // in-panel. Nothing new was built here, only registered.
+  { id: 'vat-calculator', label: 'VAT Calculator', frLabel: 'Calculateur de TVA',
+    slug: '/vat-calculator', cat: 'finance', icon: 'receipt',
+    keywords: ['vat calculator', 'vat calculator online free', 'add vat', 'remove vat'] },
+  { id: 'discount-calculator', label: 'Discount Calculator', frLabel: 'Calculateur de Remise',
+    slug: '/discount-calculator', cat: 'finance', icon: 'tag',
+    keywords: ['discount calculator', 'percent off calculator', 'sale price calculator'] },
+  { id: 'tip-calculator', label: 'Tip Calculator', frLabel: 'Calculateur de Pourboire',
+    slug: '/tip-calculator', cat: 'finance', icon: 'banknote',
+    keywords: ['tip calculator', 'gratuity calculator', 'bill split calculator'] },
+  { id: 'compound-interest-calculator', label: 'Compound Interest Calculator', frLabel: "Calculateur d'Intérêts Composés",
+    slug: '/compound-interest-calculator', cat: 'finance', icon: 'trending-up',
+    keywords: ['compound interest calculator', 'investment growth calculator', 'interest calculator'] },
+  { id: 'gpa-calculator', label: 'GPA Calculator', frLabel: 'Calculateur de Moyenne (GPA)',
+    slug: '/gpa-calculator', cat: 'education', icon: 'graduation-cap',
+    keywords: ['gpa calculator', 'grade point average calculator', 'weighted gpa calculator'] },
+  { id: 'date-difference-calculator', label: 'Date Difference Calculator', frLabel: 'Calculateur de Différence de Dates',
+    slug: '/date-difference-calculator', cat: 'datetime', icon: 'calendar',
+    keywords: ['date difference calculator', 'days between dates', 'date calculator online free'] },
+  { id: 'timezone-converter', label: 'Time Zone Converter', frLabel: 'Convertisseur de Fuseau Horaire',
+    slug: '/timezone-converter', cat: 'datetime', icon: 'clock',
+    keywords: ['time zone converter', 'timezone calculator', 'convert time zones'] },
+  { id: 'password-generator', label: 'Password Generator', frLabel: 'Générateur de Mot de Passe',
+    slug: '/password-generator', cat: 'dev', icon: 'key',
+    keywords: ['password generator', 'strong password generator', 'random password'] },
+  { id: 'uuid-generator', label: 'UUID Generator', frLabel: 'Générateur UUID',
+    slug: '/uuid-generator', cat: 'dev', icon: 'id-badge',
+    keywords: ['uuid generator', 'guid generator', 'random uuid'] },
+  { id: 'json-formatter', label: 'JSON Formatter', frLabel: 'Formateur JSON',
+    slug: '/json-formatter', cat: 'dev', icon: 'folder',
+    keywords: ['json formatter', 'json validator online', 'json beautifier', 'pretty print json'] },
+  { id: 'qr-code-generator', label: 'QR Code Generator', frLabel: 'Générateur de QR Code',
+    slug: '/qr-code-generator', cat: 'dev', icon: 'device-mobile',
+    keywords: ['qr code generator', 'create qr code', 'free qr code'] },
+  { id: 'sha256-generator', label: 'SHA-256 Generator', frLabel: 'Générateur SHA-256',
+    slug: '/sha256-generator', cat: 'dev', icon: 'lock',
+    keywords: ['sha256 generator', 'sha256 hash online', 'hash generator'] },
+  { id: 'base64-encoder-decoder', label: 'Base64 Encoder/Decoder', frLabel: 'Encodeur/Décodeur Base64',
+    slug: '/base64-encoder-decoder', cat: 'dev', icon: 'abc',
+    keywords: ['base64 encoder', 'base64 decoder', 'base64 online'] },
+  { id: 'random-picker', label: 'Random Picker', frLabel: 'Sélecteur Aléatoire',
+    slug: '/random-picker', cat: 'misc', icon: 'dice',
+    keywords: ['random picker', 'random name picker', 'random choice generator'] },
+  { id: 'temperature-converter', label: 'Temperature Converter', frLabel: 'Convertisseur de Température',
+    slug: '/temperature-converter', cat: 'convert', icon: 'thermometer',
+    keywords: ['temperature converter', 'celsius to fahrenheit', 'fahrenheit to celsius'] },
+  { id: 'binary-converter', label: 'Binary Converter', frLabel: 'Convertisseur Binaire',
+    slug: '/binary-converter', cat: 'convert', icon: 'hash',
+    keywords: ['binary converter', 'decimal to binary', 'binary to decimal'] },
+  { id: 'rgb-hex-converter', label: 'RGB ↔ HEX Converter', frLabel: 'Convertisseur RGB ↔ HEX',
+    slug: '/rgb-hex-converter', cat: 'convert', icon: 'palette',
+    keywords: ['rgb to hex', 'hex to rgb', 'color converter rgb hex'] },
+  { id: 'roman-numeral-converter', label: 'Roman Numeral Converter', frLabel: 'Convertisseur de Chiffres Romains',
+    slug: '/roman-numeral-converter', cat: 'convert', icon: 'abc',
+    keywords: ['roman numeral converter', 'roman numerals to numbers', 'number to roman numerals'] },
   // Network Hub entry points (all render NetworkHub component)
   { id: 'network-hub',          label: 'Network Hub',          frLabel: 'Hub Réseau',           slug: '/network-hub',          cat: 'dev', icon: 'antenna', keywords: ['network', 'internet', 'hub'] },
   { id: 'ip-lookup',            label: 'IP Lookup',            frLabel: 'Recherche IP',          slug: '/ip-lookup',            cat: 'dev', icon: 'antenna', keywords: ['ip', 'address', 'location'] },
@@ -2759,6 +2859,9 @@ export const registryTools: RegistryTool[] =
     { id: 'finance',   icon: 'cash', label: t('cats.finance')   || 'Finance'    },
     { id: 'convert',   icon: 'repeat', label: t('cats.convert')   || 'Converters' },
     { id: 'dev',       icon: 'settings', label: t('cats.dev')       || 'Developer'  },
+    { id: 'education', icon: 'graduation-cap', label: t('cats.education') || 'Education'  },
+    { id: 'datetime',  icon: 'calendar', label: t('cats.datetime')  || 'Date & Time' },
+    { id: 'misc',      icon: 'sparkles', label: t('cats.misc')      || 'Misc'       },
   ]
 }
 
