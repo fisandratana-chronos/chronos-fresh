@@ -403,9 +403,845 @@ export const SEO_CONTENT: Record<string, SeoContentEntry> = {
       { q: "Chaque option peut-elle avoir un poids différent ?", a: "Non — chaque ligne saisie a une probabilité égale d'être choisie. Si vous voulez qu'une option ait plus de chances, listez-la plusieurs fois." },
     ],
   },
+
+  units: {
+    title: "Unit Converter — Length, Weight, Volume, Speed, Area & Temperature",
+    frTitle: "Convertisseur d'Unités — Longueur, Poids, Volume, Vitesse, Surface et Température",
+    what: "This unit converter handles seven everyday measurement categories in one tool: length, weight, temperature, volume, speed, area, and digital data. Instead of opening a separate converter for each type of measurement, you can switch categories with a single click and instantly convert between metric units (meters, kilograms, liters) and imperial units (feet, pounds, gallons), or between data sizes like megabytes and gigabytes. It is built for quick everyday conversions — cooking, travel, DIY projects, fitness, and international shopping all involve mixing unit systems.",
+    frWhat: "Ce convertisseur d'unités gère sept catégories de mesures courantes dans un seul outil : longueur, poids, température, volume, vitesse, surface et données numériques. Plutôt que d'ouvrir un convertisseur différent pour chaque type de mesure, vous pouvez changer de catégorie en un clic et convertir instantanément entre unités métriques (mètres, kilogrammes, litres) et unités impériales (pieds, livres, gallons), ou entre tailles de données comme mégaoctets et gigaoctets. Il est conçu pour des conversions rapides du quotidien — cuisine, voyage, bricolage, sport et achats internationaux impliquent souvent de mélanger des systèmes d'unités.",
+    how: "For most categories, every unit is stored as a multiple of a base unit (meters for length, kilograms for weight, liters for volume). Converting is a simple two-step multiplication: your value is converted to the base unit, then from the base unit to your target unit. Temperature is the one exception, since Celsius, Fahrenheit, and Kelvin scales don't share a common zero point, so it uses direct conversion formulas instead of a multiplication factor.",
+    frHow: "Pour la plupart des catégories, chaque unité est stockée comme un multiple d'une unité de base (mètres pour la longueur, kilogrammes pour le poids, litres pour le volume). Convertir est une simple multiplication en deux étapes : votre valeur est convertie vers l'unité de base, puis de l'unité de base vers votre unité cible. La température fait exception, car les échelles Celsius, Fahrenheit et Kelvin ne partagent pas le même point zéro, donc elle utilise des formules de conversion directes plutôt qu'un facteur multiplicatif.",
+    formula: { expr: "Target = Value × (Factor_source ÷ Factor_target)", note: "Temperature uses direct formulas instead, e.g. °F = °C × 9/5 + 32" },
+    frFormula: { expr: "Cible = Valeur × (Facteur_source ÷ Facteur_cible)", note: "La température utilise des formules directes, ex. °F = °C × 9/5 + 32" },
+    examples: [
+      { label: "Distance", input: "5 km to miles", result: "3.107 mi" },
+      { label: "Weight", input: "1 kg to pounds", result: "2.205 lb" },
+      { label: "Temperature", input: "100°C to °F", result: "212°F" },
+    ],
+    frExamples: [
+      { label: "Distance", input: "5 km en miles", result: "3,107 mi" },
+      { label: "Poids", input: "1 kg en livres", result: "2,205 lb" },
+      { label: "Température", input: "100°C en °F", result: "212°F" },
+    ],
+    faq: [
+      { q: "Why is temperature converted differently from other units?", a: "Length, weight, and volume conversions are pure ratios (multiply by a factor), but temperature scales start at different zero points — 0°C is not the same physical temperature as 0°F. So temperature needs an offset-and-scale formula rather than a simple multiplication." },
+      { q: "How accurate are these conversions?", a: "The conversion factors used (e.g. 1 inch = 2.54 cm exactly) are the official internationally defined values, so results are accurate to the number of decimal places shown." },
+      { q: "Can I convert currency here too?", a: "No — currency exchange rates change constantly and require live data, so currency has its own dedicated Currency Converter tool instead." },
+    ],
+    frFaq: [
+      { q: "Pourquoi la température est-elle convertie différemment des autres unités ?", a: "Les conversions de longueur, poids et volume sont de purs ratios (multiplier par un facteur), mais les échelles de température commencent à des points zéro différents — 0°C n'est pas la même température physique que 0°F. Elle nécessite donc une formule de décalage et d'échelle plutôt qu'une simple multiplication." },
+      { q: "Ces conversions sont-elles précises ?", a: "Les facteurs de conversion utilisés (ex. 1 pouce = 2,54 cm exactement) sont les valeurs officielles définies internationalement, donc les résultats sont précis au nombre de décimales affiché." },
+      { q: "Puis-je aussi convertir des devises ici ?", a: "Non — les taux de change des devises changent constamment et nécessitent des données en temps réel, donc les devises ont leur propre outil dédié, le Convertisseur de Devises." },
+    ],
+  },
+
+  fuel: {
+    title: "Fuel Cost Calculator — Trip Fuel Cost & Consumption",
+    frTitle: "Calculateur de Coût de Carburant — Coût et Consommation de Trajet",
+    what: "This calculator estimates how much fuel a trip will use and what it will cost, based on the distance, your vehicle's fuel consumption rate, and the current fuel price. It's useful for budgeting road trips, comparing costs between vehicles, splitting fuel costs with passengers, or deciding whether it's cheaper to drive or fly. A one-way/round-trip toggle lets you calculate a full round trip without re-entering the distance.",
+    frWhat: "Ce calculateur estime la quantité de carburant qu'un trajet consommera et son coût, en fonction de la distance, du taux de consommation de votre véhicule et du prix actuel du carburant. Il est utile pour budgétiser des road trips, comparer les coûts entre véhicules, partager les frais de carburant avec des passagers, ou décider s'il est plus économique de conduire ou de prendre l'avion. Un bouton aller simple/aller-retour permet de calculer un trajet complet sans ressaisir la distance.",
+    how: "Fuel consumption is typically expressed as liters per 100 kilometers (L/100km). The calculator multiplies your distance by this rate and divides by 100 to get the liters needed, then multiplies by the price per liter for the total cost. Choosing round trip simply doubles the one-way distance before running the same calculation.",
+    frHow: "La consommation de carburant est généralement exprimée en litres aux 100 kilomètres (L/100km). Le calculateur multiplie votre distance par ce taux et divise par 100 pour obtenir les litres nécessaires, puis multiplie par le prix au litre pour le coût total. Choisir aller-retour double simplement la distance aller simple avant d'effectuer le même calcul.",
+    formula: { expr: "Fuel (L) = (Distance × Consumption) ÷ 100", note: "Cost = Fuel (L) × Price per liter" },
+    frFormula: { expr: "Carburant (L) = (Distance × Consommation) ÷ 100", note: "Coût = Carburant (L) × Prix au litre" },
+    examples: [
+      { label: "City commute", input: "100 km, 7 L/100km, $1.90/L", result: "7 L needed — $13.30" },
+      { label: "Round trip", input: "50 km round trip, 6 L/100km, $2.00/L", result: "12 L needed — $24.00" },
+      { label: "Long highway drive", input: "500 km, 5.5 L/100km, $1.80/L", result: "27.5 L needed — $49.50" },
+    ],
+    frExamples: [
+      { label: "Trajet urbain", input: "100 km, 7 L/100km, 1,90$/L", result: "7 L nécessaires — 13,30$" },
+      { label: "Aller-retour", input: "50 km aller-retour, 6 L/100km, 2,00$/L", result: "12 L nécessaires — 24,00$" },
+      { label: "Long trajet autoroutier", input: "500 km, 5,5 L/100km, 1,80$/L", result: "27,5 L nécessaires — 49,50$" },
+    ],
+    faq: [
+      { q: "Where do I find my car's fuel consumption rate?", a: "It's usually in your vehicle's manual or spec sheet, listed as L/100km or mpg. You can also calculate your own real-world rate by dividing liters used by (distance ÷ 100) on your next fill-up." },
+      { q: "Does this account for traffic or driving style?", a: "No — it uses the consumption rate you enter, which is an average. Heavy traffic, aggressive driving, or highway speeds can all shift real consumption higher or lower than the rate you provide." },
+      { q: "Can I use miles and gallons instead?", a: "This calculator works in the units you enter — just be consistent (e.g. use gallons per 100 miles for consumption if working in imperial units)." },
+    ],
+    frFaq: [
+      { q: "Où trouver le taux de consommation de ma voiture ?", a: "C'est généralement dans le manuel ou la fiche technique de votre véhicule, indiqué en L/100km. Vous pouvez aussi calculer votre propre taux réel en divisant les litres utilisés par (distance ÷ 100) lors de votre prochain plein." },
+      { q: "Cela tient-il compte du trafic ou du style de conduite ?", a: "Non — il utilise le taux de consommation que vous saisissez, qui est une moyenne. Un trafic dense, une conduite sportive ou des vitesses autoroutières peuvent tous faire varier la consommation réelle par rapport au taux fourni." },
+      { q: "Puis-je utiliser des miles et des gallons à la place ?", a: "Ce calculateur fonctionne avec les unités que vous saisissez — soyez simplement cohérent (ex. utilisez gallons aux 100 miles pour la consommation si vous travaillez en unités impériales)." },
+    ],
+  },
+
+  salary: {
+    title: "Salary Calculator — Hourly, Daily, Weekly, Monthly & Yearly Pay",
+    frTitle: "Calculateur de Salaire — Paie Horaire, Journalière, Hebdomadaire, Mensuelle et Annuelle",
+    what: "This calculator converts a pay amount between five common pay periods — hourly, daily, weekly, monthly, and yearly — so you can compare a job offer stated as an annual salary against one stated as an hourly rate, or figure out your effective hourly earnings from a monthly paycheck. It's built for job comparisons, freelance rate-setting, and everyday budgeting.",
+    frWhat: "Ce calculateur convertit un montant de paie entre cinq périodes de paie courantes — horaire, journalière, hebdomadaire, mensuelle et annuelle — afin de pouvoir comparer une offre d'emploi exprimée en salaire annuel à une autre exprimée en taux horaire, ou de connaître vos gains horaires effectifs à partir d'un salaire mensuel. Il est conçu pour comparer des emplois, fixer des tarifs en freelance et budgétiser au quotidien.",
+    how: "The calculator first converts whatever amount and period you enter into an hourly rate, using your hours-per-day, days-per-week, and weeks-per-year assumptions (defaulting to a standard 8-hour, 5-day, 52-week schedule). From that hourly rate, it derives all the other periods by multiplying back up. Adjusting the schedule assumptions — for part-time work or unpaid time off — changes every converted figure accordingly.",
+    frHow: "Le calculateur convertit d'abord le montant et la période saisis en taux horaire, en utilisant vos hypothèses d'heures/jour, jours/semaine et semaines/année (par défaut un horaire standard de 8h, 5 jours, 52 semaines). À partir de ce taux horaire, il déduit toutes les autres périodes en remultipliant. Ajuster les hypothèses d'horaire — pour un travail à temps partiel ou des congés non payés — modifie chaque chiffre converti en conséquence.",
+    formula: { expr: "Yearly = Hourly × Hours/day × Days/week × Weeks/year", note: "Default assumption: 8 hours/day, 5 days/week, 52 weeks/year" },
+    frFormula: { expr: "Annuel = Horaire × Heures/jour × Jours/semaine × Semaines/année", note: "Hypothèse par défaut : 8h/jour, 5 jours/semaine, 52 semaines/année" },
+    examples: [
+      { label: "Standard full-time", input: "$20/hour, 8h/day, 5d/week, 52w/year", result: "$41,600/year" },
+      { label: "Monthly to hourly", input: "$5,000/month", result: "$28.85/hour" },
+      { label: "Part-time (30 weeks/year)", input: "$25/hour, 30 weeks/year", result: "$30,000/year" },
+    ],
+    frExamples: [
+      { label: "Temps plein standard", input: "20$/heure, 8h/jour, 5j/semaine, 52sem/an", result: "41 600$/an" },
+      { label: "Mensuel vers horaire", input: "5 000$/mois", result: "28,85$/heure" },
+      { label: "Temps partiel (30 semaines/an)", input: "25$/heure, 30 semaines/an", result: "30 000$/an" },
+    ],
+    faq: [
+      { q: "Does this account for taxes?", a: "No — all figures are gross (pre-tax) pay. Your actual take-home pay will be lower after income tax and other deductions, which vary by country and personal situation." },
+      { q: "How do I account for unpaid vacation?", a: "Lower the weeks/year field — e.g. 50 instead of 52 if you take two unpaid weeks off — and the yearly and monthly figures will adjust automatically." },
+      { q: "Why does my monthly figure look slightly different from salary÷12?", a: "Monthly pay here is derived from the yearly total divided by 12, which accounts for the exact number of working days across the year rather than assuming every month is identical." },
+    ],
+    frFaq: [
+      { q: "Cela tient-il compte des impôts ?", a: "Non — tous les chiffres sont bruts (avant impôt). Votre salaire net réel sera plus bas après l'impôt sur le revenu et autres déductions, qui varient selon le pays et la situation personnelle." },
+      { q: "Comment tenir compte des congés non payés ?", a: "Réduisez le champ semaines/année — par exemple 50 au lieu de 52 si vous prenez deux semaines non payées — et les chiffres annuel et mensuel s'ajusteront automatiquement." },
+      { q: "Pourquoi mon chiffre mensuel diffère-t-il légèrement de salaire÷12 ?", a: "Le salaire mensuel ici est dérivé du total annuel divisé par 12, ce qui tient compte du nombre exact de jours travaillés sur l'année plutôt que de supposer que chaque mois est identique." },
+    ],
+  },
+
+  margin: {
+    title: "Profit Margin Calculator — Margin, Markup & Profit",
+    frTitle: "Calculateur de Marge Bénéficiaire — Marge, Majoration et Profit",
+    what: "Profit margin and markup are two different ways of expressing the same profit, and mixing them up is one of the most common pricing mistakes small businesses make. This calculator computes both from your cost and selling price, so you always know exactly how much profit you're making and how it's expressed in each convention. A second mode lets you work backwards: enter your cost and a target margin, and it tells you what to charge.",
+    frWhat: "La marge bénéficiaire et la majoration sont deux façons différentes d'exprimer le même profit, et les confondre est l'une des erreurs de tarification les plus courantes chez les petites entreprises. Ce calculateur calcule les deux à partir de votre coût et prix de vente, afin de toujours savoir exactement combien de profit vous réalisez et comment il s'exprime dans chaque convention. Un second mode permet de travailler à l'envers : entrez votre coût et une marge cible, et il vous indique le prix à facturer.",
+    how: "Profit is simply selling price minus cost. Margin expresses that profit as a percentage of the selling price (what fraction of what the customer pays is profit), while markup expresses it as a percentage of the cost (how much you added on top of what you paid). Because they use different denominators, a 50% markup is not the same as a 50% margin — margin is always the smaller number of the two.",
+    frHow: "Le profit est simplement le prix de vente moins le coût. La marge exprime ce profit en pourcentage du prix de vente (quelle fraction de ce que paie le client est du profit), tandis que la majoration l'exprime en pourcentage du coût (combien vous avez ajouté par rapport à ce que vous avez payé). Comme ils utilisent des dénominateurs différents, une majoration de 50% n'est pas la même chose qu'une marge de 50% — la marge est toujours le plus petit des deux nombres.",
+    formula: { expr: "Margin % = (Selling Price − Cost) ÷ Selling Price × 100", note: "Markup % = (Selling Price − Cost) ÷ Cost × 100" },
+    frFormula: { expr: "Marge % = (Prix de vente − Coût) ÷ Prix de vente × 100", note: "Majoration % = (Prix de vente − Coût) ÷ Coût × 100" },
+    examples: [
+      { label: "Retail item", input: "Cost $50, sell at $80", result: "Profit $30 — Margin 37.5%, Markup 60%" },
+      { label: "Target margin", input: "Cost $50, target 30% margin", result: "Sell at $71.43" },
+      { label: "Thin-margin business", input: "Cost $90, sell at $100", result: "Profit $10 — Margin 10%, Markup 11.1%" },
+    ],
+    frExamples: [
+      { label: "Article de détail", input: "Coût 50$, vendu à 80$", result: "Profit 30$ — Marge 37,5%, Majoration 60%" },
+      { label: "Marge cible", input: "Coût 50$, marge cible 30%", result: "Vendre à 71,43$" },
+      { label: "Commerce à faible marge", input: "Coût 90$, vendu à 100$", result: "Profit 10$ — Marge 10%, Majoration 11,1%" },
+    ],
+    faq: [
+      { q: "Which one should I use for pricing, margin or markup?", a: "Most retailers think in margin, since it directly tells you what percentage of revenue is profit — useful for comparing against overhead costs. Markup is more common when pricing is based on cost-plus contracts." },
+      { q: "Why is markup always higher than margin for the same sale?", a: "Because markup divides profit by the smaller number (cost), while margin divides it by the larger number (selling price). The gap between them widens as the profit percentage increases." },
+      { q: "What does a negative margin mean?", a: "A negative margin means you're selling below cost — you're losing money on every sale, which only makes sense as a temporary strategy (e.g. clearing inventory)." },
+    ],
+    frFaq: [
+      { q: "Lequel utiliser pour la tarification, marge ou majoration ?", a: "La plupart des détaillants pensent en marge, car elle indique directement quel pourcentage du revenu est du profit — utile pour comparer aux coûts fixes. La majoration est plus courante pour la tarification basée sur des contrats coût-plus." },
+      { q: "Pourquoi la majoration est-elle toujours plus élevée que la marge pour la même vente ?", a: "Parce que la majoration divise le profit par le nombre le plus petit (le coût), tandis que la marge le divise par le nombre le plus grand (le prix de vente). L'écart s'agrandit à mesure que le pourcentage de profit augmente." },
+      { q: "Que signifie une marge négative ?", a: "Une marge négative signifie que vous vendez en dessous du coût — vous perdez de l'argent à chaque vente, ce qui n'a de sens que comme stratégie temporaire (ex. écouler un inventaire)." },
+    ],
+  },
+
+  roi: {
+    title: "ROI Calculator — Return on Investment & Annualized Return",
+    frTitle: "Calculateur de ROI — Retour sur Investissement et Rendement Annualisé",
+    what: "Return on Investment (ROI) measures how much profit an investment generated relative to what you put in, expressed as a percentage. It's one of the most widely used metrics for comparing the performance of very different investments — stocks, real estate, a business venture, or even a marketing campaign — on the same scale. This calculator also computes an annualized ROI when you provide a holding period, which lets you fairly compare investments held for different lengths of time.",
+    frWhat: "Le retour sur investissement (ROI) mesure combien de profit un investissement a généré par rapport à ce que vous y avez mis, exprimé en pourcentage. C'est l'une des mesures les plus utilisées pour comparer la performance d'investissements très différents — actions, immobilier, une entreprise, ou même une campagne marketing — sur la même échelle. Ce calculateur calcule aussi un ROI annualisé lorsque vous fournissez une durée de détention, ce qui permet de comparer équitablement des investissements détenus sur des durées différentes.",
+    how: "Basic ROI simply divides your profit (final value minus initial investment) by the initial investment. This works fine for a single comparison, but a 30% ROI over 1 year is very different from a 30% ROI over 10 years — so when a time period is given, the calculator also computes the annualized (compound) rate that would produce the same total return, letting you compare investments on an apples-to-apples yearly basis.",
+    frHow: "Le ROI de base divise simplement votre profit (valeur finale moins investissement initial) par l'investissement initial. Cela fonctionne bien pour une seule comparaison, mais un ROI de 30% sur 1 an est très différent d'un ROI de 30% sur 10 ans — donc lorsqu'une période est fournie, le calculateur calcule aussi le taux annualisé (composé) qui produirait le même rendement total, permettant de comparer les investissements sur une base annuelle équivalente.",
+    formula: { expr: "ROI % = (Return − Investment) ÷ Investment × 100", note: "Annualized ROI % = ((Return ÷ Investment)^(1/years) − 1) × 100" },
+    frFormula: { expr: "ROI % = (Retour − Investissement) ÷ Investissement × 100", note: "ROI annualisé % = ((Retour ÷ Investissement)^(1/années) − 1) × 100" },
+    examples: [
+      { label: "Stock investment", input: "Invest $1,000, return $1,300", result: "Profit $300 — ROI 30%" },
+      { label: "Over 3 years", input: "Invest $1,000, return $1,300, 3 years", result: "Annualized ROI ≈ 9.14%/year" },
+      { label: "Loss", input: "Invest $2,000, return $1,700", result: "Profit −$300 — ROI −15%" },
+    ],
+    frExamples: [
+      { label: "Investissement en actions", input: "Investir 1 000$, retour 1 300$", result: "Profit 300$ — ROI 30%" },
+      { label: "Sur 3 ans", input: "Investir 1 000$, retour 1 300$, 3 ans", result: "ROI annualisé ≈ 9,14%/an" },
+      { label: "Perte", input: "Investir 2 000$, retour 1 700$", result: "Profit −300$ — ROI −15%" },
+    ],
+    faq: [
+      { q: "What's a 'good' ROI?", a: "It depends heavily on the investment type and time frame. Stock market index funds have historically averaged around 7-10% annualized, so any comparison should be made against similar-risk, similar-timeframe benchmarks." },
+      { q: "Why does the annualized ROI look much smaller than the total ROI?", a: "Total ROI is the cumulative return over the entire period, while annualized ROI spreads that same return evenly (compounded) across each year — the longer the period, the bigger the gap between the two figures." },
+      { q: "Does this account for risk or fees?", a: "No — ROI is a pure profit-ratio calculation. It doesn't factor in the risk taken to earn that return, taxes, inflation, or any fees paid, all of which affect your real-world outcome." },
+    ],
+    frFaq: [
+      { q: "Qu'est-ce qu'un 'bon' ROI ?", a: "Cela dépend fortement du type d'investissement et de la durée. Les fonds indiciels boursiers ont historiquement une moyenne d'environ 7-10% annualisé, donc toute comparaison devrait se faire avec des références de risque et de durée similaires." },
+      { q: "Pourquoi le ROI annualisé semble-t-il bien plus petit que le ROI total ?", a: "Le ROI total est le rendement cumulé sur toute la période, tandis que le ROI annualisé répartit ce même rendement uniformément (composé) sur chaque année — plus la période est longue, plus l'écart entre les deux chiffres est grand." },
+      { q: "Cela tient-il compte du risque ou des frais ?", a: "Non — le ROI est un calcul de ratio de profit pur. Il ne prend pas en compte le risque pris pour obtenir ce rendement, les impôts, l'inflation, ni les frais payés, qui affectent tous votre résultat réel." },
+    ],
+  },
+
+  stats: {
+    title: "Statistics Calculator — Average, Median, Sum & Range",
+    frTitle: "Calculateur de Statistiques — Moyenne, Médiane, Somme et Étendue",
+    what: "This calculator computes the basic descriptive statistics of any list of numbers you paste in — sum, average (mean), median, minimum, maximum, and range. It's a fast way to summarize test scores, survey results, expense lists, or any dataset without opening a spreadsheet, and it accepts numbers separated by commas, spaces, or line breaks so you can paste data from almost any source.",
+    frWhat: "Ce calculateur calcule les statistiques descriptives de base de toute liste de nombres que vous collez — somme, moyenne, médiane, minimum, maximum et étendue. C'est un moyen rapide de résumer des notes d'examen, des résultats de sondage, des listes de dépenses, ou tout ensemble de données sans ouvrir un tableur, et il accepte des nombres séparés par des virgules, espaces ou sauts de ligne pour coller des données depuis presque n'importe quelle source.",
+    how: "The average is the sum of all numbers divided by how many there are. The median is found by sorting the list and taking the middle value (or the average of the two middle values if the count is even) — it's often a better 'typical value' than the average when a few extreme numbers would otherwise skew the mean. Min, max, and range (max minus min) show the spread of the data.",
+    frHow: "La moyenne est la somme de tous les nombres divisée par leur nombre. La médiane est trouvée en triant la liste et en prenant la valeur du milieu (ou la moyenne des deux valeurs du milieu si le nombre est pair) — c'est souvent une meilleure « valeur typique » que la moyenne lorsque quelques nombres extrêmes fausseraient sinon la moyenne. Min, max et étendue (max moins min) montrent la dispersion des données.",
+    formula: { expr: "Average = Sum ÷ Count", note: "Median = middle value of the sorted list (or average of the two middle values)" },
+    frFormula: { expr: "Moyenne = Somme ÷ Nombre", note: "Médiane = valeur du milieu de la liste triée (ou moyenne des deux valeurs du milieu)" },
+    examples: [
+      { label: "Six numbers", input: "4, 8, 15, 16, 23, 42", result: "Average 18, Median 15.5" },
+      { label: "Test scores", input: "72, 85, 90, 65, 78", result: "Average 78, Median 78" },
+      { label: "With an outlier", input: "10, 12, 11, 9, 200", result: "Average 48.4, Median 11" },
+    ],
+    frExamples: [
+      { label: "Six nombres", input: "4, 8, 15, 16, 23, 42", result: "Moyenne 18, Médiane 15,5" },
+      { label: "Notes d'examen", input: "72, 85, 90, 65, 78", result: "Moyenne 78, Médiane 78" },
+      { label: "Avec une valeur aberrante", input: "10, 12, 11, 9, 200", result: "Moyenne 48,4, Médiane 11" },
+    ],
+    faq: [
+      { q: "Why is my median so different from my average?", a: "This usually happens when your data has one or more extreme outliers. The average is pulled toward outliers, while the median stays close to where most of the data actually sits — the third example above shows this clearly." },
+      { q: "Is there a limit to how many numbers I can enter?", a: "No hard limit — the calculator processes the list entirely in your browser, so very large lists (thousands of numbers) will still work, though extremely long pastes may take a moment to parse." },
+      { q: "What happens if I include text or invalid entries?", a: "Non-numeric entries are simply skipped — only values that parse as valid numbers are included in the calculation." },
+    ],
+    frFaq: [
+      { q: "Pourquoi ma médiane est-elle si différente de ma moyenne ?", a: "Cela arrive généralement quand vos données ont une ou plusieurs valeurs aberrantes extrêmes. La moyenne est tirée vers les valeurs aberrantes, tandis que la médiane reste proche de là où se situe la majorité des données — le troisième exemple ci-dessus le montre clairement." },
+      { q: "Y a-t-il une limite au nombre de nombres que je peux saisir ?", a: "Aucune limite stricte — le calculateur traite la liste entièrement dans votre navigateur, donc de très grandes listes (milliers de nombres) fonctionneront quand même, bien que des collages extrêmement longs puissent prendre un moment à analyser." },
+      { q: "Que se passe-t-il si j'inclus du texte ou des entrées invalides ?", a: "Les entrées non numériques sont simplement ignorées — seules les valeurs qui s'interprètent comme des nombres valides sont incluses dans le calcul." },
+    ],
+  },
+
+  area: {
+    title: "Area Calculator — Rectangle, Square, Triangle, Circle & Trapezoid",
+    frTitle: "Calculateur de Surface — Rectangle, Carré, Triangle, Cercle et Trapèze",
+    what: "This calculator finds the area (and, for rectangles, squares, and circles, the perimeter or circumference too) of five common shapes: rectangle, square, triangle, circle, and trapezoid. It's useful for home improvement projects like flooring or paint estimates, gardening and landscaping, school geometry homework, or any situation where you need to know how much surface a shape covers.",
+    frWhat: "Ce calculateur trouve l'aire (et, pour les rectangles, carrés et cercles, le périmètre ou la circonférence aussi) de cinq formes courantes : rectangle, carré, triangle, cercle et trapèze. Il est utile pour des projets de rénovation comme l'estimation de revêtement de sol ou de peinture, le jardinage et l'aménagement paysager, les devoirs de géométrie scolaire, ou toute situation où vous devez connaître la surface couverte par une forme.",
+    how: "Each shape uses its own standard geometry formula: a rectangle's area is width times height, a square's is its side squared, a triangle's is half of base times height, a circle's is pi times the radius squared, and a trapezoid's is the average of its two parallel sides times its height. Enter the measurements requested for your chosen shape — using the same unit for every field — and the calculator applies the matching formula instantly.",
+    frHow: "Chaque forme utilise sa propre formule géométrique standard : l'aire d'un rectangle est largeur fois hauteur, celle d'un carré est son côté au carré, celle d'un triangle est la moitié de base fois hauteur, celle d'un cercle est pi fois le rayon au carré, et celle d'un trapèze est la moyenne de ses deux côtés parallèles fois sa hauteur. Entrez les mesures demandées pour la forme choisie — en utilisant la même unité pour chaque champ — et le calculateur applique instantanément la formule correspondante.",
+    formula: { expr: "Rectangle: W×H · Square: S² · Triangle: ½×B×H · Circle: π×R² · Trapezoid: ½×(A+B)×H", note: "Perimeter is shown for Rectangle, Square, and Circle (circumference)" },
+    frFormula: { expr: "Rectangle : L×H · Carré : C² · Triangle : ½×B×H · Cercle : π×R² · Trapèze : ½×(A+B)×H", note: "Le périmètre est affiché pour Rectangle, Carré et Cercle (circonférence)" },
+    examples: [
+      { label: "Rectangle room", input: "Width 5m, Height 3m", result: "Area 15 m² — Perimeter 16 m" },
+      { label: "Circular garden", input: "Radius 4m", result: "Area 50.27 m² — Circumference 25.13 m" },
+      { label: "Triangle plot", input: "Base 6m, Height 4m", result: "Area 12 m²" },
+    ],
+    frExamples: [
+      { label: "Pièce rectangulaire", input: "Largeur 5m, Hauteur 3m", result: "Aire 15 m² — Périmètre 16 m" },
+      { label: "Jardin circulaire", input: "Rayon 4m", result: "Aire 50,27 m² — Circonférence 25,13 m" },
+      { label: "Terrain triangulaire", input: "Base 6m, Hauteur 4m", result: "Aire 12 m²" },
+    ],
+    faq: [
+      { q: "What units should I use?", a: "Any unit works, as long as you use the same one for every input — the result will be in that unit squared (e.g. meters in, square meters out)." },
+      { q: "Why is there no perimeter for triangle and trapezoid?", a: "Their perimeter needs the length of every side, but their area formulas here only need base and height (triangle) or the two parallel sides and height (trapezoid) — so a full perimeter isn't calculable from those same inputs alone." },
+      { q: "How do I calculate an irregular shape?", a: "Break it into simpler shapes (rectangles, triangles) that this calculator supports, find each area separately, then add them together." },
+    ],
+    frFaq: [
+      { q: "Quelles unités dois-je utiliser ?", a: "N'importe quelle unité fonctionne, tant que vous utilisez la même pour chaque entrée — le résultat sera dans cette unité au carré (ex. mètres en entrée, mètres carrés en sortie)." },
+      { q: "Pourquoi n'y a-t-il pas de périmètre pour le triangle et le trapèze ?", a: "Leur périmètre nécessite la longueur de chaque côté, mais leurs formules d'aire ici n'ont besoin que de la base et hauteur (triangle) ou des deux côtés parallèles et de la hauteur (trapèze) — un périmètre complet n'est donc pas calculable à partir de ces mêmes entrées seules." },
+      { q: "Comment calculer une forme irrégulière ?", a: "Décomposez-la en formes plus simples (rectangles, triangles) prises en charge par ce calculateur, trouvez chaque aire séparément, puis additionnez-les." },
+    ],
+  },
+
+  bmrtdee: {
+    title: "BMR/TDEE Calculator — Daily Calorie Needs",
+    frTitle: "Calculateur de BMR/TDEE — Besoins Caloriques Quotidiens",
+    what: "Basal Metabolic Rate (BMR) is the number of calories your body burns at complete rest just to keep basic functions running — breathing, circulation, cell repair. Total Daily Energy Expenditure (TDEE) adds your activity level on top of that, giving a realistic estimate of how many calories you burn in a typical day. TDEE is the number most people actually need for setting calorie goals, whether the aim is weight loss, maintenance, or muscle gain.",
+    frWhat: "Le métabolisme de base (BMR) est le nombre de calories que votre corps brûle au repos complet juste pour maintenir les fonctions de base — respiration, circulation, réparation cellulaire. La dépense énergétique quotidienne totale (TDEE) ajoute votre niveau d'activité à cela, donnant une estimation réaliste du nombre de calories que vous brûlez en une journée typique. Le TDEE est le chiffre dont la plupart des gens ont réellement besoin pour fixer des objectifs caloriques, que le but soit la perte de poids, le maintien ou la prise de muscle.",
+    how: "This calculator uses the Mifflin-St Jeor equation, considered one of the most accurate BMR formulas for the general population. It takes your weight, height, age, and biological sex to compute BMR, then multiplies that by an activity multiplier — ranging from 1.2 for a sedentary lifestyle to 1.9 for very intense daily activity — to get your TDEE.",
+    frHow: "Ce calculateur utilise l'équation de Mifflin-St Jeor, considérée comme l'une des formules de BMR les plus précises pour la population générale. Elle prend votre poids, taille, âge et sexe biologique pour calculer le BMR, puis le multiplie par un facteur d'activité — allant de 1,2 pour un mode de vie sédentaire à 1,9 pour une activité quotidienne très intense — pour obtenir votre TDEE.",
+    formula: { expr: "BMR (men) = 10×kg + 6.25×cm − 5×age + 5", note: "BMR (women) = 10×kg + 6.25×cm − 5×age − 161; TDEE = BMR × activity factor" },
+    frFormula: { expr: "BMR (hommes) = 10×kg + 6,25×cm − 5×âge + 5", note: "BMR (femmes) = 10×kg + 6,25×cm − 5×âge − 161 ; TDEE = BMR × facteur d'activité" },
+    examples: [
+      { label: "Male, moderate activity", input: "70kg, 175cm, 30yo, moderate", result: "BMR 1,665 kcal — TDEE 2,581 kcal/day" },
+      { label: "Female, sedentary", input: "60kg, 165cm, 28yo, sedentary", result: "BMR 1,345 kcal — TDEE 1,614 kcal/day" },
+      { label: "Male, very active", input: "85kg, 180cm, 25yo, very active", result: "BMR 1,842 kcal — TDEE 3,500 kcal/day" },
+    ],
+    frExamples: [
+      { label: "Homme, activité modérée", input: "70kg, 175cm, 30ans, modérée", result: "BMR 1 665 kcal — TDEE 2 581 kcal/jour" },
+      { label: "Femme, sédentaire", input: "60kg, 165cm, 28ans, sédentaire", result: "BMR 1 345 kcal — TDEE 1 614 kcal/jour" },
+      { label: "Homme, très actif", input: "85kg, 180cm, 25ans, très actif", result: "BMR 1 842 kcal — TDEE 3 500 kcal/jour" },
+    ],
+    faq: [
+      { q: "How accurate is the Mifflin-St Jeor equation?", a: "It's generally considered more accurate than the older Harris-Benedict equation, with studies showing it predicts resting metabolic rate within about 10% for most people. Individual metabolism can still vary due to genetics, muscle mass, and health conditions." },
+      { q: "Should I eat exactly at my TDEE?", a: "Eating at TDEE maintains your current weight. Eating below it (a calorie deficit) leads to weight loss, and eating above it (a surplus) leads to weight gain — a moderate deficit or surplus of 300-500 calories/day is a common, sustainable target." },
+      { q: "Which activity level should I choose?", a: "Be honest rather than aspirational — most people overestimate their activity level. If you're unsure, sedentary or light is a safer starting point, and you can adjust based on how your actual weight trend compares to your goal." },
+    ],
+    frFaq: [
+      { q: "Quelle est la précision de l'équation Mifflin-St Jeor ?", a: "Elle est généralement considérée comme plus précise que l'ancienne équation Harris-Benedict, des études montrant qu'elle prédit le métabolisme de repos à environ 10% près pour la plupart des gens. Le métabolisme individuel peut toujours varier selon la génétique, la masse musculaire et l'état de santé." },
+      { q: "Dois-je manger exactement à mon TDEE ?", a: "Manger à son TDEE maintient le poids actuel. Manger en dessous (déficit calorique) mène à une perte de poids, et manger au-dessus (surplus) mène à une prise de poids — un déficit ou surplus modéré de 300-500 calories/jour est un objectif courant et durable." },
+      { q: "Quel niveau d'activité choisir ?", a: "Soyez honnête plutôt qu'aspirationnel — la plupart des gens surestiment leur niveau d'activité. En cas de doute, sédentaire ou léger est un point de départ plus sûr, ajustable selon l'évolution réelle de votre poids par rapport à votre objectif." },
+    ],
+  },
+
+  ratio: {
+    title: "Ratio Calculator — Simplify Ratios & Solve Proportions",
+    frTitle: "Calculateur de Ratio — Simplifier des Ratios et Résoudre des Proportions",
+    what: "A ratio compares two quantities (like 4:5), and a proportion is a statement that two ratios are equal (like 4:5 = 20:25). This calculator has two modes: simplifying a ratio down to its smallest whole-number form, and solving a proportion when one of the four numbers is missing. It's commonly needed for recipe scaling, map scales, mixing ratios, and school math homework.",
+    frWhat: "Un ratio compare deux quantités (comme 4:5), et une proportion est une affirmation que deux ratios sont égaux (comme 4:5 = 20:25). Ce calculateur a deux modes : simplifier un ratio à sa forme entière la plus petite, et résoudre une proportion quand l'un des quatre nombres est manquant. Il est couramment nécessaire pour l'ajustement de recettes, les échelles de carte, les ratios de mélange et les devoirs de mathématiques scolaires.",
+    how: "To simplify a ratio, both numbers are divided by their greatest common divisor (GCD) — the largest number that divides evenly into both. To solve a proportion, the calculator uses cross-multiplication: in a:b = c:d, the product of the outer terms equals the product of the inner terms (a×d = b×c), which can be rearranged to solve for whichever term is unknown.",
+    frHow: "Pour simplifier un ratio, les deux nombres sont divisés par leur plus grand diviseur commun (PGCD) — le plus grand nombre qui divise exactement les deux. Pour résoudre une proportion, le calculateur utilise la multiplication en croix : dans a:b = c:d, le produit des termes extrêmes égale le produit des termes moyens (a×d = b×c), ce qui peut être réarrangé pour résoudre le terme inconnu.",
+    formula: { expr: "Simplify: a÷GCD(a,b) : b÷GCD(a,b)", note: "Solve: a×d = b×c (cross multiplication)" },
+    frFormula: { expr: "Simplifier : a÷PGCD(a,b) : b÷PGCD(a,b)", note: "Résoudre : a×d = b×c (multiplication en croix)" },
+    examples: [
+      { label: "Simplify", input: "8:12", result: "2:3" },
+      { label: "Solve for missing term", input: "4:5 = x:25", result: "x = 20" },
+      { label: "Recipe scaling", input: "Simplify 250:500 (grams)", result: "1:2" },
+    ],
+    frExamples: [
+      { label: "Simplifier", input: "8:12", result: "2:3" },
+      { label: "Résoudre le terme manquant", input: "4:5 = x:25", result: "x = 20" },
+      { label: "Ajustement de recette", input: "Simplifier 250:500 (grammes)", result: "1:2" },
+    ],
+    faq: [
+      { q: "What's the difference between a ratio and a fraction?", a: "A ratio compares two separate quantities (4 apples : 5 oranges), while a fraction represents a part of a whole (4/9 of all the fruit). They use the same math, but mean different things in context." },
+      { q: "Can I use negative or zero values?", a: "No — ratios and proportions are only meaningful for positive quantities, since a ratio describes a relative size or rate, which doesn't make sense as zero or negative." },
+      { q: "Why does simplifying use the greatest common divisor?", a: "Dividing by any common divisor keeps the ratio equivalent, but only dividing by the greatest one guarantees you reach the smallest possible whole-number form in a single step." },
+    ],
+    frFaq: [
+      { q: "Quelle est la différence entre un ratio et une fraction ?", a: "Un ratio compare deux quantités distinctes (4 pommes : 5 oranges), tandis qu'une fraction représente une partie d'un tout (4/9 de tous les fruits). Ils utilisent les mêmes mathématiques, mais signifient des choses différentes selon le contexte." },
+      { q: "Puis-je utiliser des valeurs négatives ou nulles ?", a: "Non — les ratios et proportions n'ont de sens que pour des quantités positives, car un ratio décrit une taille ou un taux relatif, ce qui n'a pas de sens à zéro ou en négatif." },
+      { q: "Pourquoi la simplification utilise-t-elle le plus grand diviseur commun ?", a: "Diviser par n'importe quel diviseur commun garde le ratio équivalent, mais seul diviser par le plus grand garantit d'atteindre la plus petite forme entière possible en une seule étape." },
+    ],
+  },
+
+  loan: {
+    title: "Loan Calculator — Monthly Payment & Total Interest",
+    frTitle: "Calculateur de Prêt — Paiement Mensuel et Intérêts Totaux",
+    what: "This calculator computes the fixed monthly payment for any amortizing loan — personal loans, auto loans, or any fixed-rate borrowing — along with the total interest you'll pay over the life of the loan. Knowing these numbers upfront helps you compare loan offers from different lenders and understand the true cost of borrowing beyond just the sticker interest rate.",
+    frWhat: "Ce calculateur calcule le paiement mensuel fixe pour tout prêt amortissable — prêts personnels, prêts auto, ou tout emprunt à taux fixe — ainsi que le total des intérêts que vous paierez sur la durée du prêt. Connaître ces chiffres à l'avance aide à comparer les offres de prêt de différents prêteurs et à comprendre le vrai coût de l'emprunt au-delà du simple taux d'intérêt affiché.",
+    how: "The calculator takes the loan amount, annual interest rate, and term in years, then applies the standard amortization formula used by banks. Each monthly payment is the same fixed amount, but the split between interest and principal shifts over time — early payments are mostly interest, later payments are mostly principal.",
+    frHow: "Le calculateur prend le montant du prêt, le taux d'intérêt annuel et la durée en années, puis applique la formule d'amortissement standard utilisée par les banques. Chaque paiement mensuel est le même montant fixe, mais la répartition entre intérêts et capital évolue avec le temps — les premiers paiements sont surtout des intérêts, les derniers surtout du capital.",
+    formula: { expr: "M = P × [r(1+r)ⁿ] ÷ [(1+r)ⁿ − 1]", note: "M = monthly payment, P = principal, r = monthly rate, n = total months" },
+    frFormula: { expr: "M = P × [r(1+r)ⁿ] ÷ [(1+r)ⁿ − 1]", note: "M = paiement mensuel, P = capital, r = taux mensuel, n = nombre total de mois" },
+    examples: [
+      { label: "Car loan", input: "$25,000 at 6% for 5 years", result: "$483/month — $4,999 total interest" },
+      { label: "Personal loan", input: "$10,000 at 9% for 3 years", result: "$318/month — $1,439 total interest" },
+      { label: "Short-term loan", input: "$5,000 at 12% for 1 year", result: "$444/month — $328 total interest" },
+    ],
+    frExamples: [
+      { label: "Prêt auto", input: "25 000$ à 6% sur 5 ans", result: "483$/mois — 4 999$ d'intérêts totaux" },
+      { label: "Prêt personnel", input: "10 000$ à 9% sur 3 ans", result: "318$/mois — 1 439$ d'intérêts totaux" },
+      { label: "Prêt court terme", input: "5 000$ à 12% sur 1 an", result: "444$/mois — 328$ d'intérêts totaux" },
+    ],
+    faq: [
+      { q: "What's the difference between this and the Mortgage Calculator?", a: "They use the same amortization math — this one is framed for general-purpose loans (personal, auto), while Mortgage is framed specifically for home loans, which often involve larger amounts and longer terms." },
+      { q: "Does this include fees or insurance?", a: "No — it calculates pure principal-and-interest payments based on the rate and term you enter. Origination fees, insurance, or other loan costs aren't included and should be added separately." },
+      { q: "Why does interest make up more of my early payments?", a: "Interest is charged on the remaining balance, which is highest at the start of the loan. As you pay down principal, the balance shrinks, so less interest accrues each month even though the total payment stays the same." },
+    ],
+    frFaq: [
+      { q: "Quelle est la différence avec le Calculateur d'Hypothèque ?", a: "Ils utilisent les mêmes mathématiques d'amortissement — celui-ci est destiné aux prêts généraux (personnel, auto), tandis que l'Hypothèque est spécifique aux prêts immobiliers, souvent avec des montants et durées plus importants." },
+      { q: "Cela inclut-il les frais ou l'assurance ?", a: "Non — il calcule les paiements purs de capital et intérêts selon le taux et la durée saisis. Les frais de dossier, assurance ou autres coûts du prêt ne sont pas inclus et doivent être ajoutés séparément." },
+      { q: "Pourquoi les intérêts représentent-ils plus de mes premiers paiements ?", a: "Les intérêts sont calculés sur le solde restant, qui est le plus élevé en début de prêt. À mesure que vous remboursez le capital, le solde diminue, donc moins d'intérêts s'accumulent chaque mois même si le paiement total reste identique." },
+    ],
+  },
+
+  currency: {
+    title: "Currency Converter — Exchange Rates Between World Currencies",
+    frTitle: "Convertisseur de Devises — Taux de Change entre Devises Mondiales",
+    what: "This tool converts an amount from one currency to another using exchange rates, useful for travel budgeting, online shopping from foreign stores, freelance invoicing in a different currency, or simply understanding how much something costs in your home currency. It covers the world's major currencies.",
+    frWhat: "Cet outil convertit un montant d'une devise à une autre à l'aide de taux de change, utile pour le budget de voyage, les achats en ligne depuis des boutiques étrangères, la facturation en freelance dans une autre devise, ou simplement pour comprendre combien coûte quelque chose dans votre devise locale. Il couvre les principales devises mondiales.",
+    how: "The amount you enter is multiplied by the current exchange rate between your source and target currency to produce the converted amount. Because exchange rates move constantly based on global markets, the rate used reflects the most recent available data at the time of conversion.",
+    frHow: "Le montant saisi est multiplié par le taux de change actuel entre votre devise source et cible pour produire le montant converti. Comme les taux de change évoluent constamment selon les marchés mondiaux, le taux utilisé reflète les données les plus récentes disponibles au moment de la conversion.",
+    formula: { expr: "Converted amount = Amount × Exchange rate", note: "Exchange rates change continuously with global markets" },
+    frFormula: { expr: "Montant converti = Montant × Taux de change", note: "Les taux de change évoluent continuellement selon les marchés mondiaux" },
+    examples: [
+      { label: "Travel budget", input: "$500 USD to EUR", result: "≈ €460 (rate-dependent)" },
+      { label: "Online purchase", input: "£75 GBP to USD", result: "≈ $95 (rate-dependent)" },
+      { label: "Freelance invoice", input: "€1,200 EUR to JPY", result: "≈ ¥195,000 (rate-dependent)" },
+    ],
+    frExamples: [
+      { label: "Budget voyage", input: "500$ USD en EUR", result: "≈ 460€ (selon le taux)" },
+      { label: "Achat en ligne", input: "75£ GBP en USD", result: "≈ 95$ (selon le taux)" },
+      { label: "Facture freelance", input: "1 200€ EUR en JPY", result: "≈ 195 000¥ (selon le taux)" },
+    ],
+    faq: [
+      { q: "How often do exchange rates update?", a: "Currency markets trade nearly 24 hours a day on weekdays, so rates can shift by the minute. For large transactions, always check the live rate at the time you actually need it." },
+      { q: "Why is the rate I see different from my bank's rate?", a: "Banks and payment providers typically add a margin on top of the market ('mid-market') exchange rate, so the rate you're offered when actually exchanging money is usually less favorable than the reference rate shown here." },
+      { q: "Which currencies are supported?", a: "All major world currencies are supported, covering the currencies most commonly needed for travel, shopping, and international business." },
+    ],
+    frFaq: [
+      { q: "À quelle fréquence les taux de change sont-ils mis à jour ?", a: "Les marchés des devises se négocient presque 24h/24 en semaine, donc les taux peuvent changer à la minute près. Pour de grosses transactions, vérifiez toujours le taux en direct au moment où vous en avez réellement besoin." },
+      { q: "Pourquoi le taux que je vois diffère-t-il de celui de ma banque ?", a: "Les banques et prestataires de paiement ajoutent généralement une marge par rapport au taux de change du marché (« mid-market »), donc le taux qui vous est proposé lors d'un échange réel est habituellement moins favorable que le taux de référence affiché ici." },
+      { q: "Quelles devises sont prises en charge ?", a: "Toutes les principales devises mondiales sont prises en charge, couvrant les devises les plus couramment nécessaires pour le voyage, les achats et le commerce international." },
+    ],
+  },
+
+  gpa: {
+    title: "GPA Calculator — Weighted Grade Point Average",
+    frTitle: "Calculateur de Moyenne (GPA) — Moyenne Pondérée",
+    what: "Grade Point Average (GPA) summarizes your academic performance across multiple courses into a single number, typically on a 4.0 scale. Because courses often carry different credit weights, a simple average of grades isn't accurate — this calculator weights each grade by its credit hours to produce a true GPA, the same way most schools and universities calculate it.",
+    frWhat: "La moyenne pondérée (GPA) résume votre performance académique sur plusieurs cours en un seul chiffre, généralement sur une échelle de 4,0. Comme les cours ont souvent des poids de crédits différents, une simple moyenne des notes n'est pas précise — ce calculateur pondère chaque note par ses heures de crédit pour produire un GPA véritable, de la même façon que la plupart des écoles et universités le calculent.",
+    how: "Each letter grade is converted to grade points (A=4.0, B=3.0, etc.), multiplied by the number of credit hours for that course, then all of these are summed and divided by the total credit hours across all courses. This weighting means a 4-credit course affects your GPA twice as much as a 2-credit course.",
+    frHow: "Chaque note en lettre est convertie en points (A=4,0, B=3,0, etc.), multipliée par le nombre d'heures de crédit de ce cours, puis le tout est additionné et divisé par le total des heures de crédit de tous les cours. Cette pondération signifie qu'un cours de 4 crédits affecte votre GPA deux fois plus qu'un cours de 2 crédits.",
+    formula: { expr: "GPA = Σ(Grade Points × Credit Hours) ÷ Σ(Credit Hours)", note: "Standard scale: A=4.0, B=3.0, C=2.0, D=1.0, F=0.0" },
+    frFormula: { expr: "GPA = Σ(Points × Heures de Crédit) ÷ Σ(Heures de Crédit)", note: "Échelle standard : A=4,0, B=3,0, C=2,0, D=1,0, F=0,0" },
+    examples: [
+      { label: "Three courses", input: "A (3cr), B (4cr), A (3cr)", result: "GPA 3.60" },
+      { label: "Mixed performance", input: "B (3cr), C (3cr), A (4cr)", result: "GPA 3.10" },
+      { label: "Single heavy course", input: "A (5cr), B (2cr)", result: "GPA 3.71" },
+    ],
+    frExamples: [
+      { label: "Trois cours", input: "A (3cr), B (4cr), A (3cr)", result: "GPA 3,60" },
+      { label: "Performance mixte", input: "B (3cr), C (3cr), A (4cr)", result: "GPA 3,10" },
+      { label: "Cours lourd unique", input: "A (5cr), B (2cr)", result: "GPA 3,71" },
+    ],
+    faq: [
+      { q: "Does this work for weighted (honors/AP) grading scales?", a: "This calculator uses the standard unweighted 4.0 scale. Schools using a 5.0 weighted scale for honors or AP courses would need to adjust the grade point values before entering them." },
+      { q: "What if my school uses a different scale (like 10.0 or percentages)?", a: "You'll need to convert your grades to the standard 4.0 scale first, or adjust the grade point values to match your institution's specific conversion table." },
+      { q: "How is a semester GPA different from a cumulative GPA?", a: "A semester GPA only includes that term's courses, while a cumulative GPA includes every course and credit hour from every term you've completed — enter all your courses together to get a cumulative figure." },
+    ],
+    frFaq: [
+      { q: "Cela fonctionne-t-il pour les échelles pondérées (honors/AP) ?", a: "Ce calculateur utilise l'échelle standard non pondérée de 4,0. Les écoles utilisant une échelle pondérée de 5,0 pour les cours honors ou AP devraient ajuster les valeurs de points avant de les saisir." },
+      { q: "Et si mon école utilise une échelle différente (comme 10,0 ou des pourcentages) ?", a: "Vous devrez d'abord convertir vos notes à l'échelle standard de 4,0, ou ajuster les valeurs de points pour correspondre au tableau de conversion spécifique de votre établissement." },
+      { q: "Quelle est la différence entre un GPA de semestre et un GPA cumulatif ?", a: "Un GPA de semestre n'inclut que les cours de ce trimestre, tandis qu'un GPA cumulatif inclut chaque cours et heure de crédit de tous les trimestres complétés — saisissez tous vos cours ensemble pour obtenir un chiffre cumulatif." },
+    ],
+  },
+
+  scientific: {
+    title: "Scientific Calculator — Trigonometry, Logarithms & More",
+    frTitle: "Calculatrice Scientifique — Trigonométrie, Logarithmes et Plus",
+    what: "This calculator goes beyond basic arithmetic to support the functions needed for algebra, trigonometry, and higher math: trigonometric functions (sin, cos, tan), logarithms, exponents, roots, and constants like π and e. It's built for students, engineers, and anyone who needs more than a phone's basic calculator app.",
+    frWhat: "Cette calculatrice va au-delà de l'arithmétique de base pour prendre en charge les fonctions nécessaires à l'algèbre, la trigonométrie et les mathématiques avancées : fonctions trigonométriques (sin, cos, tan), logarithmes, exposants, racines et constantes comme π et e. Elle est conçue pour les étudiants, ingénieurs et toute personne ayant besoin de plus qu'une calculatrice de téléphone basique.",
+    how: "Expressions are evaluated following standard mathematical order of operations (parentheses, exponents, multiplication/division, addition/subtraction). Trigonometric functions can typically be switched between degree and radian mode, which is worth double-checking before an angle calculation to avoid a common source of wrong answers.",
+    frHow: "Les expressions sont évaluées selon l'ordre standard des opérations mathématiques (parenthèses, exposants, multiplication/division, addition/soustraction). Les fonctions trigonométriques peuvent généralement basculer entre le mode degrés et radians, ce qu'il vaut la peine de vérifier avant un calcul d'angle pour éviter une source d'erreur courante.",
+    examples: [
+      { label: "Trigonometry", input: "sin(30°)", result: "0.5" },
+      { label: "Logarithm", input: "log(1000)", result: "3" },
+      { label: "Exponent & root", input: "2^10, √144", result: "1024, 12" },
+    ],
+    frExamples: [
+      { label: "Trigonométrie", input: "sin(30°)", result: "0,5" },
+      { label: "Logarithme", input: "log(1000)", result: "3" },
+      { label: "Exposant et racine", input: "2^10, √144", result: "1024, 12" },
+    ],
+    faq: [
+      { q: "Degrees or radians — which should I use?", a: "Use degrees for everyday geometry and most school problems; use radians for calculus and most higher-level physics/engineering work. Check which mode is active before trusting a trig result." },
+      { q: "What's the difference between log and ln?", a: "log (without a subscript) usually means log base 10, while ln means the natural logarithm, base e (≈2.71828). They're related but give different results for the same input." },
+      { q: "Can it handle very large or very small numbers?", a: "Yes, results are typically shown in scientific notation once they exceed a certain size, keeping the display readable regardless of magnitude." },
+    ],
+    frFaq: [
+      { q: "Degrés ou radians — lequel utiliser ?", a: "Utilisez les degrés pour la géométrie quotidienne et la plupart des problèmes scolaires ; utilisez les radians pour le calcul différentiel et la plupart des travaux avancés en physique/ingénierie. Vérifiez quel mode est actif avant de faire confiance à un résultat trigonométrique." },
+      { q: "Quelle est la différence entre log et ln ?", a: "log (sans indice) signifie généralement logarithme en base 10, tandis que ln signifie le logarithme naturel, en base e (≈2,71828). Ils sont liés mais donnent des résultats différents pour la même entrée." },
+      { q: "Peut-elle gérer de très grands ou très petits nombres ?", a: "Oui, les résultats sont généralement affichés en notation scientifique une fois qu'ils dépassent une certaine taille, gardant l'affichage lisible quelle que soit l'ampleur." },
+    ],
+  },
+
+  timezone: {
+    title: "Time Zone Converter — Compare Times Across the World",
+    frTitle: "Convertisseur de Fuseau Horaire — Comparer les Heures dans le Monde",
+    what: "This tool converts a time from one time zone to another, essential for scheduling calls with remote colleagues, planning international travel, or coordinating with friends and family abroad. Time zones are defined as offsets from UTC (Coordinated Universal Time), and this calculator handles the arithmetic for you.",
+    frWhat: "Cet outil convertit une heure d'un fuseau horaire à un autre, essentiel pour planifier des appels avec des collègues distants, organiser des voyages internationaux, ou coordonner avec des amis et la famille à l'étranger. Les fuseaux horaires sont définis comme des décalages par rapport à UTC (Temps Universel Coordonné), et ce calculateur gère l'arithmétique pour vous.",
+    how: "Every time zone has a defined offset from UTC (e.g. UTC-5, UTC+9). Converting between two zones means finding the difference between their offsets and adding or subtracting that many hours from your source time. The calculator also accounts for Daylight Saving Time in regions that observe it, since the offset itself changes twice a year in those places.",
+    frHow: "Chaque fuseau horaire a un décalage défini par rapport à UTC (ex. UTC-5, UTC+9). Convertir entre deux fuseaux signifie trouver la différence entre leurs décalages et ajouter ou soustraire ce nombre d'heures à votre heure source. Le calculateur tient aussi compte de l'heure d'été dans les régions qui l'observent, car le décalage lui-même change deux fois par an dans ces endroits.",
+    formula: { expr: "Target time = Source time + (Target UTC offset − Source UTC offset)", note: "Adjust for Daylight Saving Time where applicable" },
+    frFormula: { expr: "Heure cible = Heure source + (Décalage UTC cible − Décalage UTC source)", note: "Ajuster pour l'heure d'été le cas échéant" },
+    examples: [
+      { label: "NY to London", input: "9:00 AM EST → London", result: "2:00 PM GMT" },
+      { label: "Tokyo to LA", input: "6:00 PM JST → Los Angeles", result: "1:00 AM PST (same day)" },
+      { label: "Paris to Sydney", input: "10:00 AM CET → Sydney", result: "7:00 PM AEDT" },
+    ],
+    frExamples: [
+      { label: "NY vers Londres", input: "9h00 EST → Londres", result: "14h00 GMT" },
+      { label: "Tokyo vers LA", input: "18h00 JST → Los Angeles", result: "1h00 PST (même jour)" },
+      { label: "Paris vers Sydney", input: "10h00 CET → Sydney", result: "19h00 AEDT" },
+    ],
+    faq: [
+      { q: "Why did my converted time seem off by an hour?", a: "This is almost always a Daylight Saving Time mismatch — one of the two locations observes DST and the other doesn't, or they're not in their DST period at the same time of year. Double-check the current DST status for both locations." },
+      { q: "Does every country use Daylight Saving Time?", a: "No — most of Asia, Africa, and many other regions don't observe DST at all, while countries that do observe it don't all switch on the same dates, making cross-region conversions trickier around the transition periods." },
+      { q: "What is UTC and why does it matter?", a: "UTC is the global time standard that doesn't change with seasons, used as the reference point every time zone is defined against. It's the safest time to communicate in writing (e.g. in a meeting invite) to avoid ambiguity." },
+    ],
+    frFaq: [
+      { q: "Pourquoi mon heure convertie semble-t-elle décalée d'une heure ?", a: "C'est presque toujours un décalage lié à l'heure d'été — l'un des deux lieux l'observe et pas l'autre, ou ils ne sont pas dans leur période d'heure d'été au même moment de l'année. Vérifiez le statut actuel de l'heure d'été pour les deux lieux." },
+      { q: "Tous les pays utilisent-ils l'heure d'été ?", a: "Non — la plupart de l'Asie, de l'Afrique et de nombreuses autres régions n'observent pas du tout l'heure d'été, tandis que les pays qui l'observent ne changent pas tous aux mêmes dates, compliquant les conversions autour des périodes de transition." },
+      { q: "Qu'est-ce que UTC et pourquoi est-ce important ?", a: "UTC est la référence horaire mondiale qui ne change pas avec les saisons, utilisée comme point de référence pour définir chaque fuseau horaire. C'est l'heure la plus sûre à utiliser à l'écrit (ex. une invitation de réunion) pour éviter toute ambiguïté." },
+    ],
+  },
+
+  password: {
+    title: "Password Generator — Strong, Random Passwords",
+    frTitle: "Générateur de Mot de Passe — Mots de Passe Forts et Aléatoires",
+    what: "This tool generates strong, random passwords using a mix of uppercase and lowercase letters, numbers, and symbols. Random passwords are far more resistant to brute-force and dictionary attacks than human-created ones, since people tend to reuse predictable patterns (names, dates, common substitutions) that attackers already know to try first.",
+    frWhat: "Cet outil génère des mots de passe forts et aléatoires en mélangeant lettres majuscules et minuscules, chiffres et symboles. Les mots de passe aléatoires résistent bien mieux aux attaques par force brute et par dictionnaire que ceux créés par des humains, car les gens ont tendance à réutiliser des motifs prévisibles (noms, dates, substitutions courantes) que les attaquants savent déjà essayer en premier.",
+    how: "Each character of the password is chosen at random from the character sets you enable (uppercase, lowercase, numbers, symbols), using your browser's random number generator. Length matters more than most people realize — each additional character multiplies the number of possible combinations, making the password exponentially harder to guess.",
+    frHow: "Chaque caractère du mot de passe est choisi au hasard parmi les ensembles de caractères activés (majuscules, minuscules, chiffres, symboles), en utilisant le générateur de nombres aléatoires de votre navigateur. La longueur compte plus qu'on ne le pense — chaque caractère supplémentaire multiplie le nombre de combinaisons possibles, rendant le mot de passe exponentiellement plus difficile à deviner.",
+    examples: [
+      { label: "12 characters, all sets", input: "Length 12, upper+lower+numbers+symbols", result: "e.g. K7#mQ2!vXz9$" },
+      { label: "16 characters, no symbols", input: "Length 16, upper+lower+numbers", result: "e.g. Tf82RqLm5vNpXk3D" },
+      { label: "Simple, letters only", input: "Length 10, lowercase only", result: "e.g. qmzxvkrtpb" },
+    ],
+    frExamples: [
+      { label: "12 caractères, tous les jeux", input: "Longueur 12, maj+min+chiffres+symboles", result: "ex. K7#mQ2!vXz9$" },
+      { label: "16 caractères, sans symboles", input: "Longueur 16, maj+min+chiffres", result: "ex. Tf82RqLm5vNpXk3D" },
+      { label: "Simple, lettres uniquement", input: "Longueur 10, minuscules uniquement", result: "ex. qmzxvkrtpb" },
+    ],
+    faq: [
+      { q: "How long should my password be?", a: "At least 12 characters is a common modern baseline; 16+ is better for important accounts. Length contributes more to security than complexity — a long passphrase can be both strong and easier to remember." },
+      { q: "Should I include symbols?", a: "Yes, if the site allows them — symbols expand the character set the password is drawn from, increasing the total possible combinations an attacker would need to try." },
+      { q: "Is it safe to generate passwords in a browser?", a: "This tool generates passwords entirely in your browser using its built-in random number generator — the password is never sent anywhere, but you should still avoid reusing the same password across multiple sites." },
+    ],
+    frFaq: [
+      { q: "Quelle longueur devrait avoir mon mot de passe ?", a: "Au moins 12 caractères est une base moderne courante ; 16+ est préférable pour les comptes importants. La longueur contribue plus à la sécurité que la complexité — une longue phrase de passe peut être à la fois forte et plus facile à retenir." },
+      { q: "Dois-je inclure des symboles ?", a: "Oui, si le site les autorise — les symboles élargissent l'ensemble de caractères dont est tiré le mot de passe, augmentant le nombre total de combinaisons qu'un attaquant devrait essayer." },
+      { q: "Est-il sûr de générer des mots de passe dans un navigateur ?", a: "Cet outil génère les mots de passe entièrement dans votre navigateur avec son générateur de nombres aléatoires intégré — le mot de passe n'est jamais envoyé où que ce soit, mais évitez tout de même de réutiliser le même mot de passe sur plusieurs sites." },
+    ],
+  },
+
+  uuid: {
+    title: "UUID Generator — Random Unique Identifiers",
+    frTitle: "Générateur UUID — Identifiants Uniques Aléatoires",
+    what: "A UUID (Universally Unique Identifier) is a 128-bit random value used across software systems to identify records, sessions, or objects without needing a central authority to hand out sequential IDs. This generator creates standard version-4 (random) UUIDs, commonly used in databases, APIs, and distributed systems.",
+    frWhat: "Un UUID (Identifiant Unique Universel) est une valeur aléatoire de 128 bits utilisée dans les systèmes logiciels pour identifier des enregistrements, sessions ou objets sans avoir besoin d'une autorité centrale distribuant des ID séquentiels. Ce générateur crée des UUID version 4 (aléatoires) standards, couramment utilisés dans les bases de données, API et systèmes distribués.",
+    how: "A version-4 UUID is built from 122 random bits (the remaining 6 bits are fixed to mark the version and variant), formatted as 32 hexadecimal characters split into five groups by hyphens. With that much randomness, the odds of two independently generated UUIDs ever colliding are astronomically small.",
+    frHow: "Un UUID version 4 est construit à partir de 122 bits aléatoires (les 6 bits restants sont fixes pour marquer la version et la variante), formaté en 32 caractères hexadécimaux répartis en cinq groupes séparés par des tirets. Avec autant d'aléatoire, la probabilité que deux UUID générés indépendamment entrent en collision est astronomiquement faible.",
+    formula: { expr: "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx", note: "x = random hex digit, 4 marks the version, y is one of 8/9/a/b (the variant)" },
+    frFormula: { expr: "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx", note: "x = chiffre hexadécimal aléatoire, 4 marque la version, y est 8/9/a/b (la variante)" },
+    examples: [
+      { label: "Single UUID", input: "Generate 1", result: "e.g. 3f29a8c2-7e41-4b6d-9a13-f0d8c4e7b921" },
+      { label: "Batch", input: "Generate 5", result: "5 unique UUIDs, one per line" },
+    ],
+    frExamples: [
+      { label: "UUID unique", input: "Générer 1", result: "ex. 3f29a8c2-7e41-4b6d-9a13-f0d8c4e7b921" },
+      { label: "Lot", input: "Générer 5", result: "5 UUID uniques, un par ligne" },
+    ],
+    faq: [
+      { q: "Can two generated UUIDs ever be the same?", a: "In theory yes, but the probability is so low (roughly 1 in 2.7×10³⁸) that it's considered practically impossible — you'd need to generate billions of UUIDs per second for billions of years before a collision became likely." },
+      { q: "What's the difference between UUID versions?", a: "Version 4 (used here) is purely random. Other versions derive the UUID from timestamps, MAC addresses, or namespaces instead — version 4 is the most common choice when you just need a unique, unpredictable ID." },
+      { q: "Where are UUIDs commonly used?", a: "Database primary keys, API request IDs, session tokens, and distributed system object identifiers are all common uses, since UUIDs can be generated independently on different machines without any coordination." },
+    ],
+    frFaq: [
+      { q: "Deux UUID générés peuvent-ils être identiques ?", a: "En théorie oui, mais la probabilité est si faible (environ 1 sur 2,7×10³⁸) qu'elle est considérée comme pratiquement impossible — il faudrait générer des milliards d'UUID par seconde pendant des milliards d'années avant qu'une collision devienne probable." },
+      { q: "Quelle est la différence entre les versions d'UUID ?", a: "La version 4 (utilisée ici) est purement aléatoire. D'autres versions dérivent l'UUID d'horodatages, d'adresses MAC ou d'espaces de noms — la version 4 est le choix le plus courant quand on a simplement besoin d'un ID unique et imprévisible." },
+      { q: "Où les UUID sont-ils couramment utilisés ?", a: "Les clés primaires de base de données, ID de requêtes API, jetons de session et identifiants d'objets de systèmes distribués sont des usages courants, car les UUID peuvent être générés indépendamment sur différentes machines sans coordination." },
+    ],
+  },
+
+  json: {
+    title: "JSON Formatter — Validate & Beautify JSON",
+    frTitle: "Formateur JSON — Valider et Embellir le JSON",
+    what: "This tool formats messy or minified JSON into a readable, properly indented structure, and validates that the JSON is syntactically correct along the way. It's a daily tool for developers working with APIs, config files, or debugging data that arrives as a single unreadable line of text.",
+    frWhat: "Cet outil formate du JSON désordonné ou minifié en une structure lisible et correctement indentée, tout en validant que le JSON est syntaxiquement correct. C'est un outil quotidien pour les développeurs travaillant avec des API, des fichiers de configuration, ou déboguant des données arrivant en une seule ligne de texte illisible.",
+    how: "The tool parses your input as JSON — checking that brackets, quotes, and commas are all correctly placed — then re-serializes it with consistent indentation. If the input has a syntax error, the parser reports where it failed, which is usually the fastest way to locate a typo in a large JSON payload.",
+    frHow: "L'outil analyse votre saisie en tant que JSON — vérifiant que les crochets, guillemets et virgules sont correctement placés — puis le re-sérialise avec une indentation cohérente. Si l'entrée a une erreur de syntaxe, l'analyseur indique où il a échoué, ce qui est généralement le moyen le plus rapide de localiser une faute de frappe dans un gros payload JSON.",
+    examples: [
+      { label: "Minified input", input: '{"name":"Alex","age":30}', result: "Formatted with 2-space indent, one field per line" },
+      { label: "Invalid JSON", input: '{"name":"Alex",}', result: "Error: trailing comma not allowed" },
+    ],
+    frExamples: [
+      { label: "Entrée minifiée", input: '{"name":"Alex","age":30}', result: "Formaté avec indentation de 2 espaces, un champ par ligne" },
+      { label: "JSON invalide", input: '{"name":"Alex",}', result: "Erreur : virgule finale non autorisée" },
+    ],
+    faq: [
+      { q: "Why does my JSON fail to format?", a: "The most common causes are trailing commas (not allowed in standard JSON), unquoted keys, single quotes instead of double quotes, or a missing closing bracket — the error message points to roughly where the parser got stuck." },
+      { q: "Is my data sent anywhere when I format it?", a: "No — parsing and formatting happens entirely in your browser using standard JSON parsing, so your data never leaves your device." },
+      { q: "Can this minify JSON too, not just beautify it?", a: "Formatting and minifying are the same operation with different indentation settings — most JSON formatters offer both a readable (indented) and compact (single-line) output option." },
+    ],
+    frFaq: [
+      { q: "Pourquoi mon JSON échoue-t-il au formatage ?", a: "Les causes les plus courantes sont les virgules finales (non autorisées en JSON standard), les clés sans guillemets, des guillemets simples au lieu de doubles, ou un crochet fermant manquant — le message d'erreur indique approximativement où l'analyseur s'est bloqué." },
+      { q: "Mes données sont-elles envoyées quelque part lors du formatage ?", a: "Non — l'analyse et le formatage se font entièrement dans votre navigateur avec l'analyse JSON standard, donc vos données ne quittent jamais votre appareil." },
+      { q: "Cela peut-il aussi minifier le JSON, pas seulement l'embellir ?", a: "Formater et minifier sont la même opération avec des réglages d'indentation différents — la plupart des formateurs JSON offrent une sortie lisible (indentée) et compacte (une ligne)." },
+    ],
+  },
+
+  qr: {
+    title: "QR Code Generator — Create Free QR Codes",
+    frTitle: "Générateur de QR Code — Créer des QR Codes Gratuits",
+    what: "This tool turns any text, URL, Wi-Fi credentials, or contact info into a scannable QR code image you can download and use on flyers, business cards, product packaging, or digital menus. QR codes let someone open a link or capture information instantly with their phone's camera, without typing anything.",
+    frWhat: "Cet outil transforme tout texte, URL, identifiants Wi-Fi ou informations de contact en une image de QR code scannable que vous pouvez télécharger et utiliser sur des flyers, cartes de visite, emballages produits ou menus numériques. Les QR codes permettent d'ouvrir un lien ou capturer une information instantanément avec l'appareil photo d'un téléphone, sans rien taper.",
+    how: "The QR code encodes your input data into a grid of black and white squares following the QR standard, which includes built-in error correction — meaning the code can still be scanned successfully even if part of it is smudged, scratched, or partially covered by a logo.",
+    frHow: "Le QR code encode vos données d'entrée dans une grille de carrés noirs et blancs selon le standard QR, qui inclut une correction d'erreur intégrée — ce qui signifie que le code peut toujours être scanné avec succès même si une partie est tachée, rayée, ou partiellement couverte par un logo.",
+    examples: [
+      { label: "Website link", input: "https://example.com", result: "Scannable QR code opening that URL" },
+      { label: "Wi-Fi credentials", input: "Network name + password", result: "QR code that connects a phone to Wi-Fi when scanned" },
+      { label: "Plain text", input: "Any short message", result: "QR code displaying that text when scanned" },
+    ],
+    frExamples: [
+      { label: "Lien de site web", input: "https://example.com", result: "QR code scannable ouvrant cette URL" },
+      { label: "Identifiants Wi-Fi", input: "Nom du réseau + mot de passe", result: "QR code qui connecte un téléphone au Wi-Fi une fois scanné" },
+      { label: "Texte simple", input: "Tout message court", result: "QR code affichant ce texte une fois scanné" },
+    ],
+    faq: [
+      { q: "Do QR codes expire?", a: "No — a QR code generated this way encodes the data directly and permanently. It will keep working as long as the underlying content (like a linked webpage) still exists; the code image itself never expires." },
+      { q: "Can I put a logo in the middle of my QR code?", a: "Many QR generators support this because of built-in error correction, which tolerates a portion of the code being obscured — though covering too much can still make it unreadable, so keep any logo small relative to the whole code." },
+      { q: "What can I encode besides a URL?", a: "Plain text, Wi-Fi network credentials, contact cards (vCard), email addresses, and phone numbers are all commonly supported — anything the QR standard can represent as text." },
+    ],
+    frFaq: [
+      { q: "Les QR codes expirent-ils ?", a: "Non — un QR code généré ainsi encode les données directement et de façon permanente. Il continuera de fonctionner tant que le contenu sous-jacent (comme une page web liée) existe encore ; l'image du code elle-même n'expire jamais." },
+      { q: "Puis-je mettre un logo au centre de mon QR code ?", a: "De nombreux générateurs de QR code le permettent grâce à la correction d'erreur intégrée, qui tolère qu'une partie du code soit masquée — mais en couvrir trop peut quand même le rendre illisible, donc gardez tout logo petit par rapport à l'ensemble du code." },
+      { q: "Que puis-je encoder à part une URL ?", a: "Texte simple, identifiants de réseau Wi-Fi, cartes de contact (vCard), adresses email et numéros de téléphone sont tous couramment pris en charge — tout ce que le standard QR peut représenter en texte." },
+    ],
+  },
+
+  wordcount: {
+    title: "Word Counter — Words, Characters & Reading Time",
+    frTitle: "Compteur de Mots — Mots, Caractères et Temps de Lecture",
+    what: "This tool counts the words, characters, sentences, and paragraphs in any text you paste in, and estimates reading time. It's commonly used for meeting essay word limits, staying within social media character limits, checking article length for SEO, or estimating how long a speech or presentation will take.",
+    frWhat: "Cet outil compte les mots, caractères, phrases et paragraphes de tout texte collé, et estime le temps de lecture. Il est couramment utilisé pour respecter des limites de mots d'essais, rester dans les limites de caractères des réseaux sociaux, vérifier la longueur d'un article pour le SEO, ou estimer la durée d'un discours ou d'une présentation.",
+    how: "Words are counted by splitting the text on whitespace, characters are counted with and without spaces, sentences are detected by terminal punctuation (. ! ?), and paragraphs by line breaks. Reading time is estimated using an average adult reading speed, typically around 200-250 words per minute.",
+    frHow: "Les mots sont comptés en divisant le texte sur les espaces, les caractères sont comptés avec et sans espaces, les phrases sont détectées par la ponctuation finale (. ! ?), et les paragraphes par les sauts de ligne. Le temps de lecture est estimé en utilisant une vitesse de lecture moyenne adulte, généralement autour de 200-250 mots par minute.",
+    examples: [
+      { label: "Short paragraph", input: "A 3-sentence paragraph", result: "~45 words, ~260 characters, <1 min read" },
+      { label: "Tweet-length text", input: "280-character post", result: "~50 words, 280 characters" },
+      { label: "Full essay", input: "1,500-word essay", result: "1,500 words, ~6 min read" },
+    ],
+    frExamples: [
+      { label: "Paragraphe court", input: "Un paragraphe de 3 phrases", result: "~45 mots, ~260 caractères, <1 min de lecture" },
+      { label: "Texte format tweet", input: "Publication de 280 caractères", result: "~50 mots, 280 caractères" },
+      { label: "Essai complet", input: "Essai de 1 500 mots", result: "1 500 mots, ~6 min de lecture" },
+    ],
+    faq: [
+      { q: "Why does my word count differ slightly from my word processor?", a: "Different tools handle edge cases like hyphenated words, numbers, or multiple consecutive spaces slightly differently — small discrepancies of a few words are normal and rarely matter for practical purposes." },
+      { q: "Does this count characters with or without spaces?", a: "Both figures are typically shown, since some limits (like certain form fields) count spaces while others (like some social platforms) may count differently — check which figure applies to your specific limit." },
+      { q: "How accurate is the reading time estimate?", a: "It's a rough average based on typical adult reading speed — actual reading time varies with text complexity, the reader's familiarity with the subject, and whether they're skimming or reading closely." },
+    ],
+    frFaq: [
+      { q: "Pourquoi mon nombre de mots diffère-t-il légèrement de mon traitement de texte ?", a: "Différents outils gèrent les cas particuliers comme les mots avec trait d'union, les nombres ou les espaces multiples consécutifs un peu différemment — de petits écarts de quelques mots sont normaux et rarement significatifs en pratique." },
+      { q: "Cela compte-t-il les caractères avec ou sans espaces ?", a: "Les deux chiffres sont généralement affichés, car certaines limites (comme certains champs de formulaire) comptent les espaces tandis que d'autres (comme certaines plateformes sociales) comptent différemment — vérifiez quel chiffre s'applique à votre limite spécifique." },
+      { q: "Quelle est la précision de l'estimation du temps de lecture ?", a: "C'est une moyenne approximative basée sur la vitesse de lecture typique d'un adulte — le temps de lecture réel varie selon la complexité du texte, la familiarité du lecteur avec le sujet, et s'il survole ou lit attentivement." },
+    ],
+  },
+
+  textdiff: {
+    title: "Text Diff Checker — Compare Two Texts",
+    frTitle: "Comparateur de Texte — Comparer Deux Textes",
+    what: "This tool compares two blocks of text and highlights exactly what changed between them — additions, deletions, and modifications — line by line. It's used to review edits between document versions, compare contract revisions, spot changes in code snippets, or verify that two pieces of text are truly identical.",
+    frWhat: "Cet outil compare deux blocs de texte et met en évidence exactement ce qui a changé entre eux — ajouts, suppressions et modifications — ligne par ligne. Il est utilisé pour vérifier des modifications entre versions de documents, comparer des révisions de contrats, repérer des changements dans des extraits de code, ou vérifier que deux textes sont véritablement identiques.",
+    how: "The tool aligns both texts line by line and applies a diff algorithm to identify which lines match, which were added, and which were removed. Matching lines are shown normally, while added and removed lines are color-coded, making changes easy to scan even in long documents.",
+    frHow: "L'outil aligne les deux textes ligne par ligne et applique un algorithme de diff pour identifier quelles lignes correspondent, lesquelles ont été ajoutées et lesquelles ont été supprimées. Les lignes correspondantes sont affichées normalement, tandis que les lignes ajoutées et supprimées sont colorées, rendant les changements faciles à repérer même dans de longs documents.",
+    examples: [
+      { label: "Single word change", input: "\"the quick fox\" vs \"the slow fox\"", result: "'quick' removed, 'slow' added" },
+      { label: "Added line", input: "2 lines vs same 2 lines + 1 new line", result: "Third line highlighted as added" },
+    ],
+    frExamples: [
+      { label: "Changement d'un mot", input: "\"le renard rapide\" vs \"le renard lent\"", result: "'rapide' supprimé, 'lent' ajouté" },
+      { label: "Ligne ajoutée", input: "2 lignes vs mêmes 2 lignes + 1 nouvelle", result: "Troisième ligne mise en évidence comme ajoutée" },
+    ],
+    faq: [
+      { q: "Does this compare word-by-word or line-by-line?", a: "The comparison works line by line to identify structural changes; within a changed line, the specific difference is usually still visually clear from the highlighted portion." },
+      { q: "Does whitespace affect the comparison?", a: "Extra spaces or different line endings can register as differences even when the visible text looks the same — if you're getting unexpected results, check for trailing whitespace or inconsistent formatting." },
+      { q: "Is my text uploaded anywhere?", a: "No — the comparison runs entirely in your browser, so neither text is sent to a server." },
+    ],
+    frFaq: [
+      { q: "Cela compare-t-il mot par mot ou ligne par ligne ?", a: "La comparaison fonctionne ligne par ligne pour identifier les changements structurels ; au sein d'une ligne modifiée, la différence spécifique reste généralement visuellement claire grâce à la partie mise en évidence." },
+      { q: "Les espaces affectent-ils la comparaison ?", a: "Des espaces supplémentaires ou des fins de ligne différentes peuvent être enregistrés comme des différences même quand le texte visible semble identique — en cas de résultat inattendu, vérifiez les espaces en fin de ligne ou un formatage incohérent." },
+      { q: "Mon texte est-il envoyé quelque part ?", a: "Non — la comparaison s'exécute entièrement dans votre navigateur, donc aucun des deux textes n'est envoyé à un serveur." },
+    ],
+  },
+
+  lorem: {
+    title: "Lorem Ipsum Generator — Placeholder Text",
+    frTitle: "Générateur de Lorem Ipsum — Texte de Remplissage",
+    what: "Lorem Ipsum is scrambled, meaningless Latin-derived text used as filler in designs, mockups, and templates, so viewers focus on layout and typography instead of being distracted by actual (and often not-yet-written) content. It's an industry standard that's been used by designers and publishers since long before digital design existed.",
+    frWhat: "Le Lorem Ipsum est un texte pseudo-latin brouillé et dénué de sens, utilisé comme texte de remplissage dans les designs, maquettes et modèles, afin que les observateurs se concentrent sur la mise en page et la typographie plutôt que d'être distraits par le contenu réel (souvent pas encore rédigé). C'est une norme du secteur utilisée par les designers et éditeurs bien avant l'existence du design numérique.",
+    how: "You choose how much text you need — a number of words, sentences, or paragraphs — and the generator assembles that amount from the classic Lorem Ipsum passage (derived from a 1st-century BC Latin text by Cicero), repeating and reshuffling it as needed to fill the requested length.",
+    frHow: "Vous choisissez la quantité de texte nécessaire — un nombre de mots, phrases ou paragraphes — et le générateur assemble cette quantité à partir du passage classique du Lorem Ipsum (dérivé d'un texte latin du 1er siècle av. J.-C. de Cicéron), en le répétant et le réorganisant selon les besoins pour atteindre la longueur demandée.",
+    examples: [
+      { label: "One paragraph", input: "1 paragraph", result: "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit...\"" },
+      { label: "Short heading filler", input: "5 words", result: "\"Lorem ipsum dolor sit amet\"" },
+    ],
+    frExamples: [
+      { label: "Un paragraphe", input: "1 paragraphe", result: "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit...\"" },
+      { label: "Remplissage de titre court", input: "5 mots", result: "\"Lorem ipsum dolor sit amet\"" },
+    ],
+    faq: [
+      { q: "Why is Lorem Ipsum used instead of real text?", a: "Because it looks like natural language (with realistic word lengths and letter distribution) without being readable, viewers don't get distracted reading the content and instead evaluate the actual layout and typography objectively." },
+      { q: "What does Lorem Ipsum actually mean?", a: "It's scrambled and altered Latin from a passage by Cicero, and in its jumbled form it doesn't translate to anything coherent — its content has never mattered, only its visual texture as a stand-in for real text." },
+      { q: "Can I generate it in a different language?", a: "This generator produces the classic Latin-derived Lorem Ipsum; if you need placeholder text that reads naturally in a specific language, you'd want a language-specific filler text generator instead." },
+    ],
+    frFaq: [
+      { q: "Pourquoi utilise-t-on le Lorem Ipsum au lieu d'un vrai texte ?", a: "Comme il ressemble à un langage naturel (avec des longueurs de mots et une distribution de lettres réalistes) sans être lisible, les observateurs ne sont pas distraits par la lecture du contenu et évaluent objectivement la mise en page et la typographie réelles." },
+      { q: "Que signifie réellement le Lorem Ipsum ?", a: "C'est du latin brouillé et modifié issu d'un passage de Cicéron, et sous sa forme mélangée il ne se traduit en rien de cohérent — son contenu n'a jamais eu d'importance, seule sa texture visuelle en tant que substitut de texte réel compte." },
+      { q: "Puis-je le générer dans une autre langue ?", a: "Ce générateur produit le Lorem Ipsum classique dérivé du latin ; si vous avez besoin d'un texte de remplissage qui se lit naturellement dans une langue spécifique, il vous faudrait plutôt un générateur de texte de remplissage propre à cette langue." },
+    ],
+  },
+
+  casegen: {
+    title: "Case Converter — UPPERCASE, lowercase, Title Case & More",
+    frTitle: "Convertisseur de Casse — MAJUSCULES, minuscules, Casse de Titre et Plus",
+    what: "This tool converts text between different capitalization styles: UPPERCASE, lowercase, Title Case, Sentence case, camelCase, snake_case, and kebab-case. It's handy for cleaning up pasted text, preparing variable names for code, formatting headings consistently, or fixing text that was accidentally typed with Caps Lock on.",
+    frWhat: "Cet outil convertit du texte entre différents styles de casse : MAJUSCULES, minuscules, Casse De Titre, Casse de phrase, camelCase, snake_case et kebab-case. Il est pratique pour nettoyer du texte collé, préparer des noms de variables pour du code, formater des titres de manière cohérente, ou corriger du texte tapé accidentellement avec le verrouillage majuscule activé.",
+    how: "Each case style follows its own rule: UPPERCASE and lowercase transform every letter; Title Case capitalizes the first letter of each word; Sentence case capitalizes only the first letter of the text; and the programming-oriented styles (camelCase, snake_case, kebab-case) remove spaces and join words using capitalization, underscores, or hyphens respectively.",
+    frHow: "Chaque style de casse suit sa propre règle : MAJUSCULES et minuscules transforment chaque lettre ; Casse de Titre met en majuscule la première lettre de chaque mot ; Casse de phrase met en majuscule seulement la première lettre du texte ; et les styles orientés programmation (camelCase, snake_case, kebab-case) suppriment les espaces et joignent les mots en utilisant la casse, les tirets bas ou les tirets respectivement.",
+    examples: [
+      { label: "Title Case", input: "\"hello world example\"", result: "\"Hello World Example\"" },
+      { label: "camelCase", input: "\"hello world example\"", result: "\"helloWorldExample\"" },
+      { label: "snake_case", input: "\"Hello World Example\"", result: "\"hello_world_example\"" },
+    ],
+    frExamples: [
+      { label: "Casse de Titre", input: "\"bonjour le monde\"", result: "\"Bonjour Le Monde\"" },
+      { label: "camelCase", input: "\"bonjour le monde\"", result: "\"bonjourLeMonde\"" },
+      { label: "snake_case", input: "\"Bonjour Le Monde\"", result: "\"bonjour_le_monde\"" },
+    ],
+    faq: [
+      { q: "What's the difference between camelCase and PascalCase?", a: "camelCase starts with a lowercase letter (helloWorld), while PascalCase starts with an uppercase letter (HelloWorld) — camelCase is typically used for variables and functions, PascalCase for class or type names in most programming languages." },
+      { q: "Why does Title Case sometimes capitalize small words like 'the' or 'of'?", a: "Simple Title Case converters capitalize every word for consistency; proper editorial title-case rules actually keep short articles, conjunctions, and prepositions lowercase unless they're the first or last word — check which convention your style guide requires." },
+      { q: "Does this handle accented characters correctly?", a: "Standard case conversion works with accented letters (é, à, ü, etc.) the same way it does with unaccented ones, converting them to their corresponding upper or lower case form." },
+    ],
+    frFaq: [
+      { q: "Quelle est la différence entre camelCase et PascalCase ?", a: "camelCase commence par une minuscule (helloWorld), tandis que PascalCase commence par une majuscule (HelloWorld) — camelCase est typiquement utilisé pour les variables et fonctions, PascalCase pour les noms de classes ou de types dans la plupart des langages de programmation." },
+      { q: "Pourquoi la Casse de Titre met-elle parfois en majuscule des petits mots comme 'le' ou 'de' ?", a: "Les convertisseurs simples de Casse de Titre mettent chaque mot en majuscule par cohérence ; les vraies règles éditoriales de casse de titre gardent en réalité les articles courts, conjonctions et prépositions en minuscule sauf s'ils sont le premier ou dernier mot — vérifiez quelle convention exige votre guide de style." },
+      { q: "Cela gère-t-il correctement les caractères accentués ?", a: "La conversion de casse standard fonctionne avec les lettres accentuées (é, à, ü, etc.) de la même façon qu'avec les lettres non accentuées, les convertissant vers leur forme majuscule ou minuscule correspondante." },
+    ],
+  },
+
+  sha256: {
+    title: "SHA-256 Generator — Cryptographic Hash Calculator",
+    frTitle: "Générateur SHA-256 — Calculateur de Hachage Cryptographique",
+    what: "SHA-256 is a one-way cryptographic hash function that turns any input — text, a file, a password — into a fixed 256-bit (64 hexadecimal character) fingerprint. It's used to verify that a file hasn't been tampered with, to store passwords without keeping the actual password, and as a building block in blockchain and digital signature systems.",
+    frWhat: "SHA-256 est une fonction de hachage cryptographique à sens unique qui transforme toute entrée — texte, fichier, mot de passe — en une empreinte fixe de 256 bits (64 caractères hexadécimaux). Elle est utilisée pour vérifier qu'un fichier n'a pas été altéré, pour stocker des mots de passe sans conserver le mot de passe réel, et comme composant de base dans les systèmes de blockchain et de signature numérique.",
+    how: "The input is processed through the SHA-256 algorithm, which mixes and compresses the data through many rounds of mathematical operations to produce a fixed-length output. Critically, this process is one-way — you cannot reverse a hash back into its original input — and even a single-character change to the input produces a completely different hash.",
+    frHow: "L'entrée est traitée par l'algorithme SHA-256, qui mélange et compresse les données à travers de nombreux cycles d'opérations mathématiques pour produire une sortie de longueur fixe. Ce processus est essentiellement à sens unique — on ne peut pas inverser un hachage pour retrouver son entrée d'origine — et même un changement d'un seul caractère dans l'entrée produit un hachage complètement différent.",
+    examples: [
+      { label: "Simple text", input: "\"hello\"", result: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824" },
+      { label: "Empty string", input: "\"\"", result: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
+    ],
+    frExamples: [
+      { label: "Texte simple", input: "\"hello\"", result: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824" },
+      { label: "Chaîne vide", input: "\"\"", result: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
+    ],
+    faq: [
+      { q: "Can I reverse a SHA-256 hash back to the original text?", a: "No — SHA-256 is a one-way function by design. The only practical way to 'reverse' it is to guess inputs and hash them until one matches, which is why short, guessable inputs (like weak passwords) are still vulnerable even when hashed." },
+      { q: "Why do two identical inputs always produce the same hash?", a: "SHA-256 is deterministic — the same input always produces the same output, which is exactly what makes it useful for verifying that a file or piece of text hasn't changed: hash it again and compare." },
+      { q: "Is SHA-256 still considered secure?", a: "Yes, SHA-256 has no known practical vulnerabilities and remains widely used in security-critical systems, including Bitcoin's blockchain. For password storage specifically, though, dedicated password-hashing algorithms (like bcrypt or Argon2) are recommended over plain SHA-256." },
+    ],
+    frFaq: [
+      { q: "Puis-je inverser un hachage SHA-256 pour retrouver le texte original ?", a: "Non — SHA-256 est une fonction à sens unique par conception. La seule façon pratique de « l'inverser » est de deviner des entrées et de les hacher jusqu'à ce qu'une corresponde, ce qui explique pourquoi des entrées courtes et devinables (comme des mots de passe faibles) restent vulnérables même hachées." },
+      { q: "Pourquoi deux entrées identiques produisent-elles toujours le même hachage ?", a: "SHA-256 est déterministe — la même entrée produit toujours la même sortie, ce qui est exactement ce qui le rend utile pour vérifier qu'un fichier ou un texte n'a pas changé : le hacher à nouveau et comparer." },
+      { q: "SHA-256 est-il toujours considéré comme sûr ?", a: "Oui, SHA-256 n'a aucune vulnérabilité pratique connue et reste largement utilisé dans les systèmes critiques de sécurité, y compris la blockchain de Bitcoin. Pour le stockage de mots de passe spécifiquement, des algorithmes dédiés (comme bcrypt ou Argon2) sont toutefois recommandés plutôt que SHA-256 seul." },
+    ],
+  },
+
+  base64: {
+    title: "Base64 Encoder/Decoder — Convert Text & Data to Base64",
+    frTitle: "Encodeur/Décodeur Base64 — Convertir Texte et Données en Base64",
+    what: "Base64 is a way of encoding binary data (like images or files) as plain text, using only 64 safe characters (A-Z, a-z, 0-9, + and /). It's used to embed images directly in HTML/CSS, attach binary data to text-based formats like JSON or email, and safely transmit data through systems that only handle plain text.",
+    frWhat: "Base64 est une façon d'encoder des données binaires (comme des images ou fichiers) en texte brut, en utilisant seulement 64 caractères sûrs (A-Z, a-z, 0-9, + et /). Il est utilisé pour intégrer des images directement dans du HTML/CSS, attacher des données binaires à des formats textuels comme JSON ou email, et transmettre en toute sécurité des données via des systèmes qui ne gèrent que du texte brut.",
+    how: "Encoding takes the raw bytes of your input and regroups them into 6-bit chunks (since 2⁶ = 64), mapping each chunk to one of the 64 allowed characters. This means Base64 output is always about 33% larger than the original data — a necessary trade-off for making binary data safely representable as text.",
+    frHow: "L'encodage prend les octets bruts de votre entrée et les regroupe en blocs de 6 bits (puisque 2⁶ = 64), associant chaque bloc à l'un des 64 caractères autorisés. Cela signifie que la sortie Base64 est toujours environ 33% plus grande que les données d'origine — un compromis nécessaire pour rendre les données binaires représentables en toute sécurité sous forme de texte.",
+    examples: [
+      { label: "Encode text", input: "\"Hello, World!\"", result: "\"SGVsbG8sIFdvcmxkIQ==\"" },
+      { label: "Decode text", input: "\"SGVsbG8sIFdvcmxkIQ==\"", result: "\"Hello, World!\"" },
+    ],
+    frExamples: [
+      { label: "Encoder du texte", input: "\"Bonjour le monde !\"", result: "\"Qm9uam91ciBsZSBtb25kZSAh\"" },
+      { label: "Décoder du texte", input: "\"Qm9uam91ciBsZSBtb25kZSAh\"", result: "\"Bonjour le monde !\"" },
+    ],
+    faq: [
+      { q: "Is Base64 encryption?", a: "No — Base64 is encoding, not encryption. It has no secret key and anyone can decode it instantly, so it provides zero security or confidentiality. It only changes the data's format, not its accessibility." },
+      { q: "Why does Base64 output sometimes end with = signs?", a: "The = characters are padding, added when the input length isn't a clean multiple of 3 bytes, ensuring the encoded output always comes out in complete 4-character groups." },
+      { q: "Why does encoded text look longer than the original?", a: "Base64 converts every 3 bytes of input into 4 characters of output, so encoded data is always roughly 33% larger than the original — this is expected and unavoidable given how the encoding works." },
+    ],
+    frFaq: [
+      { q: "Le Base64 est-il du chiffrement ?", a: "Non — le Base64 est de l'encodage, pas du chiffrement. Il n'a pas de clé secrète et n'importe qui peut le décoder instantanément, donc il n'offre aucune sécurité ni confidentialité. Il ne fait que changer le format des données, pas leur accessibilité." },
+      { q: "Pourquoi la sortie Base64 se termine-t-elle parfois par des signes = ?", a: "Les caractères = sont du remplissage (padding), ajoutés quand la longueur de l'entrée n'est pas un multiple exact de 3 octets, garantissant que la sortie encodée sort toujours en groupes complets de 4 caractères." },
+      { q: "Pourquoi le texte encodé semble-t-il plus long que l'original ?", a: "Le Base64 convertit chaque groupe de 3 octets d'entrée en 4 caractères de sortie, donc les données encodées sont toujours environ 33% plus grandes que l'original — c'est attendu et inévitable étant donné le fonctionnement de l'encodage." },
+    ],
+  },
+
+  temp: {
+    title: "Temperature Converter — Celsius, Fahrenheit & Kelvin",
+    frTitle: "Convertisseur de Température — Celsius, Fahrenheit et Kelvin",
+    what: "This tool converts temperatures between the three most commonly used scales: Celsius (used by most of the world), Fahrenheit (used mainly in the US), and Kelvin (used in science, since it starts at absolute zero). It's handy for cooking with foreign recipes, understanding weather reports while traveling, or scientific calculations.",
+    frWhat: "Cet outil convertit les températures entre les trois échelles les plus couramment utilisées : Celsius (utilisée par la majorité du monde), Fahrenheit (utilisée principalement aux États-Unis) et Kelvin (utilisée en science, car elle commence au zéro absolu). Il est pratique pour cuisiner avec des recettes étrangères, comprendre les bulletins météo en voyage, ou pour des calculs scientifiques.",
+    how: "Celsius and Fahrenheit use different zero points and different-sized degrees, so converting between them requires both a multiplication and an addition/subtraction, not just a simple ratio. Kelvin uses the same size degree as Celsius but starts at absolute zero (−273.15°C), so converting to/from Kelvin is just an offset.",
+    frHow: "Celsius et Fahrenheit utilisent des points zéro différents et des degrés de tailles différentes, donc convertir entre eux nécessite à la fois une multiplication et une addition/soustraction, pas juste un simple ratio. Kelvin utilise la même taille de degré que Celsius mais commence au zéro absolu (−273,15°C), donc convertir vers/depuis Kelvin n'est qu'un décalage.",
+    formula: { expr: "°F = °C × 9/5 + 32", note: "K = °C + 273.15" },
+    frFormula: { expr: "°F = °C × 9/5 + 32", note: "K = °C + 273,15" },
+    examples: [
+      { label: "Water boiling point", input: "100°C", result: "212°F — 373.15 K" },
+      { label: "Room temperature", input: "20°C", result: "68°F — 293.15 K" },
+      { label: "Absolute zero", input: "0 K", result: "−273.15°C — −459.67°F" },
+    ],
+    frExamples: [
+      { label: "Point d'ébullition de l'eau", input: "100°C", result: "212°F — 373,15 K" },
+      { label: "Température ambiante", input: "20°C", result: "68°F — 293,15 K" },
+      { label: "Zéro absolu", input: "0 K", result: "−273,15°C — −459,67°F" },
+    ],
+    faq: [
+      { q: "Why does the US use Fahrenheit while most of the world uses Celsius?", a: "Fahrenheit was the standard across the British Empire until most countries switched to Celsius (part of the metric system) during the 20th century — the US never made that switch for everyday use." },
+      { q: "What is Kelvin used for if not everyday temperature?", a: "Kelvin is the scientific standard because it starts at absolute zero (the coldest physically possible temperature), making it the natural unit for physics, chemistry, and engineering calculations where negative temperatures would be awkward." },
+      { q: "Is there a quick mental shortcut for Celsius to Fahrenheit?", a: "A rough approximation is to double the Celsius value and add 30 — it's not exact, but close enough for a quick everyday estimate before checking the precise conversion." },
+    ],
+    frFaq: [
+      { q: "Pourquoi les États-Unis utilisent-ils Fahrenheit alors que la majorité du monde utilise Celsius ?", a: "Fahrenheit était le standard dans tout l'Empire britannique jusqu'à ce que la plupart des pays passent au Celsius (partie du système métrique) au 20e siècle — les États-Unis n'ont jamais fait ce changement pour un usage quotidien." },
+      { q: "À quoi sert Kelvin si ce n'est pour la température quotidienne ?", a: "Kelvin est le standard scientifique car il commence au zéro absolu (la température la plus froide physiquement possible), en faisant l'unité naturelle pour les calculs de physique, chimie et ingénierie où des températures négatives seraient gênantes." },
+      { q: "Existe-t-il un raccourci mental rapide de Celsius vers Fahrenheit ?", a: "Une approximation rapide consiste à doubler la valeur Celsius et ajouter 30 — ce n'est pas exact, mais assez proche pour une estimation rapide du quotidien avant de vérifier la conversion précise." },
+    ],
+  },
+
+  binary: {
+    title: "Binary Converter — Decimal ↔ Binary Conversion",
+    frTitle: "Convertisseur Binaire — Conversion Décimal ↔ Binaire",
+    what: "This tool converts numbers between decimal (base 10, the everyday number system) and binary (base 2, using only 0s and 1s), which is the fundamental language computers use internally to represent all data. It's commonly used by programming students, computer science coursework, and anyone working with low-level data representation.",
+    frWhat: "Cet outil convertit les nombres entre décimal (base 10, le système numérique quotidien) et binaire (base 2, utilisant uniquement des 0 et des 1), qui est le langage fondamental que les ordinateurs utilisent en interne pour représenter toutes les données. Il est couramment utilisé par les étudiants en programmation, les cours d'informatique, et toute personne travaillant avec la représentation de données de bas niveau.",
+    how: "Binary represents numbers using powers of 2 instead of powers of 10. Converting decimal to binary repeatedly divides the number by 2 and records the remainders; converting binary to decimal multiplies each binary digit by its corresponding power of 2 (1, 2, 4, 8, 16...) and sums the results.",
+    frHow: "Le binaire représente les nombres en utilisant des puissances de 2 au lieu de puissances de 10. Convertir du décimal vers le binaire divise répétitivement le nombre par 2 et enregistre les restes ; convertir du binaire vers le décimal multiplie chaque chiffre binaire par sa puissance de 2 correspondante (1, 2, 4, 8, 16...) et additionne les résultats.",
+    formula: { expr: "Decimal = Σ(bit × 2^position)", note: "e.g. 1011₂ = 1×8 + 0×4 + 1×2 + 1×1 = 11₁₀" },
+    frFormula: { expr: "Décimal = Σ(bit × 2^position)", note: "ex. 1011₂ = 1×8 + 0×4 + 1×2 + 1×1 = 11₁₀" },
+    examples: [
+      { label: "Decimal to binary", input: "11", result: "1011" },
+      { label: "Binary to decimal", input: "11111111", result: "255" },
+      { label: "Small number", input: "5", result: "101" },
+    ],
+    frExamples: [
+      { label: "Décimal vers binaire", input: "11", result: "1011" },
+      { label: "Binaire vers décimal", input: "11111111", result: "255" },
+      { label: "Petit nombre", input: "5", result: "101" },
+    ],
+    faq: [
+      { q: "Why do computers use binary instead of decimal?", a: "Computer hardware is built from transistors that are most reliably built as two-state switches (on/off), which naturally maps to binary's two digits (0 and 1) — building reliable 10-state hardware for decimal would be far more complex and error-prone." },
+      { q: "What does 11111111 in binary represent?", a: "Eight 1s in binary equals 255 in decimal — this is why byte values (8 bits) range from 0 to 255, a number that shows up constantly in computing (RGB color channels, for example)." },
+      { q: "Can this convert to hexadecimal too?", a: "This tool focuses on decimal-binary conversion; hexadecimal (base 16) is a separate, related system also commonly used in computing, often as a more compact way to write binary values." },
+    ],
+    frFaq: [
+      { q: "Pourquoi les ordinateurs utilisent-ils le binaire plutôt que le décimal ?", a: "Le matériel informatique est construit à partir de transistors qui sont plus fiables en tant qu'interrupteurs à deux états (allumé/éteint), ce qui correspond naturellement aux deux chiffres du binaire (0 et 1) — construire du matériel fiable à 10 états pour le décimal serait bien plus complexe et sujet aux erreurs." },
+      { q: "Que représente 11111111 en binaire ?", a: "Huit 1 en binaire égalent 255 en décimal — c'est pourquoi les valeurs d'octet (8 bits) vont de 0 à 255, un nombre qui apparaît constamment en informatique (canaux de couleur RVB, par exemple)." },
+      { q: "Cela peut-il aussi convertir en hexadécimal ?", a: "Cet outil se concentre sur la conversion décimal-binaire ; l'hexadécimal (base 16) est un système séparé et lié, également couramment utilisé en informatique, souvent comme façon plus compacte d'écrire des valeurs binaires." },
+    ],
+  },
+
+  rgb: {
+    title: "RGB ↔ HEX Converter — Color Code Conversion",
+    frTitle: "Convertisseur RGB ↔ HEX — Conversion de Codes Couleur",
+    what: "This tool converts colors between RGB format (three numbers 0-255 for red, green, and blue) and HEX format (a 6-digit code like #FF5733), the two most common ways colors are specified in web design, CSS, and graphic design software. Designers and developers switch between them constantly depending on which tool or codebase they're working in.",
+    frWhat: "Cet outil convertit les couleurs entre le format RGB (trois nombres 0-255 pour rouge, vert et bleu) et le format HEX (un code à 6 chiffres comme #FF5733), les deux façons les plus courantes de spécifier des couleurs en design web, CSS et logiciels de design graphique. Designers et développeurs basculent constamment entre les deux selon l'outil ou la base de code sur laquelle ils travaillent.",
+    how: "Each RGB value (0-255) is converted to a 2-digit hexadecimal number (00-FF) and the three pairs are concatenated with a # prefix to form the HEX code. Converting the other way splits the HEX code into its three 2-digit pairs and converts each back to a 0-255 decimal value.",
+    frHow: "Chaque valeur RGB (0-255) est convertie en un nombre hexadécimal à 2 chiffres (00-FF) et les trois paires sont concaténées avec un préfixe # pour former le code HEX. Convertir dans l'autre sens divise le code HEX en ses trois paires de 2 chiffres et reconvertit chacune en une valeur décimale 0-255.",
+    formula: { expr: "HEX = # + hex(R) + hex(G) + hex(B)", note: "Each channel: 0-255 decimal ↔ 00-FF hexadecimal" },
+    frFormula: { expr: "HEX = # + hex(R) + hex(V) + hex(B)", note: "Chaque canal : 0-255 décimal ↔ 00-FF hexadécimal" },
+    examples: [
+      { label: "Pure red", input: "RGB(255, 0, 0)", result: "#FF0000" },
+      { label: "Sky blue", input: "#87CEEB", result: "RGB(135, 206, 235)" },
+      { label: "Black", input: "RGB(0, 0, 0)", result: "#000000" },
+    ],
+    frExamples: [
+      { label: "Rouge pur", input: "RGB(255, 0, 0)", result: "#FF0000" },
+      { label: "Bleu ciel", input: "#87CEEB", result: "RGB(135, 206, 235)" },
+      { label: "Noir", input: "RGB(0, 0, 0)", result: "#000000" },
+    ],
+    faq: [
+      { q: "Why do web designers use HEX instead of RGB?", a: "HEX is more compact (one 6-character code instead of three separate numbers) and is the traditional CSS color format, though modern CSS accepts both — the choice is often just a matter of tooling or personal preference." },
+      { q: "What does each pair of HEX digits represent?", a: "The 6-digit HEX code splits into three 2-digit pairs, in order: the first pair is red, the second is green, and the third is blue — each pair ranges from 00 (none of that color) to FF (maximum, 255 in decimal)." },
+      { q: "Can this handle transparency (alpha)?", a: "Standard 6-digit HEX and 3-value RGB don't include transparency — that requires the 8-digit HEX (#RRGGBBAA) or RGBA format, which adds a fourth alpha channel value." },
+    ],
+    frFaq: [
+      { q: "Pourquoi les designers web utilisent-ils HEX plutôt que RGB ?", a: "HEX est plus compact (un seul code à 6 caractères au lieu de trois nombres séparés) et est le format de couleur CSS traditionnel, bien que le CSS moderne accepte les deux — le choix est souvent une question d'outils ou de préférence personnelle." },
+      { q: "Que représente chaque paire de chiffres HEX ?", a: "Le code HEX à 6 chiffres se divise en trois paires de 2 chiffres, dans l'ordre : la première paire est le rouge, la deuxième le vert, et la troisième le bleu — chaque paire va de 00 (aucune de cette couleur) à FF (maximum, 255 en décimal)." },
+      { q: "Cela gère-t-il la transparence (alpha) ?", a: "Le HEX standard à 6 chiffres et le RGB à 3 valeurs n'incluent pas la transparence — cela nécessite le format HEX à 8 chiffres (#RRVVBBAA) ou RGBA, qui ajoute une quatrième valeur de canal alpha." },
+    ],
+  },
+
+  roman: {
+    title: "Roman Numeral Converter — Arabic Numbers ↔ Roman Numerals",
+    frTitle: "Convertisseur de Chiffres Romains — Nombres Arabes ↔ Chiffres Romains",
+    what: "This tool converts between standard Arabic numbers (1, 2, 3...) and Roman numerals (I, II, III...), the numbering system used in ancient Rome that still appears today on clock faces, in movie copyright years, book chapter numbers, and monarch or Super Bowl naming (Elizabeth II, Super Bowl LVIII).",
+    frWhat: "Cet outil convertit entre les nombres arabes standards (1, 2, 3...) et les chiffres romains (I, II, III...), le système de numération utilisé dans la Rome antique qui apparaît encore aujourd'hui sur les cadrans d'horloge, les années de copyright de films, les numéros de chapitres de livres, et les noms de monarques ou de Super Bowl (Elizabeth II, Super Bowl LVIII).",
+    how: "Roman numerals use combinations of seven letters (I=1, V=5, X=10, L=50, C=100, D=500, M=1000), where letters are normally added together, but a smaller value placed before a larger one is subtracted instead (e.g. IV = 5−1 = 4). The converter works through these subtraction and addition rules to translate in either direction.",
+    frHow: "Les chiffres romains utilisent des combinaisons de sept lettres (I=1, V=5, X=10, L=50, C=100, D=500, M=1000), où les lettres s'additionnent normalement, mais une valeur plus petite placée avant une plus grande est soustraite à la place (ex. IV = 5−1 = 4). Le convertisseur applique ces règles de soustraction et d'addition pour traduire dans les deux sens.",
+    formula: { expr: "I=1, V=5, X=10, L=50, C=100, D=500, M=1000", note: "Smaller value before larger = subtract (IV=4); otherwise add (VI=6)" },
+    frFormula: { expr: "I=1, V=5, X=10, L=50, C=100, D=500, M=1000", note: "Valeur plus petite avant plus grande = soustraire (IV=4) ; sinon additionner (VI=6)" },
+    examples: [
+      { label: "Number to Roman", input: "1994", result: "MCMXCIV" },
+      { label: "Roman to number", input: "LVIII", result: "58" },
+      { label: "Current year style", input: "2024", result: "MMXXIV" },
+    ],
+    frExamples: [
+      { label: "Nombre vers Romain", input: "1994", result: "MCMXCIV" },
+      { label: "Romain vers nombre", input: "LVIII", result: "58" },
+      { label: "Style année actuelle", input: "2024", result: "MMXXIV" },
+    ],
+    faq: [
+      { q: "What's the largest number Roman numerals can represent?", a: "Using the standard letters alone, 3,999 (MMMCMXCIX) is the practical maximum, since Romans had no single symbol for 5,000 or beyond — larger numbers historically used a bar over a numeral to multiply it by 1,000." },
+      { q: "Why is 4 written as IV instead of IIII?", a: "IIII (four I's) was actually used historically and still appears on some clock faces for symmetry, but the subtractive rule (IV = 5−1) became the standard convention for compactness in most other contexts." },
+      { q: "Is there a Roman numeral for zero?", a: "No — the Romans didn't have a symbol for zero in their numeral system; the concept of zero as a number came from Indian and later Arabic mathematics, entering Europe long after Roman numerals were already established." },
+    ],
+    frFaq: [
+      { q: "Quel est le plus grand nombre que les chiffres romains peuvent représenter ?", a: "En utilisant les lettres standards seules, 3 999 (MMMCMXCIX) est le maximum pratique, car les Romains n'avaient pas de symbole unique pour 5 000 ou plus — les nombres plus grands utilisaient historiquement une barre au-dessus d'un chiffre pour le multiplier par 1 000." },
+      { q: "Pourquoi 4 s'écrit-il IV au lieu de IIII ?", a: "IIII (quatre I) était en fait utilisé historiquement et apparaît encore sur certains cadrans d'horloge pour la symétrie, mais la règle soustractive (IV = 5−1) est devenue la convention standard pour la compacité dans la plupart des autres contextes." },
+      { q: "Existe-t-il un chiffre romain pour zéro ?", a: "Non — les Romains n'avaient pas de symbole pour zéro dans leur système de numération ; le concept de zéro en tant que nombre vient des mathématiques indiennes puis arabes, arrivant en Europe bien après que les chiffres romains étaient déjà établis." },
+    ],
+  },
 };
 
-// ── NETWORK_SEO_CONTENT — content ho an'ny 12 tool ao amin'ny NET_HUB ──
+
 // Mitovy endrika amin'ny SEO_CONTENT etsy ambony (what/how/formula/
 // examples/faq, EN + FR). Ny "key" dia MITOVY amin'ny "id" ao amin'ny
 // TABS array an'ny NetworkHub.tsx (ip, speed, status, password, dns,

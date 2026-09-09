@@ -1779,6 +1779,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
   const s = React.useMemo(() => buildStyles(C), [C]);
   const responsiveStyle = React.useMemo(() => buildResponsiveStyle(C), [C]);
   const [tab, setTab] = React.useState(initialTab || "merge");
+  const [showInBrowserInfo, setShowInBrowserInfo] = React.useState(false);
   const cur = PDF_TABS.find(t => t.id === tab)!;
 
   return (
@@ -1859,12 +1860,62 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
                 {lang === "fr" ? cur.frDesc : cur.enDesc}
               </p>
             </div>
-            <div style={{
-              border: `1px solid ${C.greenBorder}`, color: C.green,
-              background: `${C.green}0a`, borderRadius: 999,
-              padding: "8px 12px", fontSize: 10, whiteSpace: "nowrap",
-            }}>
-              ● &nbsp; In-Browser
+            <div style={{ position: "relative" }}>
+              <button
+                type="button"
+                onClick={() => setShowInBrowserInfo(v => !v)}
+                aria-expanded={showInBrowserInfo}
+                style={{
+                  border: `1px solid ${C.greenBorder}`, color: C.green,
+                  background: `${C.green}0a`, borderRadius: 999,
+                  padding: "8px 12px", fontSize: 10, whiteSpace: "nowrap",
+                  cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                  display: "inline-flex", alignItems: "center", gap: 0,
+                }}
+              >
+                ● &nbsp; In-Browser
+              </button>
+
+              {showInBrowserInfo && (
+                <>
+                  {/* Click-outside overlay */}
+                  <div
+                    onClick={() => setShowInBrowserInfo(false)}
+                    style={{ position: "fixed", inset: 0, zIndex: 40 }}
+                  />
+                  <div
+                    role="dialog"
+                    style={{
+                      position: "absolute", top: "calc(100% + 8px)", right: 0,
+                      width: 280, zIndex: 41,
+                      border: `1px solid ${C.border}`, borderRadius: 14,
+                      background: C.panel,
+                      boxShadow: "0 12px 32px rgba(0,0,0,0.35)",
+                      padding: 16,
+                    }}
+                  >
+                    <b style={{ fontSize: 12, color: C.text, display: "block", marginBottom: 6 }}>
+                      {lang === "fr" ? "Pourquoi c'est gratuit et 100% privé" : "Why it's free & 100% private"}
+                    </b>
+                    <p style={{ fontSize: 11, lineHeight: 1.6, color: C.muted, margin: 0 }}>
+                      {lang === "fr"
+                        ? "Cet outil s'exécute entièrement dans votre navigateur (via WebAssembly / JavaScript). Vos fichiers ne sont jamais envoyés à un serveur, donc aucun coût d'hébergement pour nous — et vos données ne quittent jamais votre appareil."
+                        : "This tool runs entirely in your browser (via WebAssembly / JavaScript). Your files are never uploaded to a server, so there's no hosting cost on our end — and your data never leaves your device."}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowInBrowserInfo(false)}
+                      style={{
+                        marginTop: 12, fontSize: 10, color: C.muted2,
+                        background: "transparent", border: "none", cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      {lang === "fr" ? "Fermer" : "Close"}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

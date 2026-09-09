@@ -252,7 +252,7 @@ const PRESETS = [
   { label: 'Instagram Story', w: 1080, h: 1920, icon: 'device-mobile' },
   { label: 'Twitter Post', w: 1200, h: 675, icon: 'share' },
   { label: 'Facebook Post', w: 1200, h: 630, icon: 'users' },
-  { label: 'YouTube Thumbnail', w: 1280, h: 720, icon: '▶️' },
+  { label: 'YouTube Thumbnail', w: 1280, h: 720, icon: 'play' },
   { label: 'TikTok Video', w: 1080, h: 1920, icon: 'music' },
   { label: 'LinkedIn Banner', w: 1584, h: 396, icon: 'briefcase' },
 ]
@@ -264,22 +264,22 @@ const FAMILIES: FamilyDef[] = [
   {
     id: 'optimize', label: 'Optimize', frLabel: 'Optimiser',
     tools: [
-      { id: 'compress', label: 'Compress', frLabel: 'Compresser',    icon: '⇣', heading: 'Compress an image', frHeading: 'Compresser une image',    desc: 'Reduce file size while keeping your image quality.', frDesc: 'Réduisez la taille du fichier tout en conservant la qualité de votre image.' },
-      { id: 'resize',   label: 'Resize', frLabel: 'Redimensionner',  icon: '⌗', heading: 'Resize an image', frHeading: 'Redimensionner une image',       desc: 'Resize to any dimension or preset with smart crop.', frDesc: 'Redimensionnez selon n\'importe quelle dimension ou format prédéfini, avec recadrage intelligent.' },
-      { id: 'base64',   label: 'Image → Base64', frLabel: 'Image → Base64', icon: '{}', heading: 'Image → Base64', frHeading: 'Image → Base64',    desc: 'Convert any image to a Base64 Data URI for use in HTML or CSS.', frDesc: 'Convertissez n\'importe quelle image en URI de données Base64 pour l\'utiliser en HTML ou CSS.' },
+      { id: 'compress', label: 'Compress', frLabel: 'Compresser',    icon: 'compress', heading: 'Compress an image', frHeading: 'Compresser une image',    desc: 'Reduce file size while keeping your image quality.', frDesc: 'Réduisez la taille du fichier tout en conservant la qualité de votre image.' },
+      { id: 'resize',   label: 'Resize', frLabel: 'Redimensionner',  icon: 'resize', heading: 'Resize an image', frHeading: 'Redimensionner une image',       desc: 'Resize to any dimension or preset with smart crop.', frDesc: 'Redimensionnez selon n\'importe quelle dimension ou format prédéfini, avec recadrage intelligent.' },
+      { id: 'base64',   label: 'Image → Base64', frLabel: 'Image → Base64', icon: 'braces', heading: 'Image → Base64', frHeading: 'Image → Base64',    desc: 'Convert any image to a Base64 Data URI for use in HTML or CSS.', frDesc: 'Convertissez n\'importe quelle image en URI de données Base64 pour l\'utiliser en HTML ou CSS.' },
     ],
   },
   {
     id: 'convert', label: 'Convert', frLabel: 'Convertir',
     tools: [
-      { id: 'convert', label: 'Convert', frLabel: 'Convertir', icon: '↗', heading: 'Convert image format', frHeading: 'Convertir le format d\'image', desc: 'Convert between JPG, PNG, WEBP, and AVIF.', frDesc: 'Convertissez entre JPG, PNG, WEBP et AVIF.' },
+      { id: 'convert', label: 'Convert', frLabel: 'Convertir', icon: 'repeat', heading: 'Convert image format', frHeading: 'Convertir le format d\'image', desc: 'Convert between JPG, PNG, WEBP, and AVIF.', frDesc: 'Convertissez entre JPG, PNG, WEBP et AVIF.' },
     ],
   },
   {
     id: 'edit', label: 'Edit', frLabel: 'Modifier',
     tools: [
       { id: 'crop',     label: 'Crop', frLabel: 'Recadrer',        icon: 'scissors', heading: 'Crop an image', frHeading: 'Recadrer une image',  desc: 'Crop to any ratio or custom area.', frDesc: 'Recadrez selon n\'importe quel ratio ou zone personnalisée.' },
-      { id: 'flip',     label: 'Flip/Rotate', frLabel: 'Retourner/Pivoter', icon: '↻', heading: 'Flip or rotate', frHeading: 'Retourner ou pivoter', desc: 'Mirror horizontally, vertically, or rotate by angle.', frDesc: 'Effet miroir horizontal, vertical, ou rotation selon un angle.' },
+      { id: 'flip',     label: 'Flip/Rotate', frLabel: 'Retourner/Pivoter', icon: 'rotate', heading: 'Flip or rotate', frHeading: 'Retourner ou pivoter', desc: 'Mirror horizontally, vertically, or rotate by angle.', frDesc: 'Effet miroir horizontal, vertical, ou rotation selon un angle.' },
     ],
   },
   {
@@ -287,23 +287,23 @@ const FAMILIES: FamilyDef[] = [
     tools: [
       { id: 'removemetadata',   label: 'Remove Metadata', frLabel: 'Supprimer les métadonnées',    icon: 'shield', heading: 'Remove Image Metadata', frHeading: 'Supprimer les métadonnées de l\'image',   desc: 'Strip GPS, camera model, date and all EXIF data from your image.', frDesc: 'Supprimez le GPS, le modèle d\'appareil photo, la date et toutes les données EXIF de votre image.' },
       { id: 'exifviewer',       label: 'EXIF Viewer', frLabel: 'Visionneuse EXIF',        icon: 'search', heading: 'EXIF Viewer', frHeading: 'Visionneuse EXIF',             desc: 'Inspect all metadata embedded in your image file.', frDesc: 'Inspectez toutes les métadonnées intégrées dans votre fichier image.' },
-      { id: 'screenshotredact', label: 'Screenshot Redact', frLabel: 'Caviarder une capture',  icon: '▓', heading: 'Screenshot Redact', frHeading: 'Caviarder une capture d\'écran',       desc: 'Blur, pixelate or black out sensitive areas in any screenshot.', frDesc: 'Floutez, pixelisez ou masquez les zones sensibles de n\'importe quelle capture d\'écran.' },
+      { id: 'screenshotredact', label: 'Screenshot Redact', frLabel: 'Caviarder une capture',  icon: 'eye-off', heading: 'Screenshot Redact', frHeading: 'Caviarder une capture d\'écran',       desc: 'Blur, pixelate or black out sensitive areas in any screenshot.', frDesc: 'Floutez, pixelisez ou masquez les zones sensibles de n\'importe quelle capture d\'écran.' },
       { id: 'bgremove',         label: 'Remove BG', frLabel: 'Supprimer l\'arrière-plan',          icon: 'sparkles', heading: 'Remove Background', frHeading: 'Supprimer l\'arrière-plan',       desc: 'Remove image backgrounds automatically with AI.', frDesc: 'Supprimez automatiquement l\'arrière-plan de vos images grâce à l\'IA.' },
     ],
   },
   {
     id: 'create', label: 'Create', frLabel: 'Créer',
     tools: [
-      { id: 'watermark',    label: 'Watermark', frLabel: 'Filigrane',     icon: '◈', heading: 'Add a Watermark', frHeading: 'Ajouter un filigrane',       desc: 'Protect your images with text or image watermarks.', frDesc: 'Protégez vos images avec des filigranes texte ou image.' },
+      { id: 'watermark',    label: 'Watermark', frLabel: 'Filigrane',     icon: 'stamp', heading: 'Add a Watermark', frHeading: 'Ajouter un filigrane',       desc: 'Protect your images with text or image watermarks.', frDesc: 'Protégez vos images avec des filigranes texte ou image.' },
       { id: 'passportphoto',label: 'Passport Photo', frLabel: 'Photo d\'identité', icon: 'id-badge', heading: 'Passport / ID Photo', frHeading: 'Photo passeport / identité',   desc: 'Generate passport or ID photos at the correct size and background.', frDesc: 'Générez des photos passeport ou d\'identité au bon format et avec le bon arrière-plan.' },
-      { id: 'favicon',      label: 'Favicon', frLabel: 'Favicon',        icon: '⭐', heading: 'Favicon Generator', frHeading: 'Générateur de favicon',     desc: 'Generate favicon.ico and all PNG sizes from any image or logo.', frDesc: 'Générez un favicon.ico et toutes les tailles PNG à partir de n\'importe quelle image ou logo.' },
+      { id: 'favicon',      label: 'Favicon', frLabel: 'Favicon',        icon: 'star', heading: 'Favicon Generator', frHeading: 'Générateur de favicon',     desc: 'Generate favicon.ico and all PNG sizes from any image or logo.', frDesc: 'Générez un favicon.ico et toutes les tailles PNG à partir de n\'importe quelle image ou logo.' },
       { id: 'upscale',      label: 'AI Upscale', frLabel: 'Agrandir (IA)',     icon: 'sparkles', heading: 'AI Upscale', frHeading: 'Agrandissement par IA',            desc: 'Upscale images 2× or 4× using AI — Real-ESRGAN.', frDesc: 'Agrandissez vos images 2× ou 4× grâce à l\'IA — Real-ESRGAN.' },
     ],
   },
   {
     id: 'colors', label: 'Colors', frLabel: 'Couleurs',
     tools: [
-      { id: 'colorpicker',     label: 'Color Picker', frLabel: 'Pipette à couleurs',     icon: '◉', heading: 'Pick a Color', frHeading: 'Choisir une couleur',          desc: 'Extract colors from any image pixel.', frDesc: 'Extrayez la couleur de n\'importe quel pixel d\'une image.' },
+      { id: 'colorpicker',     label: 'Color Picker', frLabel: 'Pipette à couleurs',     icon: 'eyedropper', heading: 'Pick a Color', frHeading: 'Choisir une couleur',          desc: 'Extract colors from any image pixel.', frDesc: 'Extrayez la couleur de n\'importe quel pixel d\'une image.' },
       { id: 'paletteextractor',label: 'Palette Extractor', frLabel: 'Extracteur de palette', icon: 'palette', heading: 'Palette Extractor', frHeading: 'Extracteur de palette',     desc: 'Extract the dominant color palette from any image.', frDesc: 'Extrayez la palette de couleurs dominante de n\'importe quelle image.' },
     ],
   },
@@ -318,6 +318,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
   const { dark } = useDark()
   const { lang } = useLang()
   const [tab, setTab] = useState<Tab>(initialTab || 'compress')
+  const [openBadgeInfo, setOpenBadgeInfo] = useState<number | null>(null)
 
   const selectTool = (id: Tab) => setTab(id)
 
@@ -454,21 +455,61 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 24 }}>
                 {[
-                  { icon: 'lock', en: '100% Free', fr: '100% Gratuit', enSub: 'No upload needed', frSub: 'Sans envoi requis' },
-                  { icon: 'bolt', en: 'Instant', fr: 'Instantané', enSub: 'Processed in your browser', frSub: 'Traité dans votre navigateur' },
-                  { icon: 'sparkles', en: 'Private', fr: 'Privé', enSub: 'Nothing leaves your device', frSub: 'Rien ne quitte votre appareil' },
-                ].map(f => (
-                  <div key={f.en} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${T.border}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.accent, flexShrink: 0 }}>
-                      <Icon name={f.icon} size={16} />
+                  { icon: 'lock', en: '100% Free', fr: '100% Gratuit', enSub: 'No upload needed', frSub: 'Sans envoi requis',
+                    enInfo: "All tools are free to use, with no account or subscription. Since everything runs in your browser, there's no server cost on our end for processing your files.",
+                    frInfo: "Tous les outils sont gratuits, sans compte ni abonnement. Comme tout s'exécute dans votre navigateur, cela ne nous coûte rien de traiter vos fichiers." },
+                  { icon: 'bolt', en: 'Instant', fr: 'Instantané', enSub: 'Processed in your browser', frSub: 'Traité dans votre navigateur',
+                    enInfo: "Your image is processed locally with client-side JavaScript — there's no upload to a server and no wait for a response, so results appear instantly.",
+                    frInfo: "Votre image est traitée localement en JavaScript côté client — aucun envoi vers un serveur, aucune attente : le résultat apparaît instantanément." },
+                  { icon: 'sparkles', en: 'Private', fr: 'Privé', enSub: 'Nothing leaves your device', frSub: 'Rien ne quitte votre appareil',
+                    enInfo: "Your images never leave your device — they're never uploaded or stored anywhere. Everything happens locally in your browser tab.",
+                    frInfo: "Vos images ne quittent jamais votre appareil — elles ne sont ni envoyées ni stockées où que ce soit. Tout se passe localement dans votre navigateur." },
+                ].map((f, i) => {
+                  const open = openBadgeInfo === i
+                  return (
+                    <div key={f.en} style={{ position: 'relative' }}>
+                      <button
+                        type="button"
+                        onClick={() => setOpenBadgeInfo(o => o === i ? null : i)}
+                        aria-expanded={open}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left',
+                          background: 'transparent', border: 'none', padding: 0, margin: 0,
+                          cursor: 'pointer', font: 'inherit', color: 'inherit', appearance: 'none',
+                          WebkitAppearance: 'none', borderRadius: 0,
+                        }}
+                      >
+                        <div style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${T.border}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.accent, flexShrink: 0 }}>
+                          <Icon name={f.icon} size={16} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 12.5, fontWeight: 700, color: T.text }}>{lang === 'fr' ? f.fr : f.en}</div>
+                          <div style={{ fontSize: 11, color: T.muted }}>{lang === 'fr' ? f.frSub : f.enSub}</div>
+                        </div>
+                      </button>
+                      {open && (
+                        <>
+                          <div onClick={() => setOpenBadgeInfo(null)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+                          <div role="dialog" style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, width: 260, zIndex: 41,
+                            border: `1px solid ${T.border}`, borderRadius: 14, background: T.surface,
+                            boxShadow: '0 12px 32px rgba(0,0,0,0.35)', padding: 16 }}>
+                            <b style={{ fontSize: 12, color: T.text, display: 'block', marginBottom: 6 }}>
+                              {lang === 'fr' ? f.fr : f.en} — {lang === 'fr' ? f.frSub : f.enSub}
+                            </b>
+                            <p style={{ fontSize: 11, lineHeight: 1.6, color: T.muted, margin: 0 }}>
+                              {lang === 'fr' ? f.frInfo : f.enInfo}
+                            </p>
+                            <button type="button" onClick={() => setOpenBadgeInfo(null)}
+                              style={{ marginTop: 12, fontSize: 10, color: T.muted, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
+                              {lang === 'fr' ? 'Fermer' : 'Close'}
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <div>
-                      <div style={{ fontSize: 12.5, fontWeight: 700, color: T.text }}>{lang === 'fr' ? f.fr : f.en}</div>
-                      <div style={{ fontSize: 11, color: T.muted }}>{lang === 'fr' ? f.frSub : f.enSub}</div>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               {tab === 'compress'        && <CompressPanel        T={T} />}
@@ -578,7 +619,7 @@ function CompressPanel({ T }: { T: any }) {
           onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); addFiles(e.dataTransfer.files) }}
           onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={e => addFiles(e.target.files)} />
-          <div className="ih-upload-icon">⇧</div>
+          <div className="ih-upload-icon"><Icon name="upload" size={28} /></div>
           <h3 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: 34, fontWeight: 600, color: T.text }}>{lang === 'fr' ? 'Déposez votre image ici' : 'Drop your image here'}</h3>
           <p style={{ margin: '8px 0 24px', color: T.muted, fontSize: 14 }}>{lang === 'fr' ? 'ou cliquez n\'importe où pour parcourir votre appareil' : 'or click anywhere to browse from your device'}</p>
           <div style={{ color: T.accent, fontWeight: 600, fontSize: 14 }}>{lang === 'fr' ? 'Choisir une image' : 'Choose an image'}</div>
@@ -1752,8 +1793,8 @@ function ScreenshotRedactPanel({ T }: { T: any }) {
 
   const MODES: { v: RedactMode; label: string; frLabel: string; icon: string }[] = [
     { v: 'blur',     label: 'Blur',     frLabel: 'Flouter',    icon: 'cloud' },
-    { v: 'pixelate', label: 'Pixelate', frLabel: 'Pixeliser',  icon: '▦' },
-    { v: 'blackout', label: 'Blackout', frLabel: 'Masquer',    icon: '■' },
+    { v: 'pixelate', label: 'Pixelate', frLabel: 'Pixeliser',  icon: 'grid-dots' },
+    { v: 'blackout', label: 'Blackout', frLabel: 'Masquer',    icon: 'square-filled' },
   ]
 
   return (

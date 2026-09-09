@@ -940,6 +940,7 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
   const { dark } = useDark()
   const C_T = React.useMemo(() => buildPalette(dark), [dark])
   const [tab, setTab] = React.useState('length')
+  const [showInBrowserInfo, setShowInBrowserInfo] = React.useState(false)
   const cur = CONV_TABS.find(t => t.id === tab)
   const isFr = lang === 'fr'
 
@@ -1059,13 +1060,44 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
             <span style={{ color: C_T.muted }}> / </span>
             <span style={{ color: C_T.text }}>{(isFr ? cur?.fr : cur?.en)?.toUpperCase()}</span>
           </div>
-          <div style={{ marginBottom: 22 }}>
-            <h1 style={{ fontSize: 30, fontWeight: 800, margin: 0, lineHeight: 1.2, letterSpacing: '-0.5px' }}>
-              {seoEntry ? (isFr ? seoEntry.frTitle : seoEntry.title) : (isFr ? cur?.fr : cur?.en)}
-            </h1>
-            <p style={{ color: C_T.muted, fontSize: 15, margin: '8px 0 0' }}>
-              {isFr ? cur?.frDesc : cur?.enDesc}
-            </p>
+          <div className="chronos-hero-row" style={{ marginBottom: 22, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+            <div>
+              <h1 style={{ fontSize: 30, fontWeight: 800, margin: 0, lineHeight: 1.2, letterSpacing: '-0.5px' }}>
+                {seoEntry ? (isFr ? seoEntry.frTitle : seoEntry.title) : (isFr ? cur?.fr : cur?.en)}
+              </h1>
+              <p style={{ color: C_T.muted, fontSize: 15, margin: '8px 0 0' }}>
+                {isFr ? cur?.frDesc : cur?.enDesc}
+              </p>
+            </div>
+            <div style={{ position: 'relative' }}>
+              <button type="button" onClick={() => setShowInBrowserInfo(v => !v)} aria-expanded={showInBrowserInfo}
+                style={{ border: `1px solid ${C_T.success}40`, color: C_T.success, background: `${C_T.success}0a`,
+                borderRadius: 999, padding: '8px 12px', fontSize: 10, whiteSpace: 'nowrap', cursor: 'pointer',
+                fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
+                ● &nbsp; {isFr ? '100% Dans le navigateur' : '100% In-Browser'}
+              </button>
+              {showInBrowserInfo && (
+                <>
+                  <div onClick={() => setShowInBrowserInfo(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+                  <div role="dialog" style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, width: 280, zIndex: 41,
+                    border: `1px solid ${C_T.border}`, borderRadius: 14, background: C_T.card,
+                    boxShadow: '0 12px 32px rgba(0,0,0,0.35)', padding: 16 }}>
+                    <b style={{ fontSize: 12, color: C_T.text, display: 'block', marginBottom: 6 }}>
+                      {isFr ? "Pourquoi c'est gratuit et 100% privé" : "Why it's free & 100% private"}
+                    </b>
+                    <p style={{ fontSize: 11, lineHeight: 1.6, color: C_T.muted, margin: 0 }}>
+                      {isFr
+                        ? "Ce convertisseur s'exécute entièrement dans votre navigateur (JavaScript côté client). Vos données ne sont jamais envoyées à un serveur, donc aucun coût d'hébergement pour nous — et rien ne quitte votre appareil."
+                        : "This converter runs entirely in your browser (client-side JavaScript). Your data is never uploaded to a server, so there's no hosting cost on our end — and nothing leaves your device."}
+                    </p>
+                    <button type="button" onClick={() => setShowInBrowserInfo(false)}
+                      style={{ marginTop: 12, fontSize: 10, color: C_T.muted, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
+                      {isFr ? 'Fermer' : 'Close'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           <div className="conv-layout">

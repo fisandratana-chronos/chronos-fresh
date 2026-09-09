@@ -137,6 +137,15 @@ export const IconTarget = (p: IconProps) => base(<><circle cx="12" cy="12" r="8.
 export const IconSpeakerphone = (p: IconProps) => base(<><path d="M3 11v2a2 2 0 0 0 2 2h1l3 5V4L6 9H5a2 2 0 0 0-2 2Z" /><path d="M14 8a4 4 0 0 1 0 8M17 5a8 8 0 0 1 0 14" /></>, p)
 export const IconTrash = (p: IconProps) => base(<><path d="M4 7h16M9 7V4h6v3M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M10 11v6M14 11v6" /></>, p)
 export const IconPercent = (p: IconProps) => base(<><path d="M19 5 5 19" /><circle cx="6.5" cy="6.5" r="2.5" /><circle cx="17.5" cy="17.5" r="2.5" /></>, p)
+export const IconResize = (p: IconProps) => base(<><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" /></>, p)
+export const IconBraces = (p: IconProps) => base(<><path d="M8 3C6.3 3 5 4.3 5 6v2.5c0 1.4-.9 2-2 2.5 1.1.5 2 1.1 2 2.5V16c0 1.7 1.3 3 3 3" /><path d="M16 3c1.7 0 3 1.3 3 3v2.5c0 1.4.9 2 2 2.5-1.1.5-2 1.1-2 2.5V16c0 1.7-1.3 3-3 3" /></>, p)
+export const IconRotate = (p: IconProps) => base(<><rect x="3" y="3" width="7" height="7" rx="1.2" /><path d="M14 4a7 7 0 1 1-6.7 9" /><path d="M17 2v4h-4" /></>, p)
+export const IconEyeOff = (p: IconProps) => base(<><path d="M3 3l18 18" /><path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c5 0 9 4 10 7-.5 1.2-1.3 2.5-2.5 3.6M6.6 6.7C4.4 8.1 2.8 10 2 12c1 3 5 7 10 7 1.3 0 2.5-.2 3.6-.7" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></>, p)
+export const IconStamp = (p: IconProps) => base(<><path d="M12 3a3 3 0 0 0-1.7 5.5c.8.6.9 1.5.2 2.5H10a3 3 0 0 0-3 3v1h10v-1a3 3 0 0 0-3-3h-.5c-.7-1 -.6-1.9.2-2.5A3 3 0 0 0 12 3Z" /><path d="M4 21h16" /></>, p)
+export const IconEyedropper = (p: IconProps) => base(<><path d="m2.5 21.5 1-4 9-9" /><path d="m13.5 7.5 3-3a2.5 2.5 0 1 1 3.5 3.5l-3 3" /><path d="m11 12 3-3" /></>, p)
+export const IconGridDots = (p: IconProps) => base(<><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>, p)
+export const IconSquareFilled = (p: IconProps) => base(<rect x="4" y="4" width="16" height="16" rx="2" fill={p.color || 'currentColor'} stroke="none" />, p)
+export const IconPlay = (p: IconProps) => base(<><circle cx="12" cy="12" r="9" /><path d="M10 8.3v7.4l6.5-3.7Z" /></>, p)
 
 const REGISTRY: Record<string, (p: IconProps) => React.ReactElement> = {
   bolt: IconBolt, flame: IconFlame, heart: IconHeart, cash: IconCash, 'credit-card': IconCreditCard,
@@ -158,6 +167,9 @@ const REGISTRY: Record<string, (p: IconProps) => React.ReactElement> = {
   menu: IconMenu, flask: IconFlask, brush: IconBrush, 'device-mobile': IconDeviceMobile,
   compress: IconCompress, edit: IconEdit, masks: IconMasks, dot: IconDot, network: IconNetwork, target: IconTarget,
   speakerphone: IconSpeakerphone, trash: IconTrash, percent: IconPercent,
+  resize: IconResize, braces: IconBraces, rotate: IconRotate, 'eye-off': IconEyeOff,
+  stamp: IconStamp, eyedropper: IconEyedropper, 'grid-dots': IconGridDots,
+  'square-filled': IconSquareFilled, play: IconPlay,
 }
 
 export function Icon({ name, ...rest }: { name: string } & IconProps) {

@@ -40,24 +40,28 @@ const TextThemeCtx = React.createContext(buildPalette(true))
 
 // ── Tab config ──
 
+// Icon — SVG Icon component (mitovy amin'ny ImageHub.tsx / TConvertersHub.tsx),
+// nampiasaina indray ho an'ny tool tsirairay (ny 3D glossy PNG teo aloha
+// dia nesorina satria tsy nety tsara ny endriny).
+
 const TEXT_TABS = [
-  { id: 'word-counter',   icon: 'hash',     en: 'Word Counter',          fr: 'Compteur de mots',        enDesc: 'Words, characters, sentences, reading time', frDesc: 'Mots, caractères, phrases, temps de lecture' },
+  { id: 'word-counter',   icon: 'clipboard', en: 'Word Counter',          fr: 'Compteur de mots',        enDesc: 'Words, characters, sentences, reading time', frDesc: 'Mots, caractères, phrases, temps de lecture' },
   { id: 'case-converter', icon: 'typography', en: 'Case Converter',      fr: 'Convertisseur de casse',   enDesc: 'UPPERCASE, lowercase, Title Case, and more',  frDesc: 'MAJUSCULE, minuscule, Titre, et plus' },
-  { id: 'text-cleaner',   icon: 'sparkle',  en: 'Text Cleaner',          fr: 'Nettoyeur de texte',       enDesc: 'Remove extra spaces, tabs, empty lines',      frDesc: "Supprimer espaces, tabulations, lignes vides" },
+  { id: 'text-cleaner',   icon: 'sparkles', en: 'Text Cleaner',          fr: 'Nettoyeur de texte',       enDesc: 'Remove extra spaces, tabs, empty lines',      frDesc: "Supprimer espaces, tabulations, lignes vides" },
   { id: 'find-replace',   icon: 'search',   en: 'Find & Replace',        fr: 'Rechercher et remplacer',  enDesc: 'Search and replace text, with regex support', frDesc: 'Rechercher et remplacer, avec support regex' },
-  { id: 'remove-duplicates', icon: 'layers', en: 'Remove Duplicate Lines', fr: 'Supprimer les doublons', enDesc: 'Remove duplicate lines from a list',          frDesc: 'Supprimer les lignes en double' },
-  { id: 'sort-lines',     icon: 'sort',     en: 'Sort Lines',            fr: 'Trier les lignes',         enDesc: 'Sort lines alphabetically, numerically, or by length', frDesc: 'Trier par ordre alphabétique, numérique ou par longueur' },
+  { id: 'remove-duplicates', icon: 'repeat', en: 'Remove Duplicate Lines', fr: 'Supprimer les doublons', enDesc: 'Remove duplicate lines from a list',          frDesc: 'Supprimer les lignes en double' },
+  { id: 'sort-lines',     icon: 'scale',    en: 'Sort Lines',            fr: 'Trier les lignes',         enDesc: 'Sort lines alphabetically, numerically, or by length', frDesc: 'Trier par ordre alphabétique, numérique ou par longueur' },
   { id: 'text-diff',      icon: 'exchange', en: 'Text Diff',             fr: 'Comparateur de textes',    enDesc: 'Compare two texts and see what changed',      frDesc: 'Comparer deux textes et voir les différences' },
   { id: 'slug-generator', icon: 'link',     en: 'Slug Generator',        fr: 'Générateur de slug',       enDesc: 'Turn any text into a URL-friendly slug',      frDesc: 'Transformer un texte en slug pour URL' },
-  { id: 'text-statistics', icon: 'chart',   en: 'Text Statistics',       fr: 'Statistiques de texte',    enDesc: 'Word frequency, averages, and more',          frDesc: 'Fréquence des mots, moyennes, et plus' },
+  { id: 'text-statistics', icon: 'chart-bar', en: 'Text Statistics',     fr: 'Statistiques de texte',    enDesc: 'Word frequency, averages, and more',          frDesc: 'Fréquence des mots, moyennes, et plus' },
   { id: 'lorem-ipsum',    icon: 'edit',     en: 'Lorem Ipsum Generator', fr: 'Générateur Lorem Ipsum',   enDesc: 'Generate placeholder text',                   frDesc: 'Générer du texte de remplissage' },
-  { id: 'markdown-to-html', icon: 'code',   en: 'Markdown → HTML',       fr: 'Markdown → HTML',          enDesc: 'Convert Markdown to HTML',                    frDesc: 'Convertir du Markdown en HTML' },
-  { id: 'html-to-markdown', icon: 'code',   en: 'HTML → Markdown',       fr: 'HTML → Markdown',          enDesc: 'Convert HTML to Markdown',                    frDesc: 'Convertir du HTML en Markdown' },
-  { id: 'remove-empty-lines', icon: 'layers', en: 'Remove Empty Lines',  fr: 'Supprimer les lignes vides', enDesc: 'Remove blank lines from a text',              frDesc: 'Supprimer les lignes vides d\u2019un texte' },
-  { id: 'remove-spaces',  icon: 'sparkle',  en: 'Remove Spaces',         fr: 'Supprimer les espaces',    enDesc: 'Strip, trim, or collapse whitespace',         frDesc: 'Supprimer, ajuster ou fusionner les espaces' },
+  { id: 'markdown-to-html', icon: 'braces', en: 'Markdown → HTML',       fr: 'Markdown → HTML',          enDesc: 'Convert Markdown to HTML',                    frDesc: 'Convertir du Markdown en HTML' },
+  { id: 'html-to-markdown', icon: 'braces', en: 'HTML → Markdown',       fr: 'HTML → Markdown',          enDesc: 'Convert HTML to Markdown',                    frDesc: 'Convertir du HTML en Markdown' },
+  { id: 'remove-empty-lines', icon: 'eye-off', en: 'Remove Empty Lines', fr: 'Supprimer les lignes vides', enDesc: 'Remove blank lines from a text',              frDesc: 'Supprimer les lignes vides d\u2019un texte' },
+  { id: 'remove-spaces',  icon: 'sparkles', en: 'Remove Spaces',         fr: 'Supprimer les espaces',    enDesc: 'Strip, trim, or collapse whitespace',         frDesc: 'Supprimer, ajuster ou fusionner les espaces' },
   { id: 'text-reverser',  icon: 'exchange', en: 'Text Reverser',        fr: 'Inverseur de texte',       enDesc: 'Reverse characters, words, or lines',         frDesc: 'Inverser les caractères, mots ou lignes' },
-  { id: 'text-to-list',   icon: 'layers',   en: 'Text → List',          fr: 'Texte → Liste',            enDesc: 'Turn lines into a numbered or bulleted list', frDesc: 'Transformer des lignes en liste numérotée ou à puces' },
-  { id: 'list-to-text',   icon: 'layers',   en: 'List → Text',          fr: 'Liste → Texte',            enDesc: 'Strip list markers back to plain lines',      frDesc: 'Retirer les puces/numéros pour du texte simple' },
+  { id: 'text-to-list',   icon: 'file-text', en: 'Text → List',         fr: 'Texte → Liste',            enDesc: 'Turn lines into a numbered or bulleted list', frDesc: 'Transformer des lignes en liste numérotée ou à puces' },
+  { id: 'list-to-text',   icon: 'file-text', en: 'List → Text',         fr: 'Liste → Texte',            enDesc: 'Strip list markers back to plain lines',      frDesc: 'Retirer les puces/numéros pour du texte simple' },
 ]
 
 // ── Sidebar categories — mitovy filaharana amin'ny PdfHub.tsx sidebar
@@ -1154,6 +1158,7 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
   const { dark } = useDark()
   const C_T = React.useMemo(() => buildPalette(dark), [dark])
   const [tab, setTab] = React.useState('word-counter')
+  const [openBadgeInfo, setOpenBadgeInfo] = React.useState<number | null>(null)
   const cur = TEXT_TABS.find(t => t.id === tab)
   const isFr = lang === 'fr'
 
@@ -1247,7 +1252,7 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
                       fontSize: 13, fontWeight: active ? 700 : 500, cursor: 'pointer', textAlign: 'left',
                       transition: 'all .15s',
                     }}>
-                    <Icon name={t.icon} size={16} />
+                    <Icon name={t.icon} size={16} style={{ flexShrink: 0 }} />
                     {isFr ? t.fr : t.en}
                   </button>
                 )
@@ -1276,21 +1281,61 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 24 }}>
             {[
-              { icon: 'lock', en: '100% Private', fr: '100% Privé', enSub: 'Processed in your browser', frSub: 'Traité dans votre navigateur' },
-              { icon: 'bolt', en: 'Instant', fr: 'Instantané', enSub: 'No upload, no waiting', frSub: 'Sans envoi, sans attente' },
-              { icon: 'edit', en: 'Easy to Use', fr: 'Facile à utiliser', enSub: 'Just type or paste', frSub: 'Il suffit de taper ou coller' },
-            ].map(f => (
-              <div key={f.en} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${C_T.border}`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: C_T.accent, flexShrink: 0 }}>
-                  <Icon name={f.icon} size={16} />
+              { icon: 'lock', en: '100% Private', fr: '100% Privé', enSub: 'Processed in your browser', frSub: 'Traité dans votre navigateur',
+                enInfo: "Your text is processed locally with client-side JavaScript. It's never uploaded to a server or stored anywhere — everything stays in your browser tab.",
+                frInfo: "Votre texte est traité localement en JavaScript côté client. Il n'est jamais envoyé à un serveur ni stocké nulle part — tout reste dans votre navigateur." },
+              { icon: 'bolt', en: 'Instant', fr: 'Instantané', enSub: 'No upload, no waiting', frSub: 'Sans envoi, sans attente',
+                enInfo: "Since there's no file upload or server round-trip, results update instantly as you type or paste.",
+                frInfo: "Comme il n'y a ni envoi de fichier ni aller-retour vers un serveur, le résultat se met à jour instantanément pendant que vous tapez ou collez." },
+              { icon: 'edit', en: 'Easy to Use', fr: 'Facile à utiliser', enSub: 'Just type or paste', frSub: 'Il suffit de taper ou coller',
+                enInfo: "No sign-up, no settings to configure. Just type or paste your text into the box and the tool does the rest.",
+                frInfo: "Pas d'inscription, pas de réglage à configurer. Il suffit de taper ou coller votre texte dans la zone, l'outil fait le reste." },
+            ].map((f, i) => {
+              const open = openBadgeInfo === i
+              return (
+                <div key={f.en} style={{ position: 'relative' }}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenBadgeInfo(o => o === i ? null : i)}
+                    aria-expanded={open}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left',
+                      background: 'transparent', border: 'none', padding: 0, margin: 0,
+                      cursor: 'pointer', font: 'inherit', color: 'inherit', appearance: 'none',
+                      WebkitAppearance: 'none', borderRadius: 0,
+                    }}
+                  >
+                    <div style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${C_T.border}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', color: C_T.accent, flexShrink: 0 }}>
+                      <Icon name={f.icon} size={16} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 12.5, fontWeight: 700, color: C_T.text }}>{isFr ? f.fr : f.en}</div>
+                      <div style={{ fontSize: 11, color: C_T.muted }}>{isFr ? f.frSub : f.enSub}</div>
+                    </div>
+                  </button>
+                  {open && (
+                    <>
+                      <div onClick={() => setOpenBadgeInfo(null)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+                      <div role="dialog" style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, width: 260, zIndex: 41,
+                        border: `1px solid ${C_T.border}`, borderRadius: 14, background: C_T.card,
+                        boxShadow: '0 12px 32px rgba(0,0,0,0.35)', padding: 16 }}>
+                        <b style={{ fontSize: 12, color: C_T.text, display: 'block', marginBottom: 6 }}>
+                          {isFr ? f.fr : f.en} — {isFr ? f.frSub : f.enSub}
+                        </b>
+                        <p style={{ fontSize: 11, lineHeight: 1.6, color: C_T.muted, margin: 0 }}>
+                          {isFr ? f.frInfo : f.enInfo}
+                        </p>
+                        <button type="button" onClick={() => setOpenBadgeInfo(null)}
+                          style={{ marginTop: 12, fontSize: 10, color: C_T.muted, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
+                          {isFr ? 'Fermer' : 'Close'}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <div>
-                  <div style={{ fontSize: 12.5, fontWeight: 700, color: C_T.text }}>{isFr ? f.fr : f.en}</div>
-                  <div style={{ fontSize: 11, color: C_T.muted }}>{isFr ? f.frSub : f.enSub}</div>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
           <div style={{ background: C_T.card, border: `1px solid ${C_T.border}`, borderRadius: 16, padding: 24 }}>
             {panels[tab]}

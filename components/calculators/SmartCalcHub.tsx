@@ -145,6 +145,18 @@ const ID_ALIASES: Record<string, string> = {
   'ratio-calculator': 'ratio',
   'area-calculator': 'area',
 };
+
+// SEO_CONTENT (lib/seoContent.ts) is keyed by the same short ids as
+// PANEL_MAP ('uuid', 'bmi', ...), but activeTool holds whichever id
+// was actually clicked — which is the LONG TOOLS[].id when opened
+// from this hub's own grid (see the ID_ALIASES comment above), or
+// already the short id when opened via a direct URL. This resolves
+// either form down to the short key SEO_CONTENT expects.
+function toShortToolId(id: string | null): string | null {
+  if (!id) return id;
+  return ID_ALIASES[id] || id;
+}
+
 for (const [longId, shortId] of Object.entries(ID_ALIASES)) {
   if (PANEL_MAP[shortId] && !PANEL_MAP[longId]) PANEL_MAP[longId] = PANEL_MAP[shortId];
 }
@@ -180,6 +192,8 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
   const router = useRouter();
   useCalcFonts();
   const CATS = useMemo(() => getCats(t), [t]);
+  const [showInBrowserInfo, setShowInBrowserInfo] = useState(false);
+  const [openTrustBadge, setOpenTrustBadge] = useState<number | null>(null);
   const [activeTool, setActiveTool] = useState(()=>{
     // Priority 1: explicit prop from the router (ex: /tools/age-calculator
     // → initialTool="age") — jereo PDF_TAB_BY_SLUG-mitovy mapping ao
@@ -394,7 +408,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
     if(!activeTool) {
       document.title = lang === "fr" ? "SmartCalc Hub — 25 Calculatrices Gratuites en Ligne" : "SmartCalc Hub — 25 Free Online Calculators";
     } else {
-      const entry = SEO_CONTENT[activeTool];
+      const entry = SEO_CONTENT[toShortToolId(activeTool)];
       const seoTitle = (lang === "fr" && entry?.frTitle) ? entry.frTitle : entry?.title;
       const toolMeta = CALC_TOOLS.find(tl=>tl.id===activeTool);
       const toolLabel = getToolLabel(toolMeta, lang);
@@ -756,30 +770,92 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                   {CALC_TOOLS.length} free calculators — no signup, no tracking, works offline.
                 </p>
               </div>
-              <div style={{border:`1px solid ${T.emerald}40`,color:T.emerald,background:`${T.emerald}0a`,
-                borderRadius:999,padding:"8px 12px",fontSize:10,whiteSpace:"nowrap",
-                fontFamily:"Inter,sans-serif",fontWeight:600}}>
-                ● &nbsp; 100% Free
+              <div style={{position:"relative"}}>
+                <button type="button" onClick={()=>setShowInBrowserInfo(v=>!v)} aria-expanded={showInBrowserInfo}
+                  style={{border:`1px solid ${T.emerald}40`,color:T.emerald,background:`${T.emerald}0a`,
+                  borderRadius:999,padding:"8px 12px",fontSize:10,whiteSpace:"nowrap",cursor:"pointer",
+                  fontFamily:"Inter,sans-serif",fontWeight:600}}>
+                  ● &nbsp; 100% Free
+                </button>
+                {showInBrowserInfo && (
+                  <>
+                    <div onClick={()=>setShowInBrowserInfo(false)} style={{position:"fixed",inset:0,zIndex:40}} />
+                    <div role="dialog" style={{position:"absolute",top:"calc(100% + 8px)",right:0,width:280,zIndex:41,
+                      border:`1px solid ${T.border}`,borderRadius:14,background:T.bg1,
+                      boxShadow:"0 12px 32px rgba(0,0,0,0.35)",padding:16}}>
+                      <b style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:T.txt,display:"block",marginBottom:6}}>
+                        Why it's free & 100% private
+                      </b>
+                      <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,lineHeight:1.6,color:T.txt3,margin:0}}>
+                        These calculators run entirely in your browser (client-side JavaScript). Nothing is uploaded to a server, so there's no hosting cost on our end — and your data never leaves your device.
+                      </p>
+                      <button type="button" onClick={()=>setShowInBrowserInfo(false)}
+                        style={{marginTop:12,fontSize:10,color:T.txt3,background:"transparent",border:"none",cursor:"pointer",padding:0,fontFamily:"'DM Sans',sans-serif"}}>
+                        Close
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
             {/* Trust badges — same 3-item row style as PdfHub's hero */}
             <div className="chronos-trust-badges" style={{display:"flex",gap:32,flexWrap:"wrap"}}>
               {[
-                {icon:"♧",title:"100% Private",sub:"Your data stays on your device"},
-                {icon:"↯",title:"Fast & Accurate",sub:"Instant results, no waiting"},
-                {icon:"✓",title:"Easy to Use",sub:"No signup, just calculate"},
-              ].map((item,i)=>(
-                <div key={i} style={{display:"flex",gap:8,alignItems:"center"}}>
-                  <div style={{width:30,height:30,border:`1px solid ${T.border}`,borderRadius:9,
-                    display:"grid",placeItems:"center",color:T.cyan,flexShrink:0}}>
-                    {item.icon}
-                  </div>
-                  <div>
-                    <strong style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,display:"block",color:T.txt}}>{item.title}</strong>
-                    <small style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:T.txt3}}>{item.sub}</small>
-                  </div>
+                {icon:"♧",title:"100% Private",sub:"Your data stays on your device",
+                  enInfo:"Every calculation runs locally in your browser (client-side JavaScript). Your inputs are never uploaded to a server or stored anywhere.",
+                  frInfo:"Chaque calcul s'effectue localement dans votre navigateur (JavaScript côté client). Vos données ne sont jamais envoyées à un serveur ni stockées où que ce soit."},
+                {icon:"↯",title:"Fast & Accurate",sub:"Instant results, no waiting",
+                  enInfo:"Since there's no server round-trip, results update instantly as you type — with the same precision as a dedicated calculator.",
+                  frInfo:"Comme il n'y a pas d'aller-retour vers un serveur, le résultat se met à jour instantanément pendant que vous tapez, avec la même précision qu'une calculatrice dédiée."},
+                {icon:"✓",title:"Easy to Use",sub:"No signup, just calculate",
+                  enInfo:"No account, no email required. Pick a calculator, enter your numbers, and get your result right away.",
+                  frInfo:"Pas de compte, pas d'email requis. Choisissez une calculatrice, entrez vos chiffres, et obtenez votre résultat immédiatement."},
+              ].map((item,i)=>{
+                const open = openTrustBadge===i;
+                return (
+                <div key={i} style={{position:"relative"}}>
+                  <button
+                    type="button"
+                    onClick={()=>setOpenTrustBadge(o=>o===i?null:i)}
+                    aria-expanded={open}
+                    style={{
+                      display:"flex",gap:8,alignItems:"center",textAlign:"left",
+                      background:"transparent",border:"none",padding:0,margin:0,
+                      cursor:"pointer",font:"inherit",color:"inherit",appearance:"none",
+                      WebkitAppearance:"none",borderRadius:0,
+                    }}
+                  >
+                    <div style={{width:30,height:30,border:`1px solid ${T.border}`,borderRadius:9,
+                      display:"grid",placeItems:"center",color:T.cyan,flexShrink:0}}>
+                      {item.icon}
+                    </div>
+                    <div>
+                      <strong style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,display:"block",color:T.txt}}>{item.title}</strong>
+                      <small style={{fontFamily:"'DM Sans',sans-serif",fontSize:9,color:T.txt3}}>{item.sub}</small>
+                    </div>
+                  </button>
+                  {open && (
+                    <>
+                      <div onClick={()=>setOpenTrustBadge(null)} style={{position:"fixed",inset:0,zIndex:40}} />
+                      <div role="dialog" style={{position:"absolute",top:"calc(100% + 8px)",left:0,width:260,zIndex:41,
+                        border:`1px solid ${T.border}`,borderRadius:14,background:T.bg1,
+                        boxShadow:"0 12px 32px rgba(0,0,0,0.35)",padding:16}}>
+                        <b style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,color:T.txt,display:"block",marginBottom:6}}>
+                          {item.title} — {item.sub}
+                        </b>
+                        <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,lineHeight:1.6,color:T.txt3,margin:0}}>
+                          {lang==="fr" ? item.frInfo : item.enInfo}
+                        </p>
+                        <button type="button" onClick={()=>setOpenTrustBadge(null)}
+                          style={{marginTop:12,fontSize:10,color:T.txt3,background:"transparent",border:"none",cursor:"pointer",padding:0,fontFamily:"'DM Sans',sans-serif"}}>
+                          {lang==="fr" ? "Fermer" : "Close"}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
             );
@@ -1039,7 +1115,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
 function ToolSeoPage({ toolId }) {
   const { T } = useTheme();
   const { t, lang } = useLang();
-  const content = SEO_CONTENT[toolId];
+  const content = SEO_CONTENT[toShortToolId(toolId)];
   if (!content) return null;
 
   const H2 = ({ children }: { children: React.ReactNode }) => (

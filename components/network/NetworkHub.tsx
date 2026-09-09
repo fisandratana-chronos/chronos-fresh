@@ -3053,6 +3053,7 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
   const S = React.useMemo(() => mkStyles(T), [T]);
   const responsiveStyle = React.useMemo(() => buildResponsiveStyle(T), [T]);
   const [tab, setTab] = useState(initialTab || "ip");
+  const [openBadgeInfo, setOpenBadgeInfo] = useState<number | null>(null);
   const cur = TABS.find(tb => tb.id === tab)!;
   const hasHowItWorks = !!HOW_IT_WORKS[tab];
 
@@ -3171,25 +3172,67 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
           </div>
 
           {/* Trust badges */}
-          <div className="chronos-trust-badges" style={{ display: "flex", gap: 32, marginBottom: 24 }}>
+          <div className="chronos-trust-badges" style={{ display: "flex", gap: 32, marginBottom: 24, flexWrap: "wrap" }}>
             {[
-              { icon: "🚀", title: t("nh.badges.noSignupTitle"), sub: t("nh.badges.noSignupSub") },
-              { icon: "⚡", title: t("nh.badges.realtimeTitle"), sub: t("nh.badges.realtimeSub") },
-              { icon: "✓", title: t("nh.badges.easyTitle"), sub: t("nh.badges.easySub") },
-            ].map((item, i) => (
-              <div key={i} style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <div style={{
-                  width: 30, height: 30, border: `1px solid ${T.border}`,
-                  borderRadius: 9, display: "grid", placeItems: "center", color: T.cyan,
-                }}>
-                  {item.icon}
+              { icon: "🚀", title: t("nh.badges.noSignupTitle"), sub: t("nh.badges.noSignupSub"),
+                enInfo: "No account, no email, no credit card. Every network tool is free to use right away — nothing to sign up for.",
+                frInfo: "Pas de compte, pas d'email, pas de carte bancaire. Chaque outil réseau est utilisable gratuitement tout de suite, sans inscription." },
+              { icon: "⚡", title: t("nh.badges.realtimeTitle"), sub: t("nh.badges.realtimeSub"),
+                enInfo: "Each lookup queries live data at the moment you run it — results are never served from a stale cache, so what you see reflects the current state.",
+                frInfo: "Chaque recherche interroge des données en direct au moment où vous l'exécutez — les résultats ne proviennent jamais d'un cache périmé, ils reflètent l'état actuel." },
+              { icon: "✓", title: t("nh.badges.easyTitle"), sub: t("nh.badges.easySub"),
+                enInfo: "No settings to configure or manuals to read — just type what you want to look up (an IP, a domain, a port…) and get your result.",
+                frInfo: "Aucun réglage à configurer, aucun manuel à lire — il suffit de taper ce que vous voulez vérifier (une IP, un domaine, un port…) pour obtenir le résultat." },
+            ].map((item, i) => {
+              const open = openBadgeInfo === i;
+              return (
+                <div key={i} style={{ position: "relative" }}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenBadgeInfo(o => o === i ? null : i)}
+                    aria-expanded={open}
+                    style={{
+                      display: "flex", gap: 8, alignItems: "center", textAlign: "left",
+                      background: "transparent", border: "none", padding: 0, margin: 0,
+                      cursor: "pointer", font: "inherit", color: "inherit", appearance: "none",
+                      WebkitAppearance: "none", borderRadius: 0,
+                    }}
+                  >
+                    <div style={{
+                      width: 30, height: 30, border: `1px solid ${T.border}`,
+                      borderRadius: 9, display: "grid", placeItems: "center", color: T.cyan, flexShrink: 0,
+                    }}>
+                      {item.icon}
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: 11, display: "block", color: T.textPrimary }}>{item.title}</strong>
+                      <small style={{ fontSize: 9, color: T.muted2 }}>{item.sub}</small>
+                    </div>
+                  </button>
+                  {open && (
+                    <>
+                      <div onClick={() => setOpenBadgeInfo(null)} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
+                      <div role="dialog" style={{
+                        position: "absolute", top: "calc(100% + 8px)", left: 0, width: 260, zIndex: 41,
+                        border: `1px solid ${T.border}`, borderRadius: 14, background: T.bgCard,
+                        boxShadow: "0 12px 32px rgba(0,0,0,0.35)", padding: 16,
+                      }}>
+                        <b style={{ fontSize: 12, color: T.textPrimary, display: "block", marginBottom: 6 }}>
+                          {item.title} — {item.sub}
+                        </b>
+                        <p style={{ fontSize: 11, lineHeight: 1.6, color: T.muted2, margin: 0 }}>
+                          {lang === "fr" ? item.frInfo : item.enInfo}
+                        </p>
+                        <button type="button" onClick={() => setOpenBadgeInfo(null)}
+                          style={{ marginTop: 12, fontSize: 10, color: T.muted2, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}>
+                          {lang === "fr" ? "Fermer" : "Close"}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <div>
-                  <strong style={{ fontSize: 11, display: "block", color: T.textPrimary }}>{item.title}</strong>
-                  <small style={{ fontSize: 9, color: T.muted2 }}>{item.sub}</small>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Ad banner */}
