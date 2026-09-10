@@ -1780,6 +1780,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
   const responsiveStyle = React.useMemo(() => buildResponsiveStyle(C), [C]);
   const [tab, setTab] = React.useState(initialTab || "merge");
   const [showInBrowserInfo, setShowInBrowserInfo] = React.useState(false);
+  const [openTrustBadge, setOpenTrustBadge] = React.useState<number | null>(null);
   const cur = PDF_TABS.find(t => t.id === tab)!;
 
   return (
@@ -1920,25 +1921,67 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
           </div>
 
           {/* Trust badges */}
-          <div className="chronos-trust-badges" style={{ display: "flex", gap: 32, marginBottom: 24 }}>
+          <div className="chronos-trust-badges" style={{ display: "flex", gap: 32, marginBottom: 24, flexWrap: "wrap" }}>
             {[
-              { icon: "♧", title: lang === "fr" ? "100% Privé" : "100% Private", sub: lang === "fr" ? "Traité dans votre navigateur" : "Processed in your browser" },
-              { icon: "↯", title: lang === "fr" ? "Rapide & Sécurisé" : "Fast & Secure", sub: lang === "fr" ? "Pas d'upload, pas d'attente" : "No upload, no waiting" },
-              { icon: "✓", title: lang === "fr" ? "Facile à utiliser" : "Easy to Use", sub: lang === "fr" ? "Glissez-déposez simplement" : "Just drag and drop" },
-            ].map((item, i) => (
-              <div key={i} style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <div style={{
-                  width: 30, height: 30, border: `1px solid ${C.border}`,
-                  borderRadius: 9, display: "grid", placeItems: "center", color: C.accent,
-                }}>
-                  {item.icon}
+              { icon: "♧", title: lang === "fr" ? "100% Privé" : "100% Private", sub: lang === "fr" ? "Traité dans votre navigateur" : "Processed in your browser",
+                enInfo: "Your PDFs are processed locally with client-side JavaScript (pdf-lib / pdf.js). They're never uploaded to a server or stored anywhere.",
+                frInfo: "Vos PDF sont traités localement en JavaScript côté client (pdf-lib / pdf.js). Ils ne sont jamais envoyés à un serveur ni stockés où que ce soit." },
+              { icon: "↯", title: lang === "fr" ? "Rapide & Sécurisé" : "Fast & Secure", sub: lang === "fr" ? "Pas d'upload, pas d'attente" : "No upload, no waiting",
+                enInfo: "Since there's no file upload or server round-trip, merging, splitting or converting starts instantly — and your files stay under your control the whole time.",
+                frInfo: "Comme il n'y a ni envoi de fichier ni aller-retour vers un serveur, la fusion, la division ou la conversion démarre instantanément — et vos fichiers restent sous votre contrôle en permanence." },
+              { icon: "✓", title: lang === "fr" ? "Facile à utiliser" : "Easy to Use", sub: lang === "fr" ? "Glissez-déposez simplement" : "Just drag and drop",
+                enInfo: "No account, no manual to read. Drag your PDF into the drop zone (or click to browse) and the tool takes it from there.",
+                frInfo: "Pas de compte, pas de manuel à lire. Glissez votre PDF dans la zone prévue (ou cliquez pour le choisir) et l'outil s'occupe du reste." },
+            ].map((item, i) => {
+              const open = openTrustBadge === i;
+              return (
+                <div key={i} style={{ position: "relative" }}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenTrustBadge(o => o === i ? null : i)}
+                    aria-expanded={open}
+                    style={{
+                      display: "flex", gap: 8, alignItems: "center", textAlign: "left",
+                      background: "transparent", border: "none", padding: 0, margin: 0,
+                      cursor: "pointer", font: "inherit", color: "inherit", appearance: "none",
+                      WebkitAppearance: "none", borderRadius: 0,
+                    }}
+                  >
+                    <div style={{
+                      width: 30, height: 30, border: `1px solid ${C.border}`,
+                      borderRadius: 9, display: "grid", placeItems: "center", color: C.accent, flexShrink: 0,
+                    }}>
+                      {item.icon}
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: 11, display: "block", color: C.text }}>{item.title}</strong>
+                      <small style={{ fontSize: 9, color: C.muted2 }}>{item.sub}</small>
+                    </div>
+                  </button>
+                  {open && (
+                    <>
+                      <div onClick={() => setOpenTrustBadge(null)} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
+                      <div role="dialog" style={{
+                        position: "absolute", top: "calc(100% + 8px)", left: 0, width: 260, zIndex: 41,
+                        border: `1px solid ${C.border}`, borderRadius: 14, background: C.panel,
+                        boxShadow: "0 12px 32px rgba(0,0,0,0.35)", padding: 16,
+                      }}>
+                        <b style={{ fontSize: 12, color: C.text, display: "block", marginBottom: 6 }}>
+                          {item.title} — {item.sub}
+                        </b>
+                        <p style={{ fontSize: 11, lineHeight: 1.6, color: C.muted2, margin: 0 }}>
+                          {lang === "fr" ? item.frInfo : item.enInfo}
+                        </p>
+                        <button type="button" onClick={() => setOpenTrustBadge(null)}
+                          style={{ marginTop: 12, fontSize: 10, color: C.muted2, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}>
+                          {lang === "fr" ? "Fermer" : "Close"}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <div>
-                  <strong style={{ fontSize: 11, display: "block", color: C.text }}>{item.title}</strong>
-                  <small style={{ fontSize: 9, color: C.muted2 }}>{item.sub}</small>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Tool panel */}
