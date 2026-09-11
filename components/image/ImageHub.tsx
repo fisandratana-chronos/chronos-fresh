@@ -320,6 +320,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
   const [tab, setTab] = useState<Tab>(initialTab || 'compress')
   const [openBadgeInfo, setOpenBadgeInfo] = useState<number | null>(null)
   const [sidebarPinned, setSidebarPinned] = useState(false)
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [sidebarHovered, setSidebarHovered] = useState(false)
   const sidebarExpanded = sidebarPinned || sidebarHovered
 
@@ -389,6 +390,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         .ih-tool-link.rail-collapsed .ih-tool-link-label { display: none; }
         .ih-sidebar-pin { opacity: 0; transition: opacity .15s; }
         .ih-sidebar:hover .ih-sidebar-pin, .ih-sidebar-pin.pinned { opacity: 1; }
+        .ih-mobile-trigger { display: none; }
 
         @media (max-width: ${BP.mobile}px) {
           .ih-main-inner { padding: 32px 5vw 80px !important; }
@@ -400,16 +402,74 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
           .ih-shell { height: auto !important; overflow: visible !important; }
           .ih-layout { flex-direction: column !important; flex: none !important; overflow: visible !important; }
           .ih-sidebar-spacer { display: none !important; }
-          .ih-sidebar { width: auto !important; height: auto !important; position: static !important; box-shadow: none !important;
-            display: flex !important; overflow-x: auto !important; overflow-y: hidden !important; gap: 4px !important;
-            border-right: none !important; border-bottom: 1px solid ${T.border}; }
-          .ih-sidebar .ih-side-title, .ih-sidebar .ih-sidebar-heading { display: none !important; }
-          .ih-sidebar .ih-tool-link { white-space: nowrap !important; padding: 8px 12px !important; }
-          .ih-sidebar .ih-tool-link.rail-collapsed .ih-tool-link-label { display: inline !important; }
-          .ih-sidebar .ih-tool-link.rail-collapsed { justify-content: flex-start !important; gap: 10px !important; }
+          .ih-sidebar { display: none !important; }
+          .ih-mobile-trigger { display: flex !important; }
           .ih-main { overflow: visible !important; }
         }
       `}</style>
+
+      {/* Mobile-only tool switcher */}
+      <button
+        type="button"
+        className="ih-mobile-trigger"
+        onClick={() => setMobileDrawerOpen(true)}
+        style={{
+          alignItems: 'center', gap: 10, width: '100%',
+          padding: '12px 16px', background: T.surface, border: 'none',
+          borderBottom: `1px solid ${T.border}`, cursor: 'pointer', textAlign: 'left',
+        }}
+      >
+        <Icon name={cur.icon} size={16} />
+        <span style={{ fontSize: 14, fontWeight: 700, color: T.text }}>
+          {lang === 'fr' ? 'Choisir un outil' : 'Choose a tool'}
+        </span>
+        <span style={{ marginLeft: 'auto', color: T.muted, fontSize: 12 }}>▾</span>
+      </button>
+
+      {mobileDrawerOpen && (
+        <>
+          <div onClick={() => setMobileDrawerOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)' }} />
+          <div role="dialog" style={{
+            position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 201,
+            maxHeight: '75vh', overflowY: 'auto', background: T.surface,
+            borderTopLeftRadius: 20, borderTopRightRadius: 20,
+            padding: '16px 16px 24px', boxShadow: '0 -12px 32px rgba(0,0,0,0.4)',
+          }}>
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: T.border, margin: '0 auto 16px' }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <b style={{ fontSize: 15, color: T.text }}>{lang === 'fr' ? 'Choisir un outil' : 'Choose a tool'}</b>
+              <button onClick={() => setMobileDrawerOpen(false)} style={{ background: 'transparent', border: 'none', color: T.muted, fontSize: 22, cursor: 'pointer', lineHeight: 1, padding: 4 }}>×</button>
+            </div>
+            {FAMILIES.map(fam => (
+              <div key={fam.id} style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 10.5, color: T.muted, textTransform: 'uppercase', fontWeight: 800, letterSpacing: '.06em', padding: '0 4px 8px' }}>
+                  {lang === 'fr' ? fam.frLabel : fam.label}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                  {fam.tools.map(toolItem => {
+                    const active = tab === toolItem.id
+                    return (
+                      <button
+                        key={toolItem.id}
+                        onClick={() => { selectTool(toolItem.id); setMobileDrawerOpen(false) }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 10,
+                          border: `1px solid ${active ? T.accent : T.border}`,
+                          background: active ? 'rgba(6,182,212,.1)' : 'transparent',
+                          color: active ? T.accent : T.text,
+                          fontSize: 13, fontWeight: active ? 700 : 500, cursor: 'pointer', textAlign: 'left',
+                        }}>
+                        <Icon name={toolItem.icon} size={15} />
+                        {lang === 'fr' ? toolItem.frLabel : toolItem.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* ── Sidebar + content — each scrolls independently, matching
            TTextToolsHub.tsx / PdfHub.tsx structure ── */}

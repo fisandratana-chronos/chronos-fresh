@@ -2885,6 +2885,7 @@ function buildResponsiveStyle(T: Theme) { return `
   .nh-sidelink.rail-collapsed .nh-sidelink-label { display: none; }
   .chronos-sidebar-pin { opacity: 0; transition: opacity .15s; }
   .chronos-sidebar:hover .chronos-sidebar-pin, .chronos-sidebar-pin.pinned { opacity: 1; }
+  .chronos-mobile-trigger { display: none; }
 
   @media (max-width: ${BP.tablet}px) {
     .chronos-shell {
@@ -2893,29 +2894,8 @@ function buildResponsiveStyle(T: Theme) { return `
       overflow: visible !important;
     }
     .chronos-sidebar-spacer { display: none !important; }
-    .chronos-sidebar {
-      position: static !important;
-      width: auto !important;
-      box-shadow: none !important;
-      border-right: none !important;
-      border-bottom: 1px solid ${T.border};
-      padding: 12px !important;
-      height: auto !important;
-      overflow-y: visible !important;
-    }
-    .chronos-sidebar-pin { display: none !important; }
-    .nh-sidelink.rail-collapsed { justify-content: flex-start !important; gap: 10px !important; padding: 0 12px !important; }
-    .nh-sidelink.rail-collapsed .nh-sidelink-label { display: inline !important; }
-    .chronos-sidebar-groups {
-      display: flex !important;
-      flex-direction: row !important;
-      flex-wrap: nowrap !important;
-      overflow-x: auto !important;
-      gap: 18px !important;
-      -webkit-overflow-scrolling: touch;
-    }
-    .chronos-sidebar-groups > div { margin-top: 0 !important; flex: 0 0 auto; }
-    .chronos-sidebar-groups button { white-space: nowrap; }
+    .chronos-sidebar { display: none !important; }
+    .chronos-mobile-trigger { display: flex !important; }
     .chronos-privacy-badge { display: none !important; }
     .chronos-main { width: 100% !important; padding: 16px 16px 40px !important; height: auto !important; overflow-y: visible !important; }
     .chronos-hero-title { font-size: 34px !important; }
@@ -3069,6 +3049,7 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
   const [tab, setTab] = useState(initialTab || "ip");
   const [openBadgeInfo, setOpenBadgeInfo] = useState<number | null>(null);
   const [sidebarPinned, setSidebarPinned] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [sidebarHovered, setSidebarHovered] = useState(false);
   const sidebarExpanded = sidebarPinned || sidebarHovered;
   const cur = TABS.find(tb => tb.id === tab)!;
@@ -3107,6 +3088,70 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
     }}>
       <GlobalStyles />
       <style>{responsiveStyle}</style>
+
+      {/* Mobile-only tool switcher */}
+      <button
+        type="button"
+        className="chronos-mobile-trigger"
+        onClick={() => setMobileDrawerOpen(true)}
+        style={{
+          alignItems: "center", gap: 10, width: "100%",
+          padding: "12px 16px", background: T.bgCard, border: "none",
+          borderBottom: `1px solid ${T.border}`, cursor: "pointer", textAlign: "left",
+        }}
+      >
+        <Icon name={cur.icon} size={16} />
+        <span style={{ fontSize: 14, fontWeight: 700, color: T.textPrimary }}>
+          {lang === "fr" ? "Choisir un outil" : "Choose a tool"}
+        </span>
+        <span style={{ marginLeft: "auto", color: T.muted2, fontSize: 12 }}>▾</span>
+      </button>
+
+      {mobileDrawerOpen && (
+        <>
+          <div onClick={() => setMobileDrawerOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.5)" }} />
+          <div role="dialog" style={{
+            position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 201,
+            maxHeight: "75vh", overflowY: "auto", background: T.bgCard,
+            borderTopLeftRadius: 20, borderTopRightRadius: 20,
+            padding: "16px 16px 24px", boxShadow: "0 -12px 32px rgba(0,0,0,0.4)",
+          }}>
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: T.border, margin: "0 auto 16px" }} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <b style={{ fontSize: 15, color: T.textPrimary }}>{lang === "fr" ? "Choisir un outil" : "Choose a tool"}</b>
+              <button onClick={() => setMobileDrawerOpen(false)} style={{ background: "transparent", border: "none", color: T.muted2, fontSize: 22, cursor: "pointer", lineHeight: 1, padding: 4 }}>×</button>
+            </div>
+            {TAB_GROUPS.map(group => (
+              <div key={group.id} style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 10.5, color: T.muted2, textTransform: "uppercase", fontWeight: 800, letterSpacing: ".06em", padding: "0 4px 8px" }}>
+                  {lang === "fr" ? group.fr : group.en}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
+                  {TABS.filter(tb => tb.group === group.id).map(tb => {
+                    const active = tab === tb.id
+                    return (
+                      <button
+                        key={tb.id}
+                        onClick={() => { setTab(tb.id); setMobileDrawerOpen(false) }}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 10,
+                          border: `1px solid ${active ? T.cyan : T.border}`,
+                          background: active ? `${T.cyan}18` : "transparent",
+                          color: active ? T.cyan : T.textPrimary,
+                          fontSize: 13, fontWeight: active ? 700 : 500, cursor: "pointer", textAlign: "left",
+                        }}>
+                        <Icon name={tb.icon} size={15} />
+                        {lang === "fr" ? tb.fr : tb.en}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
 
       {/* ── Layout: sidebar + content ── */}
       <div className="chronos-shell" style={{ display: "grid", gridTemplateColumns: `${sidebarPinned ? 240 : 64}px 1fr`, height: "calc(100vh - 64px)", overflow: "hidden", position: "relative", transition: "grid-template-columns .16s ease" }}>

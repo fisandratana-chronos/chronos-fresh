@@ -195,6 +195,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
   const [showInBrowserInfo, setShowInBrowserInfo] = useState(false);
   const [openTrustBadge, setOpenTrustBadge] = useState<number | null>(null);
   const [sidebarPinned, setSidebarPinned] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [sidebarHovered, setSidebarHovered] = useState(false);
   const sidebarExpanded = sidebarPinned || sidebarHovered;
   const [activeTool, setActiveTool] = useState(()=>{
@@ -597,6 +598,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
         .sc-group-label.rail-collapsed{display:none;}
         .sidebar-pin{opacity:0;transition:opacity .15s;}
         .sidebar:hover .sidebar-pin,.sidebar-pin.pinned{opacity:1;}
+        .sc-mobile-trigger{display:none;}
         @media(max-width:${BP.laptop}px){
           .right-panel{display:none!important;}
         }
@@ -605,11 +607,8 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           .layout{flex-direction:column!important;flex:none!important;overflow:visible!important;}
           .main-col{overflow:visible!important;}
           .sidebar-spacer{display:none!important;}
-          .sidebar{position:static!important;width:100%!important;box-shadow:none!important;border-right:none!important;border-bottom:1px solid ${T.border}!important;padding:12px!important;overflow-y:visible!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;}
-          .sidebar-pin{display:none!important;}
-          .sc-cat-link.rail-collapsed{justify-content:flex-start!important;gap:9px!important;padding:9px 12px!important;}
-          .sc-cat-link.rail-collapsed .sc-cat-label,.sc-cat-link.rail-collapsed .sc-cat-count{display:inline-flex!important;}
-          .sc-group-label.rail-collapsed{display:block!important;}
+          .sidebar{display:none!important;}
+          .sc-mobile-trigger{display:flex!important;}
           .sidebar-ad{display:none!important;}
           .tool-grid{grid-template-columns:repeat(3,1fr)!important;}
           .chronos-hero-title{font-size:38px!important;}
@@ -620,6 +619,85 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           .tool-grid{grid-template-columns:repeat(2,1fr)!important;}
         }
       `}</style>
+
+      {/* Mobile-only category switcher */}
+      <button
+        type="button"
+        className="sc-mobile-trigger"
+        onClick={() => setMobileDrawerOpen(true)}
+        style={{
+          alignItems:'center',gap:10,width:'100%',
+          padding:'12px 16px',background:T.bg1,border:'none',
+          borderBottom:`1px solid ${T.border}`,cursor:'pointer',textAlign:'left',
+        }}
+      >
+        <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:14,fontWeight:700,color:T.txt}}>
+          {lang==='fr' ? 'Choisir une catégorie' : 'Choose a category'}
+        </span>
+        <span style={{marginLeft:'auto',color:T.txt3,fontSize:12}}>▾</span>
+      </button>
+
+      {mobileDrawerOpen && (() => {
+        const SIDEBAR_SECTIONS: {label:string|null,ids:string[]}[] = [
+          { label: null,          ids: ["all","favorites","recent"] },
+          { label: "BY CATEGORY", ids: ["health","finance","convert","dev","education","datetime","misc"] },
+        ];
+        const placed = new Set<string>();
+        const groups = SIDEBAR_SECTIONS.map(sec=>{
+          const items = sec.ids.map(id=>CATS.find((c:any)=>c.id===id)).filter(Boolean) as any[];
+          items.forEach(c=>placed.add(c.id));
+          return {label:sec.label, items};
+        });
+        const rest = CATS.filter((c:any)=>!placed.has(c.id));
+        if (rest.length) groups.push({label:"OTHER", items:rest});
+        return (
+          <>
+            <div onClick={() => setMobileDrawerOpen(false)} style={{position:'fixed',inset:0,zIndex:200,background:'rgba(0,0,0,0.5)'}} />
+            <div role="dialog" style={{
+              position:'fixed',left:0,right:0,bottom:0,zIndex:201,
+              maxHeight:'75vh',overflowY:'auto',background:T.bg1,
+              borderTopLeftRadius:20,borderTopRightRadius:20,
+              padding:'16px 16px 24px',boxShadow:'0 -12px 32px rgba(0,0,0,0.4)',
+            }}>
+              <div style={{width:36,height:4,borderRadius:2,background:T.border,margin:'0 auto 16px'}} />
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+                <b style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:15,color:T.txt}}>{lang==='fr' ? 'Choisir une catégorie' : 'Choose a category'}</b>
+                <button onClick={() => setMobileDrawerOpen(false)} style={{background:'transparent',border:'none',color:T.txt3,fontSize:22,cursor:'pointer',lineHeight:1,padding:4}}>×</button>
+              </div>
+              {groups.map((g,gi) => g.items.length===0 ? null : (
+                <div key={gi} style={{marginBottom:16}}>
+                  {g.label && (
+                    <div style={{fontFamily:"Inter,sans-serif",fontSize:10.5,color:T.txt3,textTransform:'uppercase',fontWeight:800,letterSpacing:'.06em',padding:'0 4px 8px'}}>
+                      {g.label}
+                    </div>
+                  )}
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(2, 1fr)',gap:8}}>
+                    {g.items.map((cat:any) => {
+                      const active = activeCat === cat.id
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => { setActiveCat(cat.id); setQuery(""); if(activeTool) closeTool(); setMobileDrawerOpen(false) }}
+                          style={{
+                            display:'flex',alignItems:'center',gap:8,padding:'10px 12px',borderRadius:10,
+                            border:`1px solid ${active ? T.cyan : T.border}`,
+                            background:active ? `${T.cyan}18` : 'transparent',
+                            color:active ? T.cyan : T.txt,
+                            fontSize:13,fontWeight:active?700:500,cursor:'pointer',textAlign:'left',
+                            fontFamily:"'Inter','Segoe UI',sans-serif",
+                          }}>
+                          <Icon name={cat.icon} size={15} />
+                          {cat.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )
+      })()}
 
       {/* ── TOP HEADER ─────────────────────────────────────────── */}
       <header style={{borderBottom:`1px solid ${T.border}`,background:T.bg1,flexShrink:0}}>

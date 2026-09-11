@@ -943,6 +943,7 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
   const [openTrustBadge, setOpenTrustBadge] = React.useState<number | null>(null)
   const [sidebarPinned, setSidebarPinned] = React.useState(false)
   const [sidebarHovered, setSidebarHovered] = React.useState(false)
+  const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false)
   const sidebarExpanded = sidebarPinned || sidebarHovered
   const cur = CONV_TABS.find(t => t.id === tab)
   const isFr = lang === 'fr'
@@ -1008,22 +1009,86 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
         .conv-sidebar-pin { opacity: 0; transition: opacity .15s; }
         .conv-sidebar:hover .conv-sidebar-pin, .conv-sidebar-pin.pinned { opacity: 1; }
         .conv-tool-link.rail-collapsed .conv-tool-link-label { display: none; }
+        .conv-mobile-trigger { display: none; }
         @media(max-width:${BP.tablet}px){
           .conv-shell { height: auto !important; overflow: visible !important; }
           .conv-page-layout { flex-direction: column !important; flex: none !important; overflow: visible !important; }
           .conv-sidebar-spacer { display: none !important; }
-          .conv-sidebar { width: auto !important; height: auto !important; position: static !important; box-shadow: none !important;
-            display: flex !important; overflow-x: auto !important; overflow-y: hidden !important; gap: 4px !important;
-            border-right: none !important; border-bottom: 1px solid ${C_T.border}; }
-          .conv-sidebar .conv-side-title, .conv-sidebar .conv-sidebar-heading { display: none !important; }
-          .conv-sidebar .conv-tool-link { white-space: nowrap !important; padding: 8px 12px !important; }
-          .conv-sidebar .conv-tool-link.rail-collapsed .conv-tool-link-label { display: inline !important; }
-          .conv-sidebar .conv-tool-link.rail-collapsed { justify-content: flex-start !important; gap: 10px !important; }
+          .conv-sidebar { display: none !important; }
+          .conv-mobile-trigger { display: flex !important; }
           .conv-main { overflow: visible !important; }
           .conv-layout{grid-template-columns:1fr;}
           .conv-tool{position:static;order:-1;}
         }
       `}</style>
+
+      {/* Mobile-only tool switcher — replaces the sidebar with a compact
+          "current tool ▾" button that opens a bottom-sheet drawer listing
+          every tool grouped by category, instead of an endless horizontal
+          scroll strip once there are many tools. */}
+      <button
+        type="button"
+        className="conv-mobile-trigger"
+        onClick={() => setMobileDrawerOpen(true)}
+        style={{
+          alignItems: 'center', gap: 10, width: '100%',
+          padding: '12px 16px', background: C_T.card, border: 'none',
+          borderBottom: `1px solid ${C_T.border}`, cursor: 'pointer', textAlign: 'left',
+        }}
+      >
+        {cur && <Icon name={cur.icon} size={16} />}
+        <span style={{ fontSize: 14, fontWeight: 700, color: C_T.text }}>
+          {isFr ? 'Choisir un outil' : 'Choose a tool'}
+        </span>
+        <span style={{ marginLeft: 'auto', color: C_T.muted, fontSize: 12 }}>▾</span>
+      </button>
+
+      {mobileDrawerOpen && (
+        <>
+          <div onClick={() => setMobileDrawerOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)' }} />
+          <div role="dialog" style={{
+            position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 201,
+            maxHeight: '75vh', overflowY: 'auto', background: C_T.card,
+            borderTopLeftRadius: 20, borderTopRightRadius: 20,
+            padding: '16px 16px 24px', boxShadow: '0 -12px 32px rgba(0,0,0,0.4)',
+          }}>
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: C_T.border, margin: '0 auto 16px' }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <b style={{ fontSize: 15, color: C_T.text }}>{isFr ? 'Choisir un outil' : 'Choose a tool'}</b>
+              <button onClick={() => setMobileDrawerOpen(false)} style={{ background: 'transparent', border: 'none', color: C_T.muted, fontSize: 22, cursor: 'pointer', lineHeight: 1, padding: 4 }}>×</button>
+            </div>
+            {CONV_CATEGORIES.map(cat => (
+              <div key={cat.en} style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 10.5, color: C_T.muted, textTransform: 'uppercase', fontWeight: 800, letterSpacing: '.06em', padding: '0 4px 8px' }}>
+                  {isFr ? cat.fr : cat.en}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                  {cat.tools.map(toolId => {
+                    const t = CONV_TABS.find(x => x.id === toolId)
+                    if (!t) return null
+                    const active = tab === toolId
+                    return (
+                      <button
+                        key={toolId}
+                        onClick={() => { setTab(toolId); setMobileDrawerOpen(false) }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 10,
+                          border: `1px solid ${active ? C_T.accent : C_T.border}`,
+                          background: active ? `${C_T.accent}18` : 'transparent',
+                          color: active ? C_T.accent : C_T.text,
+                          fontSize: 13, fontWeight: active ? 700 : 500, cursor: 'pointer', textAlign: 'left',
+                        }}>
+                        <Icon name={t.icon} size={15} />
+                        {isFr ? t.fr : t.en}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       <div className="conv-page-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%', position: 'relative' }}>
 

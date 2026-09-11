@@ -111,6 +111,7 @@ function buildResponsiveStyle(C: ReturnType<typeof buildPalette>) { return `
   .pdf-sidelink.rail-collapsed .pdf-sidelink-label { display: none; }
   .chronos-sidebar-pin { opacity: 0; transition: opacity .15s; }
   .chronos-sidebar:hover .chronos-sidebar-pin, .chronos-sidebar-pin.pinned { opacity: 1; }
+  .chronos-mobile-trigger { display: none; }
 
   @media (max-width: ${BP.tablet}px) {
     .chronos-shell {
@@ -119,29 +120,8 @@ function buildResponsiveStyle(C: ReturnType<typeof buildPalette>) { return `
       overflow: visible !important;
     }
     .chronos-sidebar-spacer { display: none !important; }
-    .chronos-sidebar {
-      position: static !important;
-      width: auto !important;
-      box-shadow: none !important;
-      border-right: none !important;
-      border-bottom: 1px solid ${C.border};
-      padding: 12px !important;
-      height: auto !important;
-      overflow-y: visible !important;
-    }
-    .chronos-sidebar-pin { display: none !important; }
-    .pdf-sidelink.rail-collapsed { justify-content: flex-start !important; gap: 10px !important; padding: 0 12px !important; }
-    .pdf-sidelink.rail-collapsed .pdf-sidelink-label { display: inline !important; }
-    .chronos-sidebar-groups {
-      display: flex !important;
-      flex-direction: row !important;
-      flex-wrap: nowrap !important;
-      overflow-x: auto !important;
-      gap: 18px !important;
-      -webkit-overflow-scrolling: touch;
-    }
-    .chronos-sidebar-groups > div { margin-top: 0 !important; flex: 0 0 auto; }
-    .chronos-sidebar-groups button { white-space: nowrap; }
+    .chronos-sidebar { display: none !important; }
+    .chronos-mobile-trigger { display: flex !important; }
     .chronos-privacy-badge { display: none !important; }
     .chronos-main { width: 100% !important; padding: 16px 16px 40px !important; height: auto !important; overflow-y: visible !important; }
     .chronos-hero-title { font-size: 34px !important; }
@@ -1798,6 +1778,7 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
   const [openTrustBadge, setOpenTrustBadge] = React.useState<number | null>(null);
   const [sidebarPinned, setSidebarPinned] = React.useState(false);
   const [sidebarHovered, setSidebarHovered] = React.useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false);
   const sidebarExpanded = sidebarPinned || sidebarHovered;
   const cur = PDF_TABS.find(t => t.id === tab)!;
 
@@ -1810,6 +1791,76 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
       color: C.text,
     }}>
       <style>{responsiveStyle}</style>
+
+      {/* Mobile-only tool switcher — replaces the horizontal tab strip with
+          a compact "Choose a tool" button that opens a bottom-sheet drawer
+          listing every tool grouped by category. */}
+      <button
+        type="button"
+        className="chronos-mobile-trigger"
+        onClick={() => setMobileDrawerOpen(true)}
+        style={{
+          alignItems: "center", gap: 10, width: "100%",
+          padding: "12px 16px", background: C.panel, border: "none",
+          borderBottom: `1px solid ${C.border}`, cursor: "pointer", textAlign: "left",
+        }}
+      >
+        <span style={{ width: 16, display: "inline-flex" }}>{cur.icon}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>
+          {lang === "fr" ? "Choisir un outil" : "Choose a tool"}
+        </span>
+        <span style={{ marginLeft: "auto", color: C.muted2, fontSize: 12 }}>▾</span>
+      </button>
+
+      {mobileDrawerOpen && (
+        <>
+          <div onClick={() => setMobileDrawerOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.5)" }} />
+          <div role="dialog" style={{
+            position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 201,
+            maxHeight: "75vh", overflowY: "auto", background: C.panel,
+            borderTopLeftRadius: 20, borderTopRightRadius: 20,
+            padding: "16px 16px 24px", boxShadow: "0 -12px 32px rgba(0,0,0,0.4)",
+          }}>
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: "0 auto 16px" }} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <b style={{ fontSize: 15, color: C.text }}>{lang === "fr" ? "Choisir un outil" : "Choose a tool"}</b>
+              <button onClick={() => setMobileDrawerOpen(false)} style={{ background: "transparent", border: "none", color: C.muted2, fontSize: 22, cursor: "pointer", lineHeight: 1, padding: 4 }}>×</button>
+            </div>
+            {[
+              { label: lang === "fr" ? "Populaires" : "Popular", tabs: POPULAR_TABS },
+              { label: lang === "fr" ? "Convertir" : "Convert", tabs: CONVERT_TABS },
+              { label: lang === "fr" ? "Sécurité" : "Security", tabs: SECURITY_TABS },
+              { label: lang === "fr" ? "Autres" : "Other", tabs: OTHER_TABS },
+            ].map(group => (
+              <div key={group.label} style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 10.5, color: C.muted2, textTransform: "uppercase", fontWeight: 800, letterSpacing: ".06em", padding: "0 4px 8px" }}>
+                  {group.label}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
+                  {group.tabs.map(t => {
+                    const active = tab === t.id
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => { setTab(t.id); setMobileDrawerOpen(false) }}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 10,
+                          border: `1px solid ${active ? C.accent : C.border}`,
+                          background: active ? `${C.accent}18` : "transparent",
+                          color: active ? C.accent : C.text,
+                          fontSize: 13, fontWeight: active ? 700 : 500, cursor: "pointer", textAlign: "left",
+                        }}>
+                        <span style={{ width: 16 }}>{t.icon}</span>
+                        {lang === "fr" ? t.fr : t.en}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* ── Layout: sidebar + content ──
           The shell has a fixed height (not minHeight) with overflow hidden,

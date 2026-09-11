@@ -122,7 +122,7 @@ lefangoka [chatgpt]: ...................fanatsarana tools(manampy tools)
 lobonaivo:..............................texttools + imagehub + covertor [manaobe-UI]
 mamasoa: ...............................manampy network tools [tohizan]
 ramarovahoaka...........................calculator    [tohizana]
-floodifyc: ............................ Pin Barre
+floodifyc: ............................ Pin Barre  [proUI/UX]
 
 POLYMARKET
 thomasokx: .............................manatsra UI/UX
