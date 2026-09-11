@@ -1026,38 +1026,37 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
           "current tool ▾" button that opens a bottom-sheet drawer listing
           every tool grouped by category, instead of an endless horizontal
           scroll strip once there are many tools. */}
-      <button
-        type="button"
-        className="conv-mobile-trigger"
-        onClick={() => setMobileDrawerOpen(true)}
-        style={{
-          alignItems: 'center', gap: 10, width: '100%',
-          padding: '12px 16px', background: C_T.card, border: 'none',
-          borderBottom: `1px solid ${C_T.border}`, cursor: 'pointer', textAlign: 'left',
-        }}
-      >
-        {cur && <Icon name={cur.icon} size={16} />}
-        <span style={{ fontSize: 14, fontWeight: 700, color: C_T.text }}>
-          {isFr ? 'Choisir un outil' : 'Choose a tool'}
-        </span>
-        <span style={{ marginLeft: 'auto', color: C_T.muted, fontSize: 12 }}>▾</span>
-      </button>
+      <div style={{ position: 'relative' }}>
+        <button
+          type="button"
+          className="conv-mobile-trigger"
+          onClick={() => setMobileDrawerOpen(v => !v)}
+          aria-expanded={mobileDrawerOpen}
+          style={{
+            alignItems: 'center', gap: 10, width: '100%',
+            padding: '12px 16px', background: C_T.card, border: 'none',
+            borderBottom: `1px solid ${C_T.border}`, cursor: 'pointer', textAlign: 'left',
+          }}
+        >
+          {cur && <Icon name={cur.icon} size={16} />}
+          <span style={{ fontSize: 14, fontWeight: 700, color: C_T.text }}>
+            {isFr ? 'Choisir un outil' : 'Choose a tool'}
+          </span>
+          <span style={{ marginLeft: 'auto', color: C_T.muted, fontSize: mobileDrawerOpen ? 18 : 12, lineHeight: 1 }}>
+            {mobileDrawerOpen ? '×' : '▾'}
+          </span>
+        </button>
 
-      {mobileDrawerOpen && (
-        <>
-          <div onClick={() => setMobileDrawerOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)' }} />
-          <div role="dialog" style={{
-            position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 201,
-            maxHeight: '75vh', overflowY: 'auto', background: C_T.card,
-            borderTopLeftRadius: 20, borderTopRightRadius: 20,
-            padding: '16px 16px 24px', boxShadow: '0 -12px 32px rgba(0,0,0,0.4)',
-          }}>
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: C_T.border, margin: '0 auto 16px' }} />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <b style={{ fontSize: 15, color: C_T.text }}>{isFr ? 'Choisir un outil' : 'Choose a tool'}</b>
-              <button onClick={() => setMobileDrawerOpen(false)} style={{ background: 'transparent', border: 'none', color: C_T.muted, fontSize: 22, cursor: 'pointer', lineHeight: 1, padding: 4 }}>×</button>
-            </div>
-            {CONV_CATEGORIES.map(cat => (
+        {mobileDrawerOpen && (
+          <>
+            <div onClick={() => setMobileDrawerOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 200 }} />
+            <div role="dialog" style={{
+              position: 'absolute', left: 0, right: 0, top: '100%', zIndex: 201,
+              maxHeight: 'calc(100vh - 180px)', overflowY: 'auto', background: C_T.card,
+              borderBottomLeftRadius: 16, borderBottomRightRadius: 16,
+              padding: '12px 16px 20px', boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
+            }}>
+              {CONV_CATEGORIES.map(cat => (
               <div key={cat.en} style={{ marginBottom: 16 }}>
                 <div style={{ fontSize: 10.5, color: C_T.muted, textTransform: 'uppercase', fontWeight: 800, letterSpacing: '.06em', padding: '0 4px 8px' }}>
                   {isFr ? cat.fr : cat.en}
@@ -1086,9 +1085,10 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
                 </div>
               </div>
             ))}
-          </div>
-        </>
-      )}
+            </div>
+          </>
+        )}
+      </div>
 
       <div className="conv-page-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%', position: 'relative' }}>
 

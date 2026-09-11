@@ -621,23 +621,27 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
       `}</style>
 
       {/* Mobile-only category switcher */}
-      <button
-        type="button"
-        className="sc-mobile-trigger"
-        onClick={() => setMobileDrawerOpen(true)}
-        style={{
-          alignItems:'center',gap:10,width:'100%',
-          padding:'12px 16px',background:T.bg1,border:'none',
-          borderBottom:`1px solid ${T.border}`,cursor:'pointer',textAlign:'left',
-        }}
-      >
-        <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:14,fontWeight:700,color:T.txt}}>
-          {lang==='fr' ? 'Choisir une catégorie' : 'Choose a category'}
-        </span>
-        <span style={{marginLeft:'auto',color:T.txt3,fontSize:12}}>▾</span>
-      </button>
+      <div style={{position:'relative'}}>
+        <button
+          type="button"
+          className="sc-mobile-trigger"
+          onClick={() => setMobileDrawerOpen(v => !v)}
+          aria-expanded={mobileDrawerOpen}
+          style={{
+            alignItems:'center',gap:10,width:'100%',
+            padding:'12px 16px',background:T.bg1,border:'none',
+            borderBottom:`1px solid ${T.border}`,cursor:'pointer',textAlign:'left',
+          }}
+        >
+          <span style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:14,fontWeight:700,color:T.txt}}>
+            {lang==='fr' ? 'Choisir une catégorie' : 'Choose a category'}
+          </span>
+          <span style={{marginLeft:'auto',color:T.txt3,fontSize:mobileDrawerOpen?18:12,lineHeight:1}}>
+            {mobileDrawerOpen ? '×' : '▾'}
+          </span>
+        </button>
 
-      {mobileDrawerOpen && (() => {
+        {mobileDrawerOpen && (() => {
         const SIDEBAR_SECTIONS: {label:string|null,ids:string[]}[] = [
           { label: null,          ids: ["all","favorites","recent"] },
           { label: "BY CATEGORY", ids: ["health","finance","convert","dev","education","datetime","misc"] },
@@ -652,18 +656,13 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
         if (rest.length) groups.push({label:"OTHER", items:rest});
         return (
           <>
-            <div onClick={() => setMobileDrawerOpen(false)} style={{position:'fixed',inset:0,zIndex:200,background:'rgba(0,0,0,0.5)'}} />
+            <div onClick={() => setMobileDrawerOpen(false)} style={{position:'fixed',inset:0,zIndex:200}} />
             <div role="dialog" style={{
-              position:'fixed',left:0,right:0,bottom:0,zIndex:201,
-              maxHeight:'75vh',overflowY:'auto',background:T.bg1,
-              borderTopLeftRadius:20,borderTopRightRadius:20,
-              padding:'16px 16px 24px',boxShadow:'0 -12px 32px rgba(0,0,0,0.4)',
+              position:'absolute',left:0,right:0,top:'100%',zIndex:201,
+              maxHeight:'calc(100vh - 180px)',overflowY:'auto',background:T.bg1,
+              borderBottomLeftRadius:16,borderBottomRightRadius:16,
+              padding:'12px 16px 20px',boxShadow:'0 12px 32px rgba(0,0,0,0.4)',
             }}>
-              <div style={{width:36,height:4,borderRadius:2,background:T.border,margin:'0 auto 16px'}} />
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
-                <b style={{fontFamily:"'Inter','Segoe UI',sans-serif",fontSize:15,color:T.txt}}>{lang==='fr' ? 'Choisir une catégorie' : 'Choose a category'}</b>
-                <button onClick={() => setMobileDrawerOpen(false)} style={{background:'transparent',border:'none',color:T.txt3,fontSize:22,cursor:'pointer',lineHeight:1,padding:4}}>×</button>
-              </div>
               {groups.map((g,gi) => g.items.length===0 ? null : (
                 <div key={gi} style={{marginBottom:16}}>
                   {g.label && (
@@ -698,6 +697,7 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           </>
         )
       })()}
+      </div>
 
       {/* ── TOP HEADER ─────────────────────────────────────────── */}
       <header style={{borderBottom:`1px solid ${T.border}`,background:T.bg1,flexShrink:0}}>
