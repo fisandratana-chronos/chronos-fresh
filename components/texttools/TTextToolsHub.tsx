@@ -1159,6 +1159,9 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
   const C_T = React.useMemo(() => buildPalette(dark), [dark])
   const [tab, setTab] = React.useState('word-counter')
   const [openBadgeInfo, setOpenBadgeInfo] = React.useState<number | null>(null)
+  const [sidebarPinned, setSidebarPinned] = React.useState(false)
+  const [sidebarHovered, setSidebarHovered] = React.useState(false)
+  const sidebarExpanded = sidebarPinned || sidebarHovered
   const cur = TEXT_TABS.find(t => t.id === tab)
   const isFr = lang === 'fr'
 
@@ -1195,14 +1198,20 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
         .tt-scroll::-webkit-scrollbar-track { background: transparent; }
         .tt-scroll::-webkit-scrollbar-thumb { background: ${C_T.border}; border-radius: 3px; }
         .tt-scroll::-webkit-scrollbar-thumb:hover { background: ${C_T.muted}; }
+        .tool-link.rail-collapsed .tool-link-label { display: none; }
+        .texttools-sidebar-pin { opacity: 0; transition: opacity .15s; }
+        .texttools-sidebar:hover .texttools-sidebar-pin, .texttools-sidebar-pin.pinned { opacity: 1; }
         @media(max-width:${BP.tablet}px){
           .texttools-shell { height: auto !important; overflow: visible !important; }
           .texttools-layout { flex-direction: column !important; flex: none !important; overflow: visible !important; }
-          .texttools-sidebar { width: auto !important; height: auto !important;
+          .texttools-sidebar-spacer { display: none !important; }
+          .texttools-sidebar { width: auto !important; height: auto !important; position: static !important; box-shadow: none !important;
             display: flex !important; overflow-x: auto !important; overflow-y: hidden !important; gap: 4px !important;
             border-right: none !important; border-bottom: 1px solid ${C_T.border}; }
           .texttools-sidebar .side-title, .texttools-sidebar .sidebar-heading { display: none !important; }
-          .texttools-sidebar .tool-link { white-space: nowrap !important; }
+          .texttools-sidebar .tool-link { white-space: nowrap !important; padding: 8px 12px !important; }
+          .texttools-sidebar .tool-link.rail-collapsed .tool-link-label { display: inline !important; }
+          .texttools-sidebar .tool-link.rail-collapsed { justify-content: flex-start !important; gap: 10px !important; }
           .texttools-main { overflow: visible !important; }
         }
       `}</style>
@@ -1212,40 +1221,90 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
           label lives at the top of the sidebar itself, exactly like
           PdfHub's "PDF TOOLS / 14 tools" — matching that hub's structure
           instead of duplicating the title in a header bar above it. */}
-      <div className="texttools-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%' }}>
+      <div className="texttools-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%', position: 'relative' }}>
 
-        <aside className="texttools-sidebar tt-scroll" style={{
-          width: 240, flexShrink: 0, overflowY: 'auto', borderRight: `1px solid ${C_T.border}`, padding: '20px 12px',
-        }}>
-          <div className="sidebar-heading" style={{ padding: '4px 10px 16px' }}>
-            {onBack && (
-              <button onClick={onBack} style={{ background: 'transparent', color: C_T.muted, border: 'none',
-                padding: 0, marginBottom: 10, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-                ← CHRONOS
+        {/* Spacer reserves the collapsed-rail width so main content doesn't jump when the sidebar overlays open on hover */}
+        <div className="texttools-sidebar-spacer" style={{ width: sidebarPinned ? 240 : 64, flexShrink: 0, transition: 'width .16s ease' }} />
+
+        <aside
+          className="texttools-sidebar tt-scroll"
+          onMouseEnter={() => setSidebarHovered(true)}
+          onMouseLeave={() => setSidebarHovered(false)}
+          style={{
+            width: sidebarExpanded ? 240 : 64, flexShrink: 0,
+            overflowY: sidebarExpanded ? 'auto' : 'hidden', overflowX: 'hidden',
+            borderRight: `1px solid ${C_T.border}`,
+            padding: sidebarExpanded ? '20px 12px' : '20px 8px',
+            position: 'absolute', top: 0, left: 0, bottom: 0, zIndex: 50,
+            background: C_T.card,
+            transition: 'width .16s ease, padding .16s ease',
+            boxShadow: sidebarHovered && !sidebarPinned ? '8px 0 24px rgba(0,0,0,0.35)' : 'none',
+          }}
+        >
+          <div className="sidebar-heading" style={{ padding: sidebarExpanded ? '4px 10px 16px' : '4px 0 16px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 4 }}>
+            <div style={{ minWidth: 0 }}>
+              {onBack && sidebarExpanded && (
+                <button onClick={onBack} style={{ background: 'transparent', color: C_T.muted, border: 'none',
+                  padding: 0, marginBottom: 10, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  ← CHRONOS
+                </button>
+              )}
+              {sidebarExpanded ? (
+                <>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C_T.accent, letterSpacing: '-0.3px' }}>
+                    {isFr ? 'OUTILS TEXTE' : 'TEXT TOOLS'}
+                  </div>
+                  <div style={{ fontSize: 12, color: C_T.muted, marginTop: 2 }}>
+                    {TEXT_TABS.length} {isFr ? 'outils' : 'tools'}
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontSize: 15, fontWeight: 800, color: C_T.accent, textAlign: 'center' }}>T</div>
+              )}
+            </div>
+            {sidebarExpanded && (
+              <button
+                type="button"
+                className={`texttools-sidebar-pin${sidebarPinned ? ' pinned' : ''}`}
+                onClick={() => setSidebarPinned(p => !p)}
+                title={sidebarPinned
+                  ? (isFr ? 'Détacher la barre latérale' : 'Unpin sidebar')
+                  : (isFr ? 'Épingler la barre latérale' : 'Pin sidebar')}
+                aria-pressed={sidebarPinned}
+                style={{
+                  flexShrink: 0, width: 26, height: 26, borderRadius: 7,
+                  border: `1px solid ${C_T.border}`, cursor: 'pointer',
+                  background: sidebarPinned ? `${C_T.accent}18` : 'transparent',
+                  color: sidebarPinned ? C_T.accent : C_T.muted,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12,
+                }}
+              >
+                📌
               </button>
             )}
-            <div style={{ fontSize: 15, fontWeight: 800, color: C_T.accent, letterSpacing: '-0.3px' }}>
-              {isFr ? 'OUTILS TEXTE' : 'TEXT TOOLS'}
-            </div>
-            <div style={{ fontSize: 12, color: C_T.muted, marginTop: 2 }}>
-              {TEXT_TABS.length} {isFr ? 'outils' : 'tools'}
-            </div>
           </div>
           {TEXT_CATEGORIES.map(cat => (
             <React.Fragment key={cat.en}>
-              <div className="side-title" style={{ fontSize: 10.5, color: C_T.muted, textTransform: 'uppercase',
-                fontWeight: 800, letterSpacing: '.06em', padding: '10px 10px 6px' }}>
-                {isFr ? cat.fr : cat.en}
-              </div>
+              {sidebarExpanded && (
+                <div className="side-title" style={{ fontSize: 10.5, color: C_T.muted, textTransform: 'uppercase',
+                  fontWeight: 800, letterSpacing: '.06em', padding: '10px 10px 6px' }}>
+                  {isFr ? cat.fr : cat.en}
+                </div>
+              )}
               {cat.tools.map(toolId => {
                 const t = TEXT_TABS.find(x => x.id === toolId)
                 if (!t) return null
                 const active = tab === toolId
                 return (
-                  <button key={toolId} className="tool-link" onClick={() => setTab(toolId)}
+                  <button
+                    key={toolId}
+                    className={`tool-link${!sidebarExpanded ? ' rail-collapsed' : ''}`}
+                    onClick={() => setTab(toolId)}
+                    title={!sidebarExpanded ? (isFr ? t.fr : t.en) : undefined}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-                      padding: '10px 10px', borderRadius: 9, margin: '2px 0',
+                      display: 'flex', alignItems: 'center', gap: sidebarExpanded ? 10 : 0, width: '100%',
+                      justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+                      padding: sidebarExpanded ? '10px 10px' : '10px 0', borderRadius: 9, margin: '2px 0',
                       background: active ? `${C_T.accent}18` : 'transparent',
                       border: 'none', borderLeft: active ? `2px solid ${C_T.accent}` : '2px solid transparent',
                       color: active ? C_T.accent : C_T.muted,
@@ -1253,7 +1312,7 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
                       transition: 'all .15s',
                     }}>
                     <Icon name={t.icon} size={16} style={{ flexShrink: 0 }} />
-                    {isFr ? t.fr : t.en}
+                    <span className="tool-link-label">{isFr ? t.fr : t.en}</span>
                   </button>
                 )
               })}

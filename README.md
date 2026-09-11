@@ -118,11 +118,11 @@ palabe60: ..............................UI Mobil/tablet
 ilayraromima: ..........................fiteny ( tohizana)
 tahiantso: .............................manampy tools ao @ pdf ( tohizana ny calculator) 
 ledamasy: ..............................Icons.tsx
-lefangoka (chatgpt): ...................fanatsarana tools(manampy tools)
+lefangoka [chatgpt]: ...................fanatsarana tools(manampy tools)
 lobonaivo:..............................texttools + imagehub + covertor [manaobe-UI]
 mamasoa: ...............................manampy network tools [tohizan]
-ramarovahoaka..........................calculator    [tohizana]
-
+ramarovahoaka...........................calculator    [tohizana]
+floodifyc: ............................ Pin Barre
 
 POLYMARKET
 thomasokx: .............................manatsra UI/UX

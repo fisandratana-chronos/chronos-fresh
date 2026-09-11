@@ -108,6 +108,9 @@ function buildResponsiveStyle(C: ReturnType<typeof buildPalette>) { return `
   html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
     background: ${C.muted2};
   }
+  .pdf-sidelink.rail-collapsed .pdf-sidelink-label { display: none; }
+  .chronos-sidebar-pin { opacity: 0; transition: opacity .15s; }
+  .chronos-sidebar:hover .chronos-sidebar-pin, .chronos-sidebar-pin.pinned { opacity: 1; }
 
   @media (max-width: ${BP.tablet}px) {
     .chronos-shell {
@@ -115,13 +118,20 @@ function buildResponsiveStyle(C: ReturnType<typeof buildPalette>) { return `
       height: auto !important;
       overflow: visible !important;
     }
+    .chronos-sidebar-spacer { display: none !important; }
     .chronos-sidebar {
+      position: static !important;
+      width: auto !important;
+      box-shadow: none !important;
       border-right: none !important;
       border-bottom: 1px solid ${C.border};
       padding: 12px !important;
       height: auto !important;
       overflow-y: visible !important;
     }
+    .chronos-sidebar-pin { display: none !important; }
+    .pdf-sidelink.rail-collapsed { justify-content: flex-start !important; gap: 10px !important; padding: 0 12px !important; }
+    .pdf-sidelink.rail-collapsed .pdf-sidelink-label { display: inline !important; }
     .chronos-sidebar-groups {
       display: flex !important;
       flex-direction: row !important;
@@ -1726,17 +1736,20 @@ function renderPdfPanel(tab: string, lang: string): React.ReactNode {
 // the entire sidebar subtree instead of diffing it. Declaring them here
 // once, and passing `active`/`lang`/`onSelect` as explicit props instead
 // of capturing `tab`/`setTab`/`lang` via closure, fixes that.
-function SideLink({ t, active, lang, onSelect }: {
-  t: typeof PDF_TABS[0], active: boolean, lang: string, onSelect: (id: string) => void,
+function SideLink({ t, active, lang, onSelect, collapsed }: {
+  t: typeof PDF_TABS[0], active: boolean, lang: string, onSelect: (id: string) => void, collapsed?: boolean,
 }) {
   const { C } = React.useContext(PdfThemeCtx)
   return (
     <button
       onClick={() => onSelect(t.id)}
+      className={`pdf-sidelink${collapsed ? " rail-collapsed" : ""}`}
+      title={collapsed ? (lang === "fr" ? t.fr : t.en) : undefined}
       style={{
         height: 42, width: "100%",
-        display: "flex", alignItems: "center", gap: 10,
-        padding: "0 12px",
+        display: "flex", alignItems: "center", gap: collapsed ? 0 : 10,
+        justifyContent: collapsed ? "center" : "flex-start",
+        padding: collapsed ? 0 : "0 12px",
         color: active ? C.accent : C.text,
         textDecoration: "none",
         borderRadius: 8, fontSize: 13,
@@ -1748,22 +1761,24 @@ function SideLink({ t, active, lang, onSelect }: {
         transition: "all .15s",
       }}>
       <span style={{ width: 16 }}>{t.icon}</span>
-      {lang === "fr" ? t.fr : t.en}
+      <span className="pdf-sidelink-label">{lang === "fr" ? t.fr : t.en}</span>
     </button>
   );
 }
 
-function SideGroup({ label, tabs, activeTab, lang, onSelect }: {
-  label: string, tabs: typeof PDF_TABS, activeTab: string, lang: string, onSelect: (id: string) => void,
+function SideGroup({ label, tabs, activeTab, lang, onSelect, collapsed }: {
+  label: string, tabs: typeof PDF_TABS, activeTab: string, lang: string, onSelect: (id: string) => void, collapsed?: boolean,
 }) {
   const { C } = React.useContext(PdfThemeCtx)
   return (
     <div style={{ marginTop: 24 }}>
-      <div style={{ fontSize: 10, letterSpacing: "0.13em", textTransform: "uppercase", color: C.muted2, padding: "0 12px 8px" }}>
-        {label}
-      </div>
+      {!collapsed && (
+        <div style={{ fontSize: 10, letterSpacing: "0.13em", textTransform: "uppercase", color: C.muted2, padding: "0 12px 8px" }}>
+          {label}
+        </div>
+      )}
       {tabs.map(t => (
-        <SideLink key={t.id} t={t} active={activeTab === t.id} lang={lang} onSelect={onSelect} />
+        <SideLink key={t.id} t={t} active={activeTab === t.id} lang={lang} onSelect={onSelect} collapsed={collapsed} />
       ))}
     </div>
   );
@@ -1781,6 +1796,9 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
   const [tab, setTab] = React.useState(initialTab || "merge");
   const [showInBrowserInfo, setShowInBrowserInfo] = React.useState(false);
   const [openTrustBadge, setOpenTrustBadge] = React.useState<number | null>(null);
+  const [sidebarPinned, setSidebarPinned] = React.useState(false);
+  const [sidebarHovered, setSidebarHovered] = React.useState(false);
+  const sidebarExpanded = sidebarPinned || sidebarHovered;
   const cur = PDF_TABS.find(t => t.id === tab)!;
 
   return (
@@ -1799,45 +1817,83 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
           independent scrollbar via overflowY: auto, instead of the whole
           page scrolling as one unit. Reset back to normal document flow on
           mobile below, where the sidebar collapses into a horizontal strip. */}
-      <div className="chronos-shell" style={{ display: "grid", gridTemplateColumns: "240px 1fr", height: "calc(100vh - 64px)", overflow: "hidden" }}>
+      <div className="chronos-shell" style={{ display: "grid", gridTemplateColumns: `${sidebarPinned ? 240 : 64}px 1fr`, height: "calc(100vh - 64px)", overflow: "hidden", position: "relative", transition: "grid-template-columns .16s ease" }}>
+
+        {/* Spacer reserves the collapsed-rail width so main content doesn't jump when the sidebar overlays open on hover */}
+        <div className="chronos-sidebar-spacer" />
 
         {/* Sidebar */}
-        <aside className="chronos-sidebar" style={{
+        <aside
+          className="chronos-sidebar"
+          onMouseEnter={() => setSidebarHovered(true)}
+          onMouseLeave={() => setSidebarHovered(false)}
+          style={{
+          position: "absolute", top: 0, left: 0, bottom: 0, zIndex: 50,
+          width: sidebarExpanded ? 240 : 64,
           borderRight: `1px solid ${C.border}`,
-          padding: "20px 16px",
+          padding: sidebarExpanded ? "20px 16px" : "20px 8px",
           background: C.sidebarBg,
           height: "100%",
-          overflowY: "auto",
+          overflowY: sidebarExpanded ? "auto" : "hidden",
+          overflowX: "hidden",
+          transition: "width .16s ease, padding .16s ease",
+          boxShadow: sidebarHovered && !sidebarPinned ? "8px 0 24px rgba(0,0,0,0.35)" : "none",
         }}>
-          <div style={{ color: C.accent, fontWeight: 700, fontSize: 13 }}>PDF TOOLS</div>
-          <div style={{ color: C.muted, fontSize: 11, marginTop: 4 }}>{PDF_TABS.length} tools</div>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 4 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ color: C.accent, fontWeight: 700, fontSize: 13 }}>{sidebarExpanded ? "PDF TOOLS" : "PDF"}</div>
+              {sidebarExpanded && <div style={{ color: C.muted, fontSize: 11, marginTop: 4 }}>{PDF_TABS.length} tools</div>}
+            </div>
+            {sidebarExpanded && (
+              <button
+                type="button"
+                className={`chronos-sidebar-pin${sidebarPinned ? " pinned" : ""}`}
+                onClick={() => setSidebarPinned(p => !p)}
+                title={sidebarPinned
+                  ? (lang === "fr" ? "Détacher la barre latérale" : "Unpin sidebar")
+                  : (lang === "fr" ? "Épingler la barre latérale" : "Pin sidebar")}
+                aria-pressed={sidebarPinned}
+                style={{
+                  flexShrink: 0, width: 26, height: 26, borderRadius: 7,
+                  border: `1px solid ${C.border}`, cursor: "pointer",
+                  background: sidebarPinned ? `${C.accent}18` : "transparent",
+                  color: sidebarPinned ? C.accent : C.muted,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12,
+                }}
+              >
+                📌
+              </button>
+            )}
+          </div>
 
           <div className="chronos-sidebar-groups">
-            <SideGroup label={lang === "fr" ? "Populaires" : "Popular"} tabs={POPULAR_TABS}  activeTab={tab} lang={lang} onSelect={setTab} />
-            <SideGroup label={lang === "fr" ? "Convertir"  : "Convert"}  tabs={CONVERT_TABS}  activeTab={tab} lang={lang} onSelect={setTab} />
-            <SideGroup label={lang === "fr" ? "Sécurité"   : "Security"} tabs={SECURITY_TABS} activeTab={tab} lang={lang} onSelect={setTab} />
-            <SideGroup label={lang === "fr" ? "Autres"     : "Other"}    tabs={OTHER_TABS}    activeTab={tab} lang={lang} onSelect={setTab} />
+            <SideGroup label={lang === "fr" ? "Populaires" : "Popular"} tabs={POPULAR_TABS}  activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
+            <SideGroup label={lang === "fr" ? "Convertir"  : "Convert"}  tabs={CONVERT_TABS}  activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
+            <SideGroup label={lang === "fr" ? "Sécurité"   : "Security"} tabs={SECURITY_TABS} activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
+            <SideGroup label={lang === "fr" ? "Autres"     : "Other"}    tabs={OTHER_TABS}    activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
           </div>
 
           {/* Privacy badge */}
-          <div className="chronos-privacy-badge" style={{
-            marginTop: 30, padding: 15,
-            border: `1px solid ${C.border}`, borderRadius: 12,
-            background: C.panel,
-          }}>
-            <b style={{ fontSize: 11, display: "block" }}>
-              ♧ &nbsp; {lang === "fr" ? "100% Dans le navigateur" : "100% In-Browser"}
-            </b>
-            <p style={{ color: C.muted2, fontSize: 10, lineHeight: 1.5, margin: "6px 0 0" }}>
-              {lang === "fr"
-                ? "Vos fichiers restent sur votre appareil. Rien n'est téléchargé."
-                : "Your files stay on your device. Nothing is uploaded."}
-            </p>
-          </div>
+          {sidebarExpanded && (
+            <div className="chronos-privacy-badge" style={{
+              marginTop: 30, padding: 15,
+              border: `1px solid ${C.border}`, borderRadius: 12,
+              background: C.panel,
+            }}>
+              <b style={{ fontSize: 11, display: "block" }}>
+                ♧ &nbsp; {lang === "fr" ? "100% Dans le navigateur" : "100% In-Browser"}
+              </b>
+              <p style={{ color: C.muted2, fontSize: 10, lineHeight: 1.5, margin: "6px 0 0" }}>
+                {lang === "fr"
+                  ? "Vos fichiers restent sur votre appareil. Rien n'est téléchargé."
+                  : "Your files stay on your device. Nothing is uploaded."}
+              </p>
+            </div>
+          )}
         </aside>
 
         {/* Main content */}
-        <main className="chronos-main" style={{ width: "min(1100px, calc(100vw - 280px))", margin: "0 auto", padding: "20px 40px 65px", height: "100%", overflowY: "auto" }}>
+        <main className="chronos-main" style={{ width: "100%", padding: "20px 40px 65px", height: "100%", overflowY: "auto" }}>
 
           {/* Breadcrumb */}
           <div style={{ fontSize: 11, color: C.muted2, marginBottom: 18 }}>

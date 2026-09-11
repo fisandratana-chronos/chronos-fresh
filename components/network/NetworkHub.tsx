@@ -2882,6 +2882,9 @@ function buildResponsiveStyle(T: Theme) { return `
   html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
     background: ${T.muted2};
   }
+  .nh-sidelink.rail-collapsed .nh-sidelink-label { display: none; }
+  .chronos-sidebar-pin { opacity: 0; transition: opacity .15s; }
+  .chronos-sidebar:hover .chronos-sidebar-pin, .chronos-sidebar-pin.pinned { opacity: 1; }
 
   @media (max-width: ${BP.tablet}px) {
     .chronos-shell {
@@ -2889,13 +2892,20 @@ function buildResponsiveStyle(T: Theme) { return `
       height: auto !important;
       overflow: visible !important;
     }
+    .chronos-sidebar-spacer { display: none !important; }
     .chronos-sidebar {
+      position: static !important;
+      width: auto !important;
+      box-shadow: none !important;
       border-right: none !important;
       border-bottom: 1px solid ${T.border};
       padding: 12px !important;
       height: auto !important;
       overflow-y: visible !important;
     }
+    .chronos-sidebar-pin { display: none !important; }
+    .nh-sidelink.rail-collapsed { justify-content: flex-start !important; gap: 10px !important; padding: 0 12px !important; }
+    .nh-sidelink.rail-collapsed .nh-sidelink-label { display: inline !important; }
     .chronos-sidebar-groups {
       display: flex !important;
       flex-direction: row !important;
@@ -2922,18 +2932,20 @@ function buildResponsiveStyle(T: Theme) { return `
 
 // ── Sidebar ──
 
-function SideLink({ t: tabItem, active, lang, onSelect }: {
-  t: typeof TABS[0], active: boolean, lang: string, onSelect: (id: string) => void,
+function SideLink({ t: tabItem, active, lang, onSelect, collapsed }: {
+  t: typeof TABS[0], active: boolean, lang: string, onSelect: (id: string) => void, collapsed?: boolean,
 }) {
   const T = useNHTheme();
   return (
     <button
       onClick={() => onSelect(tabItem.id)}
-      title={lang === "fr" ? tabItem.frDesc : tabItem.enDesc}
+      className={`nh-sidelink${collapsed ? " rail-collapsed" : ""}`}
+      title={collapsed ? (lang === "fr" ? tabItem.fr : tabItem.en) : (lang === "fr" ? tabItem.frDesc : tabItem.enDesc)}
       style={{
         height: 42, width: "100%",
-        display: "flex", alignItems: "center", gap: 10,
-        padding: "0 12px",
+        display: "flex", alignItems: "center", gap: collapsed ? 0 : 10,
+        justifyContent: collapsed ? "center" : "flex-start",
+        padding: collapsed ? 0 : "0 12px",
         color: active ? T.cyan : T.textPrimary,
         textDecoration: "none",
         borderRadius: 8, fontSize: 13,
@@ -2945,22 +2957,24 @@ function SideLink({ t: tabItem, active, lang, onSelect }: {
         transition: "all .15s",
       }}>
       <Icon name={tabItem.icon} size={15} />
-      {lang === "fr" ? tabItem.fr : tabItem.en}
+      <span className="nh-sidelink-label">{lang === "fr" ? tabItem.fr : tabItem.en}</span>
     </button>
   );
 }
 
-function SideGroup({ label, tabs, activeTab, lang, onSelect }: {
-  label: string, tabs: typeof TABS, activeTab: string, lang: string, onSelect: (id: string) => void,
+function SideGroup({ label, tabs, activeTab, lang, onSelect, collapsed }: {
+  label: string, tabs: typeof TABS, activeTab: string, lang: string, onSelect: (id: string) => void, collapsed?: boolean,
 }) {
   const T = useNHTheme();
   return (
     <div style={{ marginTop: 24 }}>
-      <div style={{ fontSize: 10, letterSpacing: "0.13em", textTransform: "uppercase", color: T.muted2, padding: "0 12px 8px" }}>
-        {label}
-      </div>
+      {!collapsed && (
+        <div style={{ fontSize: 10, letterSpacing: "0.13em", textTransform: "uppercase", color: T.muted2, padding: "0 12px 8px" }}>
+          {label}
+        </div>
+      )}
       {tabs.map(tb => (
-        <SideLink key={tb.id} t={tb} active={activeTab === tb.id} lang={lang} onSelect={onSelect} />
+        <SideLink key={tb.id} t={tb} active={activeTab === tb.id} lang={lang} onSelect={onSelect} collapsed={collapsed} />
       ))}
     </div>
   );
@@ -3054,6 +3068,9 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
   const responsiveStyle = React.useMemo(() => buildResponsiveStyle(T), [T]);
   const [tab, setTab] = useState(initialTab || "ip");
   const [openBadgeInfo, setOpenBadgeInfo] = useState<number | null>(null);
+  const [sidebarPinned, setSidebarPinned] = useState(false);
+  const [sidebarHovered, setSidebarHovered] = useState(false);
+  const sidebarExpanded = sidebarPinned || sidebarHovered;
   const cur = TABS.find(tb => tb.id === tab)!;
   const hasHowItWorks = !!HOW_IT_WORKS[tab];
 
@@ -3092,53 +3109,97 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
       <style>{responsiveStyle}</style>
 
       {/* ── Layout: sidebar + content ── */}
-      <div className="chronos-shell" style={{ display: "grid", gridTemplateColumns: "240px 1fr", height: "calc(100vh - 64px)", overflow: "hidden" }}>
+      <div className="chronos-shell" style={{ display: "grid", gridTemplateColumns: `${sidebarPinned ? 240 : 64}px 1fr`, height: "calc(100vh - 64px)", overflow: "hidden", position: "relative", transition: "grid-template-columns .16s ease" }}>
+
+        {/* Spacer reserves the collapsed-rail width so main content doesn't jump when the sidebar overlays open on hover */}
+        <div className="chronos-sidebar-spacer" />
 
         {/* Sidebar */}
-        <aside className="chronos-sidebar" style={{
+        <aside
+          className="chronos-sidebar"
+          onMouseEnter={() => setSidebarHovered(true)}
+          onMouseLeave={() => setSidebarHovered(false)}
+          style={{
+          position: "absolute", top: 0, left: 0, bottom: 0, zIndex: 50,
+          width: sidebarExpanded ? 240 : 64,
           borderRight: `1px solid ${T.border}`,
-          padding: "20px 16px",
+          padding: sidebarExpanded ? "20px 16px" : "20px 8px",
           background: T.sidebarBg,
           height: "100%",
-          overflowY: "auto",
+          overflowY: sidebarExpanded ? "auto" : "hidden",
+          overflowX: "hidden",
+          transition: "width .16s ease, padding .16s ease",
+          boxShadow: sidebarHovered && !sidebarPinned ? "8px 0 24px rgba(0,0,0,0.35)" : "none",
         }}>
-          {onBack && (
-            <button onClick={onBack} style={{
-              background: T.green, color: "#fff",
-              border: "none", borderRadius: 10,
-              padding: "8px 16px", cursor: "pointer",
-              fontSize: 12, fontWeight: 700,
-              display: "flex", alignItems: "center", gap: 6,
-              marginBottom: 18,
-            }}>← CHRONOS</button>
-          )}
-          <div style={{ color: T.cyan, fontWeight: 700, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.06em" }}>NET_HUB</div>
-          <div style={{ color: T.textSecondary, fontSize: 11, marginTop: 4 }}>{TABS.length} {lang === "fr" ? "outils" : "tools"}</div>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 4 }}>
+            <div style={{ minWidth: 0 }}>
+              {onBack && sidebarExpanded && (
+                <button onClick={onBack} style={{
+                  background: T.green, color: "#fff",
+                  border: "none", borderRadius: 10,
+                  padding: "8px 16px", cursor: "pointer",
+                  fontSize: 12, fontWeight: 700,
+                  display: "flex", alignItems: "center", gap: 6,
+                  marginBottom: 18,
+                }}>← CHRONOS</button>
+              )}
+              {sidebarExpanded ? (
+                <>
+                  <div style={{ color: T.cyan, fontWeight: 700, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.06em" }}>NET_HUB</div>
+                  <div style={{ color: T.textSecondary, fontSize: 11, marginTop: 4 }}>{TABS.length} {lang === "fr" ? "outils" : "tools"}</div>
+                </>
+              ) : (
+                <div style={{ color: T.cyan, fontWeight: 700, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>N</div>
+              )}
+            </div>
+            {sidebarExpanded && (
+              <button
+                type="button"
+                className={`chronos-sidebar-pin${sidebarPinned ? " pinned" : ""}`}
+                onClick={() => setSidebarPinned(p => !p)}
+                title={sidebarPinned
+                  ? (lang === "fr" ? "Détacher la barre latérale" : "Unpin sidebar")
+                  : (lang === "fr" ? "Épingler la barre latérale" : "Pin sidebar")}
+                aria-pressed={sidebarPinned}
+                style={{
+                  flexShrink: 0, width: 26, height: 26, borderRadius: 7,
+                  border: `1px solid ${T.border}`, cursor: "pointer",
+                  background: sidebarPinned ? `${T.cyan}18` : "transparent",
+                  color: sidebarPinned ? T.cyan : T.muted2,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12,
+                }}
+              >
+                📌
+              </button>
+            )}
+          </div>
 
           <div className="chronos-sidebar-groups">
             {TAB_GROUPS.map(group => (
               <SideGroup key={group.id} label={lang === "fr" ? group.fr : group.en}
-                tabs={TABS.filter(tb => tb.group === group.id)} activeTab={tab} lang={lang} onSelect={setTab} />
+                tabs={TABS.filter(tb => tb.group === group.id)} activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
             ))}
           </div>
 
           {/* Live-diagnostics badge */}
-          <div className="chronos-privacy-badge" style={{
-            marginTop: 30, padding: 15,
-            border: `1px solid ${T.border}`, borderRadius: 12,
-            background: T.bgCard,
-          }}>
-            <b style={{ fontSize: 11, display: "block" }}>
-              ● &nbsp; {t("nh.sidebar.liveTitle")}
-            </b>
-            <p style={{ color: T.muted2, fontSize: 10, lineHeight: 1.5, margin: "6px 0 0" }}>
-              {t("nh.sidebar.liveDesc")}
+          {sidebarExpanded && (
+            <div className="chronos-privacy-badge" style={{
+              marginTop: 30, padding: 15,
+              border: `1px solid ${T.border}`, borderRadius: 12,
+              background: T.bgCard,
+            }}>
+              <b style={{ fontSize: 11, display: "block" }}>
+                ● &nbsp; {t("nh.sidebar.liveTitle")}
+              </b>
+              <p style={{ color: T.muted2, fontSize: 10, lineHeight: 1.5, margin: "6px 0 0" }}>
+                {t("nh.sidebar.liveDesc")}
             </p>
           </div>
+          )}
         </aside>
 
         {/* Main content */}
-        <main className="chronos-main" style={{ width: "min(1100px, calc(100vw - 280px))", margin: "0 auto", padding: "20px 40px 65px", height: "100%", overflowY: "auto" }}>
+        <main className="chronos-main" style={{ width: "100%", padding: "20px 40px 65px", height: "100%", overflowY: "auto" }}>
 
           {/* Breadcrumb */}
           <div style={{ fontSize: 11, color: T.muted2, marginBottom: 18 }}>

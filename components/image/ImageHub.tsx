@@ -319,6 +319,9 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
   const { lang } = useLang()
   const [tab, setTab] = useState<Tab>(initialTab || 'compress')
   const [openBadgeInfo, setOpenBadgeInfo] = useState<number | null>(null)
+  const [sidebarPinned, setSidebarPinned] = useState(false)
+  const [sidebarHovered, setSidebarHovered] = useState(false)
+  const sidebarExpanded = sidebarPinned || sidebarHovered
 
   const selectTool = (id: Tab) => setTab(id)
 
@@ -383,6 +386,10 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         .ih-tool-link.active { background: rgba(6,182,212,.1); border-left-color: ${T.accent}; color: ${T.accent}; font-weight: 700; }
         .ih-side-title { font-size: 10.5px; color: ${T.muted}; text-transform: uppercase; font-weight: 800; letter-spacing: .06em; padding: 10px 10px 6px; }
 
+        .ih-tool-link.rail-collapsed .ih-tool-link-label { display: none; }
+        .ih-sidebar-pin { opacity: 0; transition: opacity .15s; }
+        .ih-sidebar:hover .ih-sidebar-pin, .ih-sidebar-pin.pinned { opacity: 1; }
+
         @media (max-width: ${BP.mobile}px) {
           .ih-main-inner { padding: 32px 5vw 80px !important; }
           .ih-dropzone { min-height: 280px !important; padding: 32px 20px !important; }
@@ -392,37 +399,91 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         @media (max-width: ${BP.tablet}px) {
           .ih-shell { height: auto !important; overflow: visible !important; }
           .ih-layout { flex-direction: column !important; flex: none !important; overflow: visible !important; }
-          .ih-sidebar { width: auto !important; height: auto !important;
+          .ih-sidebar-spacer { display: none !important; }
+          .ih-sidebar { width: auto !important; height: auto !important; position: static !important; box-shadow: none !important;
             display: flex !important; overflow-x: auto !important; overflow-y: hidden !important; gap: 4px !important;
             border-right: none !important; border-bottom: 1px solid ${T.border}; }
           .ih-sidebar .ih-side-title, .ih-sidebar .ih-sidebar-heading { display: none !important; }
-          .ih-sidebar .ih-tool-link { white-space: nowrap !important; }
+          .ih-sidebar .ih-tool-link { white-space: nowrap !important; padding: 8px 12px !important; }
+          .ih-sidebar .ih-tool-link.rail-collapsed .ih-tool-link-label { display: inline !important; }
+          .ih-sidebar .ih-tool-link.rail-collapsed { justify-content: flex-start !important; gap: 10px !important; }
           .ih-main { overflow: visible !important; }
         }
       `}</style>
 
       {/* ── Sidebar + content — each scrolls independently, matching
            TTextToolsHub.tsx / PdfHub.tsx structure ── */}
-      <div className="ih-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%' }}>
+      <div className="ih-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%', position: 'relative' }}>
 
-        <aside className="ih-sidebar ih-scroll" style={{ width: 240, flexShrink: 0, overflowY: 'auto', borderRight: `1px solid ${T.border}`, padding: '20px 12px' }}>
-          <div className="ih-sidebar-heading" style={{ padding: '4px 10px 16px' }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: T.accent, letterSpacing: '-0.3px' }}>
-              {lang === 'fr' ? 'OUTILS IMAGE' : 'IMAGE TOOLS'}
+        {/* Spacer reserves the collapsed-rail width so main content doesn't jump when the sidebar overlays open on hover */}
+        <div className="ih-sidebar-spacer" style={{ width: sidebarPinned ? 240 : 64, flexShrink: 0, transition: 'width .16s ease' }} />
+
+        <aside
+          className="ih-sidebar ih-scroll"
+          onMouseEnter={() => setSidebarHovered(true)}
+          onMouseLeave={() => setSidebarHovered(false)}
+          style={{
+            width: sidebarExpanded ? 240 : 64, flexShrink: 0,
+            overflowY: sidebarExpanded ? 'auto' : 'hidden', overflowX: 'hidden',
+            borderRight: `1px solid ${T.border}`,
+            padding: sidebarExpanded ? '20px 12px' : '20px 8px',
+            position: 'absolute', top: 0, left: 0, bottom: 0, zIndex: 50,
+            background: T.surface,
+            transition: 'width .16s ease, padding .16s ease',
+            boxShadow: sidebarHovered && !sidebarPinned ? '8px 0 24px rgba(0,0,0,0.35)' : 'none',
+          }}
+        >
+          <div className="ih-sidebar-heading" style={{ padding: sidebarExpanded ? '4px 10px 16px' : '4px 0 16px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 4 }}>
+            <div style={{ minWidth: 0 }}>
+              {sidebarExpanded ? (
+                <>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: T.accent, letterSpacing: '-0.3px' }}>
+                    {lang === 'fr' ? 'OUTILS IMAGE' : 'IMAGE TOOLS'}
+                  </div>
+                  <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>
+                    {ALL_TOOLS.length} {lang === 'fr' ? 'outils' : 'tools'}
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontSize: 15, fontWeight: 800, color: T.accent, textAlign: 'center' }}>I</div>
+              )}
             </div>
-            <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>
-              {ALL_TOOLS.length} {lang === 'fr' ? 'outils' : 'tools'}
-            </div>
+            {sidebarExpanded && (
+              <button
+                type="button"
+                className={`ih-sidebar-pin${sidebarPinned ? ' pinned' : ''}`}
+                onClick={() => setSidebarPinned(p => !p)}
+                title={sidebarPinned
+                  ? (lang === 'fr' ? 'Détacher la barre latérale' : 'Unpin sidebar')
+                  : (lang === 'fr' ? 'Épingler la barre latérale' : 'Pin sidebar')}
+                aria-pressed={sidebarPinned}
+                style={{
+                  flexShrink: 0, width: 26, height: 26, borderRadius: 7,
+                  border: `1px solid ${T.border}`, cursor: 'pointer',
+                  background: sidebarPinned ? 'rgba(6,182,212,.1)' : 'transparent',
+                  color: sidebarPinned ? T.accent : T.muted,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12,
+                }}
+              >
+                📌
+              </button>
+            )}
           </div>
           {FAMILIES.map(fam => (
             <React.Fragment key={fam.id}>
-              <div className="ih-side-title">{lang === 'fr' ? fam.frLabel : fam.label}</div>
+              {sidebarExpanded && <div className="ih-side-title">{lang === 'fr' ? fam.frLabel : fam.label}</div>}
               {fam.tools.map(tool => {
                 const active = tab === tool.id
                 return (
-                  <button key={tool.id} className={`ih-tool-link${active ? ' active' : ''}`} onClick={() => selectTool(tool.id)}>
+                  <button
+                    key={tool.id}
+                    className={`ih-tool-link${active ? ' active' : ''}${!sidebarExpanded ? ' rail-collapsed' : ''}`}
+                    onClick={() => selectTool(tool.id)}
+                    title={!sidebarExpanded ? (lang === 'fr' ? tool.frLabel : tool.label) : undefined}
+                    style={!sidebarExpanded ? { justifyContent: 'center', gap: 0 } : undefined}
+                  >
                     <Icon name={tool.icon} size={16} />
-                    {lang === 'fr' ? tool.frLabel : tool.label}
+                    <span className="ih-tool-link-label">{lang === 'fr' ? tool.frLabel : tool.label}</span>
                   </button>
                 )
               })}

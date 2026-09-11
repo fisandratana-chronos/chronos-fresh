@@ -194,6 +194,9 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
   const CATS = useMemo(() => getCats(t), [t]);
   const [showInBrowserInfo, setShowInBrowserInfo] = useState(false);
   const [openTrustBadge, setOpenTrustBadge] = useState<number | null>(null);
+  const [sidebarPinned, setSidebarPinned] = useState(false);
+  const [sidebarHovered, setSidebarHovered] = useState(false);
+  const sidebarExpanded = sidebarPinned || sidebarHovered;
   const [activeTool, setActiveTool] = useState(()=>{
     // Priority 1: explicit prop from the router (ex: /tools/age-calculator
     // → initialTool="age") — jereo PDF_TAB_BY_SLUG-mitovy mapping ao
@@ -590,6 +593,10 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
         .sc-scroll::-webkit-scrollbar-track{background:transparent;}
         .sc-scroll::-webkit-scrollbar-thumb{background:${T.border};border-radius:3px;}
         .sc-scroll::-webkit-scrollbar-thumb:hover{background:${T.txt3};}
+        .sc-cat-link.rail-collapsed .sc-cat-label,.sc-cat-link.rail-collapsed .sc-cat-count{display:none;}
+        .sc-group-label.rail-collapsed{display:none;}
+        .sidebar-pin{opacity:0;transition:opacity .15s;}
+        .sidebar:hover .sidebar-pin,.sidebar-pin.pinned{opacity:1;}
         @media(max-width:${BP.laptop}px){
           .right-panel{display:none!important;}
         }
@@ -597,7 +604,12 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           .sc-shell{height:auto!important;overflow:visible!important;}
           .layout{flex-direction:column!important;flex:none!important;overflow:visible!important;}
           .main-col{overflow:visible!important;}
-          .sidebar{width:100%!important;border-right:none!important;border-bottom:1px solid ${T.border}!important;padding:12px!important;overflow-y:visible!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;}
+          .sidebar-spacer{display:none!important;}
+          .sidebar{position:static!important;width:100%!important;box-shadow:none!important;border-right:none!important;border-bottom:1px solid ${T.border}!important;padding:12px!important;overflow-y:visible!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;}
+          .sidebar-pin{display:none!important;}
+          .sc-cat-link.rail-collapsed{justify-content:flex-start!important;gap:9px!important;padding:9px 12px!important;}
+          .sc-cat-link.rail-collapsed .sc-cat-label,.sc-cat-link.rail-collapsed .sc-cat-count{display:inline-flex!important;}
+          .sc-group-label.rail-collapsed{display:block!important;}
           .sidebar-ad{display:none!important;}
           .tool-grid{grid-template-columns:repeat(3,1fr)!important;}
           .chronos-hero-title{font-size:38px!important;}
@@ -648,12 +660,48 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           remaining height; each column scrolls independently via its
           own overflowY:auto (sidebar / main / right-panel), matching
           TTextToolsHub.tsx / ImageHub.tsx / TConvertersHub.tsx ── */}
-      <div className="layout" style={{display:"flex",flex:1,minHeight:0,width:"100%"}}>
+      <div className="layout" style={{display:"flex",flex:1,minHeight:0,width:"100%",position:"relative"}}>
+
+        {/* Spacer reserves the collapsed-rail width so main content doesn't jump when the sidebar overlays open on hover */}
+        <div className="sidebar-spacer" style={{width:sidebarPinned?220:64,flexShrink:0,transition:'width .16s ease'}} />
 
         {/* ── SIDEBAR ──────────────────────────────────────────── */}
-        <aside className="sidebar sc-scroll" style={{width:220,flexShrink:0,borderRight:`1px solid ${T.border}`,
-          padding:"18px 14px",display:"flex",flexDirection:"column",gap:4,
-          overflowY:"auto"}}>
+        <aside
+          className="sidebar sc-scroll"
+          onMouseEnter={()=>setSidebarHovered(true)}
+          onMouseLeave={()=>setSidebarHovered(false)}
+          style={{
+            width:sidebarExpanded?220:64,flexShrink:0,
+            borderRight:`1px solid ${T.border}`,
+            padding:sidebarExpanded?"18px 14px":"18px 8px",
+            display:"flex",flexDirection:"column",gap:4,
+            overflowY:sidebarExpanded?"auto":"hidden",overflowX:"hidden",
+            position:"absolute",top:0,left:0,bottom:0,zIndex:50,
+            background:T.bg1,
+            transition:"width .16s ease, padding .16s ease",
+            boxShadow:sidebarHovered&&!sidebarPinned?"8px 0 24px rgba(0,0,0,0.35)":"none",
+          }}>
+
+          <div style={{display:"flex",alignItems:"center",justifyContent:sidebarExpanded?"flex-end":"center",marginBottom:sidebarExpanded?4:0}}>
+            {sidebarExpanded && (
+              <button
+                type="button"
+                className={`sidebar-pin${sidebarPinned?" pinned":""}`}
+                onClick={()=>setSidebarPinned(p=>!p)}
+                title={sidebarPinned?"Unpin sidebar":"Pin sidebar"}
+                aria-pressed={sidebarPinned}
+                style={{
+                  flexShrink:0,width:26,height:26,borderRadius:7,
+                  border:`1px solid ${T.border}`,cursor:"pointer",
+                  background:sidebarPinned?`${T.cyan}18`:"transparent",
+                  color:sidebarPinned?T.cyan:T.txt3,
+                  display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,
+                }}
+              >
+                📌
+              </button>
+            )}
+          </div>
 
           {/* ── Category list, grouped into labeled sections like PdfHub's
               SideGroup (fontSize:10, letterSpacing:0.13em, uppercase, C.muted2,
@@ -678,14 +726,17 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
             return groups.map((g,gi)=> g.items.length===0 ? null : (
               <div key={gi} style={{marginTop:gi===0?0:24}}>
                 {g.label && (
-                  <div style={{fontFamily:"Inter,sans-serif",fontSize:10,letterSpacing:"0.13em",
+                  <div className={`sc-group-label${!sidebarExpanded ? ' rail-collapsed' : ''}`} style={{fontFamily:"Inter,sans-serif",fontSize:10,letterSpacing:"0.13em",
                     textTransform:"uppercase",color:T.txt3,padding:"0 12px 8px"}}>
                     {g.label}
                   </div>
                 )}
                 {g.items.map((cat:any)=>(
                   <button key={cat.id} onClick={()=>{setActiveCat(cat.id);setQuery("");if(activeTool)closeTool();}}
-                    style={{display:"flex",alignItems:"center",gap:9,padding:"9px 12px",width:"100%",
+                    className={`sc-cat-link${!sidebarExpanded?" rail-collapsed":""}`}
+                    title={!sidebarExpanded?cat.label:undefined}
+                    style={{display:"flex",alignItems:"center",gap:sidebarExpanded?9:0,padding:sidebarExpanded?"9px 12px":"9px 0",width:"100%",
+                      justifyContent:sidebarExpanded?"flex-start":"center",
                       borderRadius:8,border:"none",
                       borderLeft:activeCat===cat.id?`2px solid ${T.cyan}`:"2px solid transparent",
                       textAlign:"left",cursor:"pointer",
@@ -694,8 +745,8 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
                       fontFamily:"'Inter','Segoe UI',sans-serif",fontWeight:activeCat===cat.id?700:400,
                       fontSize:13,transition:"all .12s"}}>
                     <Icon name={cat.icon} size={14} />
-                    <span>{cat.label}</span>
-                    <span style={{marginLeft:"auto",fontSize:10,fontWeight:600,
+                    <span className="sc-cat-label">{cat.label}</span>
+                    <span className="sc-cat-count" style={{marginLeft:"auto",fontSize:10,fontWeight:600,
                       padding:"1px 7px",borderRadius:10,
                       background:activeCat===cat.id?`${T.cyan}22`:T.bg3,
                       color:activeCat===cat.id?T.cyan:T.txt3}}>
@@ -710,6 +761,8 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
             ));
           })()}
 
+          {sidebarExpanded && (
+          <>
           {/* ── Quick access box ── */}
           <div style={{marginTop:"auto",paddingTop:16,borderTop:`1px solid ${T.border}`}}>
             <div style={{background:`${T.cyan}10`,border:`1px solid ${T.cyan}30`,borderRadius:10,padding:"12px"}}>
@@ -732,6 +785,8 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
           <div className="sidebar-ad" style={{borderTop:`1px solid ${T.border}`,margin:"10px 0",paddingTop:10}}>
             <AdSlot size="160×600" label="Advertisement" slot={ADSENSE_CONFIG.slots.sidebar.id} minH={250}/>
           </div>
+          </>
+          )}
         </aside>
 
         {/* ── MAIN CONTENT ─────────────────────────────────────── */}

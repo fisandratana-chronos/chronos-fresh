@@ -941,6 +941,9 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
   const C_T = React.useMemo(() => buildPalette(dark), [dark])
   const [tab, setTab] = React.useState('length')
   const [openTrustBadge, setOpenTrustBadge] = React.useState<number | null>(null)
+  const [sidebarPinned, setSidebarPinned] = React.useState(false)
+  const [sidebarHovered, setSidebarHovered] = React.useState(false)
+  const sidebarExpanded = sidebarPinned || sidebarHovered
   const cur = CONV_TABS.find(t => t.id === tab)
   const isFr = lang === 'fr'
 
@@ -1002,48 +1005,107 @@ function TConvertersHub({ onBack }: { onBack?: () => void }) {
         .conv-side-title { font-size: 10.5px; color: ${C_T.muted}; text-transform: uppercase; font-weight: 800; letter-spacing: .06em; padding: 10px 10px 6px; }
         .conv-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:flex-start;}
         .conv-tool{position:sticky;top:0;}
+        .conv-sidebar-pin { opacity: 0; transition: opacity .15s; }
+        .conv-sidebar:hover .conv-sidebar-pin, .conv-sidebar-pin.pinned { opacity: 1; }
+        .conv-tool-link.rail-collapsed .conv-tool-link-label { display: none; }
         @media(max-width:${BP.tablet}px){
           .conv-shell { height: auto !important; overflow: visible !important; }
           .conv-page-layout { flex-direction: column !important; flex: none !important; overflow: visible !important; }
-          .conv-sidebar { width: auto !important; height: auto !important;
+          .conv-sidebar-spacer { display: none !important; }
+          .conv-sidebar { width: auto !important; height: auto !important; position: static !important; box-shadow: none !important;
             display: flex !important; overflow-x: auto !important; overflow-y: hidden !important; gap: 4px !important;
             border-right: none !important; border-bottom: 1px solid ${C_T.border}; }
           .conv-sidebar .conv-side-title, .conv-sidebar .conv-sidebar-heading { display: none !important; }
-          .conv-sidebar .conv-tool-link { white-space: nowrap !important; }
+          .conv-sidebar .conv-tool-link { white-space: nowrap !important; padding: 8px 12px !important; }
+          .conv-sidebar .conv-tool-link.rail-collapsed .conv-tool-link-label { display: inline !important; }
+          .conv-sidebar .conv-tool-link.rail-collapsed { justify-content: flex-start !important; gap: 10px !important; }
           .conv-main { overflow: visible !important; }
           .conv-layout{grid-template-columns:1fr;}
           .conv-tool{position:static;order:-1;}
         }
       `}</style>
 
-      <div className="conv-page-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%' }}>
+      <div className="conv-page-layout" style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%', position: 'relative' }}>
 
-        <aside className="conv-sidebar conv-scroll" style={{ width: 240, flexShrink: 0, overflowY: 'auto', borderRight: `1px solid ${C_T.border}`, padding: '20px 12px' }}>
-          <div className="conv-sidebar-heading" style={{ padding: '4px 10px 16px' }}>
-            {onBack && (
-              <button onClick={onBack} style={{ background: 'transparent', color: C_T.muted, border: 'none',
-                padding: 0, marginBottom: 10, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-                ← CHRONOS
+        {/* Spacer reserves the collapsed-rail width so main content doesn't jump when the sidebar overlays open on hover */}
+        <div className="conv-sidebar-spacer" style={{ width: sidebarPinned ? 240 : 64, flexShrink: 0, transition: 'width .16s ease' }} />
+
+        <aside
+          className="conv-sidebar conv-scroll"
+          onMouseEnter={() => setSidebarHovered(true)}
+          onMouseLeave={() => setSidebarHovered(false)}
+          style={{
+            width: sidebarExpanded ? 240 : 64,
+            flexShrink: 0,
+            overflowY: sidebarExpanded ? 'auto' : 'hidden',
+            overflowX: 'hidden',
+            borderRight: `1px solid ${C_T.border}`,
+            padding: sidebarExpanded ? '20px 12px' : '20px 8px',
+            position: 'absolute', top: 0, left: 0, bottom: 0, zIndex: 50,
+            background: C_T.bg,
+            transition: 'width .16s ease, padding .16s ease',
+            boxShadow: sidebarHovered && !sidebarPinned ? '8px 0 24px rgba(0,0,0,0.35)' : 'none',
+          }}
+        >
+          <div className="conv-sidebar-heading" style={{ padding: sidebarExpanded ? '4px 10px 16px' : '4px 0 16px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 4 }}>
+            <div style={{ minWidth: 0 }}>
+              {onBack && sidebarExpanded && (
+                <button onClick={onBack} style={{ background: 'transparent', color: C_T.muted, border: 'none',
+                  padding: 0, marginBottom: 10, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  ← CHRONOS
+                </button>
+              )}
+              {sidebarExpanded ? (
+                <>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C_T.accent, letterSpacing: '-0.3px' }}>
+                    {isFr ? 'CONVERTISSEURS' : 'CONVERTERS'}
+                  </div>
+                  <div style={{ fontSize: 12, color: C_T.muted, marginTop: 2 }}>
+                    {CONV_TABS.length} {isFr ? 'outils' : 'tools'}
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontSize: 15, fontWeight: 800, color: C_T.accent, textAlign: 'center' }}>C</div>
+              )}
+            </div>
+            {sidebarExpanded && (
+              <button
+                type="button"
+                className={`conv-sidebar-pin${sidebarPinned ? ' pinned' : ''}`}
+                onClick={() => setSidebarPinned(p => !p)}
+                title={sidebarPinned
+                  ? (isFr ? 'Détacher la barre latérale' : 'Unpin sidebar')
+                  : (isFr ? 'Épingler la barre latérale' : 'Pin sidebar')}
+                aria-pressed={sidebarPinned}
+                style={{
+                  flexShrink: 0, width: 26, height: 26, borderRadius: 7,
+                  border: `1px solid ${C_T.border}`, cursor: 'pointer',
+                  background: sidebarPinned ? `${C_T.accent}18` : 'transparent',
+                  color: sidebarPinned ? C_T.accent : C_T.muted,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12,
+                }}
+              >
+                📌
               </button>
             )}
-            <div style={{ fontSize: 15, fontWeight: 800, color: C_T.accent, letterSpacing: '-0.3px' }}>
-              {isFr ? 'CONVERTISSEURS' : 'CONVERTERS'}
-            </div>
-            <div style={{ fontSize: 12, color: C_T.muted, marginTop: 2 }}>
-              {CONV_TABS.length} {isFr ? 'outils' : 'tools'}
-            </div>
           </div>
           {CONV_CATEGORIES.map(cat => (
             <React.Fragment key={cat.en}>
-              <div className="conv-side-title">{isFr ? cat.fr : cat.en}</div>
+              {sidebarExpanded && <div className="conv-side-title">{isFr ? cat.fr : cat.en}</div>}
               {cat.tools.map(toolId => {
                 const t = CONV_TABS.find(x => x.id === toolId)
                 if (!t) return null
                 const active = tab === toolId
                 return (
-                  <button key={toolId} className={`conv-tool-link${active ? ' active' : ''}`} onClick={() => setTab(toolId)}>
+                  <button
+                    key={toolId}
+                    className={`conv-tool-link${active ? ' active' : ''}${!sidebarExpanded ? ' rail-collapsed' : ''}`}
+                    onClick={() => setTab(toolId)}
+                    title={!sidebarExpanded ? (isFr ? t.fr : t.en) : undefined}
+                    style={!sidebarExpanded ? { justifyContent: 'center', gap: 0 } : undefined}
+                  >
                     <Icon name={t.icon} size={16} />
-                    {isFr ? t.fr : t.en}
+                    <span className="conv-tool-link-label">{isFr ? t.fr : t.en}</span>
                   </button>
                 )
               })}
