@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { useLang } from '../../lib/hooks/useLang'
+import { useDark } from '../../lib/hooks/useDark'
 import { IconClipboard, IconPointerClick } from '../shared/Icons'
 
 // ── BMI Categories ────────────────────────────────────────────
@@ -17,9 +18,20 @@ function getBmiCategory(bmi: number, lang: string) {
 
 export default function TBMI() {
   const { lang } = useLang()
+  const { dark } = useDark()
   const [weight, setWeight] = useState('')
   const [height, setHeight] = useState('')
   const [bmi, setBmi]       = useState<number | null>(null)
+
+  // ── Theme tokens ──────────────────────────────────────────
+  const T = {
+    text: dark ? '#F1F5F9' : '#0F172A',
+    muted: dark ? '#94A3B8' : '#64748B',
+    border: dark ? '#1E293B' : '#E2E8F0',
+    inputBg: dark ? '#111827' : '#F8FAFC',
+    scaleTrack: dark ? '#1E293B' : '#E2E8F0',
+    dotBorder: dark ? '#0B1120' : '#fff',
+  }
 
   // ── Calcul automatique ────────────────────────────────────
   useEffect(() => {
@@ -44,7 +56,7 @@ export default function TBMI() {
         <div style={{ flex: 1 }}>
           <label style={{
             display: 'block', fontSize: 12, fontWeight: 600,
-            color: '#64748B', marginBottom: 6, textTransform: 'uppercase',
+            color: T.muted, marginBottom: 6, textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}>
             {lang === 'fr' ? 'Poids' : 'Weight'} (kg)
@@ -58,8 +70,8 @@ export default function TBMI() {
             style={{
               width: '100%', padding: '12px 16px',
               borderRadius: 10, fontSize: 16,
-              border: '1px solid #E2E8F0',
-              background: '#F8FAFC',
+              border: `1px solid ${T.border}`,
+              background: T.inputBg, color: T.text,
               outline: 'none', boxSizing: 'border-box',
               fontFamily: 'Inter, sans-serif',
             }}
@@ -70,7 +82,7 @@ export default function TBMI() {
         <div style={{ flex: 1 }}>
           <label style={{
             display: 'block', fontSize: 12, fontWeight: 600,
-            color: '#64748B', marginBottom: 6, textTransform: 'uppercase',
+            color: T.muted, marginBottom: 6, textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}>
             {lang === 'fr' ? 'Taille' : 'Height'} (cm)
@@ -84,8 +96,8 @@ export default function TBMI() {
             style={{
               width: '100%', padding: '12px 16px',
               borderRadius: 10, fontSize: 16,
-              border: '1px solid #E2E8F0',
-              background: '#F8FAFC',
+              border: `1px solid ${T.border}`,
+              background: T.inputBg, color: T.text,
               outline: 'none', boxSizing: 'border-box',
               fontFamily: 'Inter, sans-serif',
             }}
@@ -122,7 +134,7 @@ export default function TBMI() {
 
           {/* Scale bar */}
           <div style={{
-            background: '#E2E8F0', borderRadius: 99,
+            background: T.scaleTrack, borderRadius: 99,
             height: 8, position: 'relative', marginBottom: 8,
           }}>
             <div style={{
@@ -131,7 +143,7 @@ export default function TBMI() {
               top: '50%', transform: 'translate(-50%, -50%)',
               width: 16, height: 16, borderRadius: '50%',
               background: category.color,
-              border: '3px solid #fff',
+              border: `3px solid ${T.dotBorder}`,
               boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
             }} />
             {/* Scale colors */}
@@ -144,7 +156,7 @@ export default function TBMI() {
           {/* Scale labels */}
           <div style={{
             display: 'flex', justifyContent: 'space-between',
-            fontSize: 10, color: '#94A3B8', marginTop: 4,
+            fontSize: 10, color: T.muted, marginTop: 4,
           }}>
             <span>10</span>
             <span>18.5</span>
@@ -172,9 +184,9 @@ export default function TBMI() {
       {/* ── Empty state ── */}
       {bmi === null && (
         <div style={{
-          textAlign: 'center', color: '#94A3B8',
+          textAlign: 'center', color: T.muted,
           fontSize: 14, padding: '32px',
-          border: '1px dashed #E2E8F0', borderRadius: 14,
+          border: `1px dashed ${T.border}`, borderRadius: 14,
         }}>
           <IconPointerClick size={16} style={{marginBottom:6}} /><br/>
           {lang === 'fr'

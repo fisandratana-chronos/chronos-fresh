@@ -2946,6 +2946,7 @@ function SideGroup({ label, tabs, activeTab, lang, onSelect, collapsed }: {
   label: string, tabs: typeof TABS, activeTab: string, lang: string, onSelect: (id: string) => void, collapsed?: boolean,
 }) {
   const T = useNHTheme();
+  if (tabs.length === 0) return null;
   return (
     <div style={{ marginTop: 24 }}>
       {!collapsed && (
@@ -3051,9 +3052,38 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
   const [sidebarPinned, setSidebarPinned] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [sidebarHovered, setSidebarHovered] = useState(false);
+  const [toolSearch, setToolSearch] = useState("");
+  const [toolSearchFocused, setToolSearchFocused] = useState(false);
   const sidebarExpanded = sidebarPinned || sidebarHovered;
   const cur = TABS.find(tb => tb.id === tab)!;
   const hasHowItWorks = !!HOW_IT_WORKS[tab];
+
+  // "/" mamoha ny search input avy hatrany (toy ny @ PDF Tools / SmartCalc
+  // Hub) — tsy miasa raha efa eo anaty input/textarea/contentEditable hafa.
+  const toolSearchRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "/") return;
+      const el = e.target as HTMLElement;
+      if (el?.tagName === "INPUT" || el?.tagName === "TEXTAREA" || el?.isContentEditable) return;
+      e.preventDefault();
+      toolSearchRef.current?.focus();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  // Mi-filtrer ireo Network tools araka ny toolSearch (anarana sy
+  // description, amin'ny lang eo am-pihodinana). Foana ny search → tabs rehetra.
+  const filteredTabs = React.useMemo(() => {
+    const q = toolSearch.trim().toLowerCase();
+    if (!q) return TABS;
+    return TABS.filter(tb => {
+      const label = (lang === "fr" ? tb.fr : tb.en).toLowerCase();
+      const desc = (lang === "fr" ? tb.frDesc : tb.enDesc).toLowerCase();
+      return label.includes(q) || desc.includes(q);
+    });
+  }, [toolSearch, lang]);
 
   const tabContent = {
     ip: <IPTab />,
@@ -3120,13 +3150,16 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
               borderBottomLeftRadius: 16, borderBottomRightRadius: 16,
               padding: "12px 16px 20px", boxShadow: "0 12px 32px rgba(0,0,0,0.4)",
             }}>
-            {TAB_GROUPS.map(group => (
+            {TAB_GROUPS.map(group => {
+              const groupTabs = filteredTabs.filter(tb => tb.group === group.id);
+              if (groupTabs.length === 0) return null;
+              return (
               <div key={group.id} style={{ marginBottom: 16 }}>
                 <div style={{ fontSize: 10.5, color: T.muted2, textTransform: "uppercase", fontWeight: 800, letterSpacing: ".06em", padding: "0 4px 8px" }}>
                   {lang === "fr" ? group.fr : group.en}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
-                  {TABS.filter(tb => tb.group === group.id).map(tb => {
+                  {groupTabs.map(tb => {
                     const active = tab === tb.id
                     return (
                       <button
@@ -3146,7 +3179,8 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
                   })}
                 </div>
               </div>
-            ))}
+              )
+            })}
             </div>
           </>
         )}
@@ -3220,10 +3254,19 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
           </div>
 
           <div className="chronos-sidebar-groups">
-            {TAB_GROUPS.map(group => (
-              <SideGroup key={group.id} label={lang === "fr" ? group.fr : group.en}
-                tabs={TABS.filter(tb => tb.group === group.id)} activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
-            ))}
+            {sidebarExpanded && filteredTabs.length === 0 && (
+              <div style={{ marginTop: 24, padding: "0 12px", fontSize: 11.5, color: T.muted2, lineHeight: 1.5 }}>
+                {lang === "fr" ? "Aucun outil trouvé." : "No tools found."}
+              </div>
+            )}
+            {TAB_GROUPS.map(group => {
+              const groupTabs = filteredTabs.filter(tb => tb.group === group.id);
+              if (groupTabs.length === 0) return null;
+              return (
+                <SideGroup key={group.id} label={lang === "fr" ? group.fr : group.en}
+                  tabs={groupTabs} activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
+              );
+            })}
           </div>
 
           {/* Live-diagnostics badge */}
@@ -3245,6 +3288,79 @@ function NetworkHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: 
 
         {/* Main content */}
         <main className="chronos-main" style={{ width: "100%", padding: "20px 40px 65px", height: "100%", overflowY: "auto" }}>
+
+          {/* Search tools — mi-filtrer ireo tool ao amin'ny sidebar sy ny
+              mobile drawer (label + description), amin'ny lang eo
+              am-pihodinana. "/" mamoha ny input avy hatrany. Miseho
+              avy hatrany ny valiny (dropdown) eo ambanin'ny input,
+              na dia litera iray monja aza no voasoratra. */}
+          <div style={{ position: "relative", marginBottom: 16 }}>
+            <span style={{
+              position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+              color: T.muted2, fontSize: 13, pointerEvents: "none",
+            }}>⌕</span>
+            <input
+              ref={toolSearchRef}
+              id="network-tools-search"
+              name="network-tools-search"
+              type="text"
+              autoComplete="off"
+              value={toolSearch}
+              onChange={e => setToolSearch(e.target.value)}
+              onFocus={e => { e.currentTarget.style.borderColor = T.cyan; setToolSearchFocused(true); }}
+              onBlur={e => { e.currentTarget.style.borderColor = T.border; setToolSearchFocused(false); }}
+              onKeyDown={e => { if (e.key === "Escape") { setToolSearch(""); toolSearchRef.current?.blur(); } }}
+              placeholder={lang === "fr" ? "Rechercher un outil... (appuyez sur « / » pour chercher)" : "Search tools... (press \"/\" to focus)"}
+              style={{
+                width: "100%", height: 35,
+                border: `1px solid ${T.border}`, borderRadius: 9,
+                background: T.inputBg, color: T.textPrimary,
+                padding: "0 12px 0 32px", fontSize: 12.5,
+                fontFamily: "'DM Sans', sans-serif",
+                outline: "none", boxSizing: "border-box",
+                transition: "border-color .15s",
+              }}
+            />
+
+            {toolSearchFocused && toolSearch.trim() !== "" && (
+              <div style={{
+                position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 60,
+                border: `1px solid ${T.border}`, borderRadius: 10,
+                background: T.bgCard, boxShadow: "0 12px 28px rgba(0,0,0,0.3)",
+                maxHeight: 280, overflowY: "auto", padding: 6,
+              }}>
+                {filteredTabs.length === 0 ? (
+                  <div style={{ padding: "10px 8px", fontSize: 12.5, color: T.muted2 }}>
+                    {lang === "fr" ? "Aucun outil trouvé." : "No tools found."}
+                  </div>
+                ) : filteredTabs.map(tb => (
+                  <button
+                    key={tb.id}
+                    type="button"
+                    onMouseDown={e => e.preventDefault()}
+                    onClick={() => { setTab(tb.id); setToolSearch(""); toolSearchRef.current?.blur(); }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10, width: "100%",
+                      padding: "8px 10px", borderRadius: 8, border: "none",
+                      background: tab === tb.id ? `${T.cyan}18` : "transparent",
+                      color: tab === tb.id ? T.cyan : T.textPrimary,
+                      cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans', sans-serif",
+                    }}
+                    onMouseEnter={e => { if (tab !== tb.id) e.currentTarget.style.background = T.inputBg; }}
+                    onMouseLeave={e => { if (tab !== tb.id) e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <Icon name={tb.icon} size={14} />
+                    <span style={{ minWidth: 0 }}>
+                      <span style={{ display: "block", fontSize: 12.5, fontWeight: 600 }}>{lang === "fr" ? tb.fr : tb.en}</span>
+                      <span style={{ display: "block", fontSize: 10.5, color: T.muted2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {lang === "fr" ? tb.frDesc : tb.enDesc}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Breadcrumb */}
           <div style={{ fontSize: 11, color: T.muted2, marginBottom: 18 }}>

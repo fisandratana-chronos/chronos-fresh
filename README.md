@@ -123,6 +123,7 @@ lobonaivo:..............................texttools + imagehub + covertor [manaobe
 mamasoa: ...............................manampy network tools [tohizan]
 ramarovahoaka...........................calculator    [tohizana]
 floodifyc: ............................ Pin Barre  [proUI/UX] 6:20
+levamba: .............................. barre de recherche
 
 POLYMARKET
 thomasokx: .............................manatsra UI/UX

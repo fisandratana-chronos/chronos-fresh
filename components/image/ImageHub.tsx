@@ -322,9 +322,44 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
   const [sidebarPinned, setSidebarPinned] = useState(false)
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [sidebarHovered, setSidebarHovered] = useState(false)
+  const [toolSearch, setToolSearch] = useState('')
   const sidebarExpanded = sidebarPinned || sidebarHovered
 
   const selectTool = (id: Tab) => setTab(id)
+
+  // "/" mamoha ny search input avy hatrany (toy ny @ PDF Tools / Network /
+  // SmartCalc Hub) — tsy miasa raha efa eo anaty input/textarea/contentEditable hafa.
+  const toolSearchRef = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== '/') return
+      const el = e.target as HTMLElement
+      if (el?.tagName === 'INPUT' || el?.tagName === 'TEXTAREA' || el?.isContentEditable) return
+      e.preventDefault()
+      toolSearchRef.current?.focus()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
+  // Mi-filtrer ireo FAMILIES/tools araka ny toolSearch (anarana sy
+  // description, amin'ny lang eo am-pihodinana). Foana ny search → daholo.
+  const filteredFamilies = React.useMemo(() => {
+    const q = toolSearch.trim().toLowerCase()
+    if (!q) return FAMILIES
+    return FAMILIES
+      .map(fam => ({
+        ...fam,
+        tools: fam.tools.filter(toolItem => {
+          const label = (lang === 'fr' ? toolItem.frLabel : toolItem.label).toLowerCase()
+          const desc = (lang === 'fr' ? toolItem.frDesc : toolItem.desc).toLowerCase()
+          return label.includes(q) || desc.includes(q)
+        }),
+      }))
+      .filter(fam => fam.tools.length > 0)
+  }, [toolSearch, lang])
+  const [toolSearchFocused, setToolSearchFocused] = useState(false)
+  const filteredToolsFlat = React.useMemo(() => filteredFamilies.flatMap(fam => fam.tools), [filteredFamilies])
 
   // CSS variables via inline style
   const T = {
@@ -439,7 +474,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
               borderBottomLeftRadius: 16, borderBottomRightRadius: 16,
               padding: '12px 16px 20px', boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
             }}>
-            {FAMILIES.map(fam => (
+            {filteredFamilies.map(fam => (
               <div key={fam.id} style={{ marginBottom: 16 }}>
                 <div style={{ fontSize: 10.5, color: T.muted, textTransform: 'uppercase', fontWeight: 800, letterSpacing: '.06em', padding: '0 4px 8px' }}>
                   {lang === 'fr' ? fam.frLabel : fam.label}
@@ -529,7 +564,12 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
               </button>
             )}
           </div>
-          {FAMILIES.map(fam => (
+          {sidebarExpanded && filteredFamilies.length === 0 && (
+            <div style={{ padding: '0 10px', fontSize: 11.5, color: T.muted, lineHeight: 1.5 }}>
+              {lang === 'fr' ? 'Aucun outil trouvé.' : 'No tools found.'}
+            </div>
+          )}
+          {filteredFamilies.map(fam => (
             <React.Fragment key={fam.id}>
               {sidebarExpanded && <div className="ih-side-title">{lang === 'fr' ? fam.frLabel : fam.label}</div>}
               {fam.tools.map(tool => {
@@ -554,6 +594,79 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
         <main className="ih-main ih-scroll" style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
           <div className="ih-main-inner" style={{ padding: '32px 32px 80px' }}>
             <div style={{ width: '100%' }}>
+
+              {/* Search tools — mi-filtrer ireo tool ao amin'ny sidebar sy
+                  ny mobile drawer (label + description), amin'ny lang eo
+                  am-pihodinana. "/" mamoha ny input avy hatrany. Miseho
+                  avy hatrany ny valiny (dropdown) eo ambanin'ny input,
+                  na dia litera iray monja aza no voasoratra. */}
+              <div style={{ position: 'relative', marginBottom: 16 }}>
+                <span style={{
+                  position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+                  color: T.muted, fontSize: 13, pointerEvents: 'none',
+                }}>⌕</span>
+                <input
+                  ref={toolSearchRef}
+                  id="image-tools-search"
+                  name="image-tools-search"
+                  type="text"
+                  autoComplete="off"
+                  value={toolSearch}
+                  onChange={e => setToolSearch(e.target.value)}
+                  onFocus={e => { e.currentTarget.style.borderColor = T.accent; setToolSearchFocused(true) }}
+                  onBlur={e => { e.currentTarget.style.borderColor = T.border; setToolSearchFocused(false) }}
+                  onKeyDown={e => { if (e.key === 'Escape') { setToolSearch(''); toolSearchRef.current?.blur() } }}
+                  placeholder={lang === 'fr' ? 'Rechercher un outil... (appuyez sur « / » pour chercher)' : 'Search tools... (press "/" to focus)'}
+                  style={{
+                    width: '100%', height: 35,
+                    border: `1px solid ${T.border}`, borderRadius: 9,
+                    background: T.surface2, color: T.text,
+                    padding: '0 12px 0 32px', fontSize: 12.5,
+                    fontFamily: "'DM Sans', sans-serif",
+                    outline: 'none', boxSizing: 'border-box',
+                    transition: 'border-color .15s',
+                  }}
+                />
+
+                {toolSearchFocused && toolSearch.trim() !== '' && (
+                  <div style={{
+                    position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 60,
+                    border: `1px solid ${T.border}`, borderRadius: 10,
+                    background: T.surface, boxShadow: '0 12px 28px rgba(0,0,0,0.3)',
+                    maxHeight: 280, overflowY: 'auto', padding: 6,
+                  }}>
+                    {filteredToolsFlat.length === 0 ? (
+                      <div style={{ padding: '10px 8px', fontSize: 12.5, color: T.muted }}>
+                        {lang === 'fr' ? 'Aucun outil trouvé.' : 'No tools found.'}
+                      </div>
+                    ) : filteredToolsFlat.map(toolItem => (
+                      <button
+                        key={toolItem.id}
+                        type="button"
+                        onMouseDown={e => e.preventDefault()}
+                        onClick={() => { selectTool(toolItem.id); setToolSearch(''); toolSearchRef.current?.blur() }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                          padding: '8px 10px', borderRadius: 8, border: 'none',
+                          background: tab === toolItem.id ? 'rgba(6,182,212,.1)' : 'transparent',
+                          color: tab === toolItem.id ? T.accent : T.text,
+                          cursor: 'pointer', textAlign: 'left', fontFamily: "'DM Sans', sans-serif",
+                        }}
+                        onMouseEnter={e => { if (tab !== toolItem.id) e.currentTarget.style.background = T.surface2 }}
+                        onMouseLeave={e => { if (tab !== toolItem.id) e.currentTarget.style.background = 'transparent' }}
+                      >
+                        <Icon name={toolItem.icon} size={14} />
+                        <span style={{ minWidth: 0 }}>
+                          <span style={{ display: 'block', fontSize: 12.5, fontWeight: 600 }}>{lang === 'fr' ? toolItem.frLabel : toolItem.label}</span>
+                          <span style={{ display: 'block', fontSize: 10.5, color: T.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {lang === 'fr' ? toolItem.frDesc : toolItem.desc}
+                          </span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               <div style={{ fontSize: 12, color: T.muted, marginBottom: 12 }}>
                 CHRONOS / {lang === 'fr' ? 'Outils Image' : 'Image Tools'} / <span style={{ color: T.text, fontWeight: 600 }}>{lang === 'fr' ? cur.frLabel : cur.label}</span>

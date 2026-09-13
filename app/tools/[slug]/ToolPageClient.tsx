@@ -11,9 +11,7 @@ import TBMI from '../../../components/tools/TBMI'
 import TCalories from '../../../components/tools/TCalories'
 import TCurrency from '../../../components/tools/TCurrency'
 import TEMI from '../../../components/tools/TEMI'
-import TIdealWeight from '../../../components/tools/TIdealWeight'
 import TMortgage from '../../../components/tools/TMortgage'
-import TWaterIntake from '../../../components/tools/TWaterIntake'
 import SmartCalcHub from '../../../components/calculators/SmartCalcHub'
 import PdfHub from '../../../components/pdf/PdfHub'
 import NetworkHub from '../../../components/network/NetworkHub'
@@ -28,6 +26,10 @@ import RichCalcContent from '../../../components/seo/RichCalcContent'
 // Ireto 4 tool ireto ihany no manana content lalindalina (what/how/
 // formula/examples) amin'izao — ny hafa dia mampiasa ny ToolSeoContent
 // mahazatra (description + FAQ avy amin'ny registryTools).
+// ⚠️ bmi/mortgage/emi/calories dia MIJANONA eto tsy ovaina — efa manana
+// ny fanazavany manokana izy ireo, ka tsy nafindra tany amin'ny
+// SmartCalcHub (jereo ideal-weight-calculator / water-intake-calculator
+// eo ambany, izay nafindra satria tsy nanana fanazavana mihitsy teo aloha).
 const RICH_CONTENT_SLUGS: Record<string, string> = {
   'bmi-calculator': 'bmi',
   'mortgage-calculator': 'mortgage',
@@ -40,9 +42,14 @@ const COMPONENT_MAP: Record<string, ComponentType<any>> = {
   'bmi-calculator':          TBMI,
   'calories-calculator':     TCalories,
   'emi-calculator':          TEMI,
-  'ideal-weight-calculator': TIdealWeight,
   'mortgage-calculator':     TMortgage,
-  'water-intake-calculator': TWaterIntake,
+  // ideal-weight-calculator / water-intake-calculator moved into
+  // SmartCalcHub (see SMARTCALC_TOOL_BY_SLUG below) — they had no dark
+  // mode or SEO explanation as standalone pages (TIdealWeight.tsx /
+  // TWaterIntake.tsx), unlike the four above which already have their
+  // own RichCalcContent explanation and were left untouched.
+  'ideal-weight-calculator': SmartCalcHub,
+  'water-intake-calculator': SmartCalcHub,
   'smart-calculator':        SmartCalcHub,
   'age-calculator':          SmartCalcHub,
   'vat-calculator':          SmartCalcHub,
@@ -173,6 +180,8 @@ const FULLSCREEN_SLUGS = new Set([
   'sha256-generator','base64-encoder-decoder','binary-converter','rgb-hex-converter',
   'unit-converter','roman-numeral-converter','random-picker','statistics-calculator',
   'area-calculator','ratio-calculator',
+  // Newly moved into SmartCalcHub (see COMPONENT_MAP comment above)
+  'ideal-weight-calculator','water-intake-calculator',
   'pdf-hub','merge-pdf','split-pdf','compress-pdf','rotate-pdf','jpg-to-pdf',
   'pdf-to-jpg','pdf-to-word','pdf-to-excel',
   'network-hub','internet-speed-test','website-status-checker','ping-checker',
@@ -239,6 +248,11 @@ const SMARTCALC_TOOL_BY_SLUG: Record<string, string> = {
   'statistics-calculator': 'stats',
   'area-calculator': 'area',
   'ratio-calculator': 'ratio',
+  // Newly moved in — short ids match SmartCalcHub.tsx's ID_ALIASES
+  // ('ideal-weight-calculator':'idealweight', 'water-intake-calculator':
+  // 'waterintake') so a direct URL visit opens the right panel.
+  'ideal-weight-calculator': 'idealweight',
+  'water-intake-calculator': 'waterintake',
 }
 // Slug (URL /tools/xxx) → tab id ao anaty PdfHub.tsx (jereo PDF_TABS
 // ao amin'io fichier io). Ilaina mba hisokafan'ilay tabana MARINA
@@ -312,12 +326,12 @@ export default function ToolPageClient({
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#F8FAFC', paddingTop: 96, paddingBottom: 64 }}>
+    <main style={{ minHeight: '100vh', background: dark ? '#0B1120' : '#F8FAFC', paddingTop: 96, paddingBottom: 64, transition: 'background 0.2s' }}>
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 24px' }}>
-        <a href="/" style={{ fontSize: 13, color: '#64748B', textDecoration: 'none' }}>
+        <a href="/" style={{ fontSize: 13, color: dark ? '#94A3B8' : '#64748B', textDecoration: 'none' }}>
           ← {lang === 'fr' ? 'Retour' : 'Back'}
         </a>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0F172A', margin: '12px 0 24px' }}>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: dark ? '#F1F5F9' : '#0F172A', margin: '12px 0 24px' }}>
           {label}
         </h1>
 
@@ -325,8 +339,8 @@ export default function ToolPageClient({
           <Component />
         ) : (
           <div style={{
-            padding: 32, borderRadius: 14, background: '#fff',
-            border: '1px dashed #E2E8F0', textAlign: 'center', color: '#64748B',
+            padding: 32, borderRadius: 14, background: dark ? '#111827' : '#fff',
+            border: `1px dashed ${dark ? '#1E293B' : '#E2E8F0'}`, textAlign: 'center', color: dark ? '#94A3B8' : '#64748B',
           }}>
             {lang === 'fr'
               ? "Cet outil n'est pas encore disponible — le composant n'a pas encore été créé."

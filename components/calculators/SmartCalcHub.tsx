@@ -144,6 +144,13 @@ const ID_ALIASES: Record<string, string> = {
   'statistics-calculator': 'stats',
   'ratio-calculator': 'ratio',
   'area-calculator': 'area',
+  // Newly integrated — used to be standalone pages with no dark mode or
+  // SEO explanation (components/tools/TIdealWeight.tsx, TWaterIntake.tsx).
+  // bmi/calories/mortgage/emi aliases already existed above; only these
+  // two were missing. Moved in-hub below (see "NEWLY INTEGRATED
+  // CALCULATORS" panels further down).
+  'ideal-weight-calculator': 'idealweight',
+  'water-intake-calculator': 'waterintake',
 };
 
 // SEO_CONTENT (lib/seoContent.ts) is keyed by the same short ids as
@@ -160,6 +167,84 @@ function toShortToolId(id: string | null): string | null {
 for (const [longId, shortId] of Object.entries(ID_ALIASES)) {
   if (PANEL_MAP[shortId] && !PANEL_MAP[longId]) PANEL_MAP[longId] = PANEL_MAP[shortId];
 }
+
+// ── NEWLY INTEGRATED CALCULATORS — fallback panels ──────────────
+// ideal-weight-calculator and water-intake-calculator used to be standalone
+// pages (components/tools/TIdealWeight.tsx, TWaterIntake.tsx) rendered
+// OUTSIDE SmartCalcHub entirely — no dark mode, no history/share/
+// related-tools, no SEO explanation. Their calculation logic is
+// reproduced below (panels defined further down this file) so they render
+// exactly like every other calculator in this hub.
+// NOTE: bmi-calculator, calories-calculator, mortgage-calculator, and
+// emi-calculator are deliberately NOT touched here — those four already
+// have their own explanation content wired up via RICH_CONTENT_SLUGS /
+// RichCalcContent in ToolPageClient.tsx and are staying on their existing
+// standalone pages as-is.
+const FALLBACK_PANEL_MAP: Record<string, any> = {
+  idealweight: IdealWeightCalcPanel,
+  waterintake: WaterIntakeCalcPanel,
+};
+for (const [shortId, Component] of Object.entries(FALLBACK_PANEL_MAP)) {
+  if (!PANEL_MAP[shortId]) PANEL_MAP[shortId] = Component;
+}
+// Re-run the long-id backfill so ideal-weight-calculator/water-intake-calculator
+// pick up whichever component (existing or fallback) just landed above.
+for (const [longId, shortId] of Object.entries(ID_ALIASES)) {
+  if (PANEL_MAP[shortId] && !PANEL_MAP[longId]) PANEL_MAP[longId] = PANEL_MAP[shortId];
+}
+
+// ── LOCAL_SEO_CONTENT — fallback "What is it / How it works / Formula /
+// Examples / FAQ" content for ideal-weight and water-intake, in case
+// lib/seoContent.ts (SEO_CONTENT) doesn't have entries for them yet.
+// ToolSeoPage below checks SEO_CONTENT first, then falls back to this.
+// (bmi/calories/mortgage/emi are NOT included here — those already have
+// their own explanation content and are left untouched.) ──
+const LOCAL_SEO_CONTENT: Record<string, any> = {
+  idealweight: {
+    title: 'Ideal Weight Calculator — Estimate a Healthy Weight Range',
+    frTitle: 'Calculateur de Poids Idéal — Estimez une Fourchette de Poids Saine',
+    what: 'This calculator estimates an ideal body weight based on your height and sex, using the Devine formula — a clinical estimate commonly used in medicine.',
+    frWhat: "Ce calculateur estime un poids corporel idéal en fonction de votre taille et de votre sexe, en utilisant la formule de Devine — une estimation clinique couramment utilisée en médecine.",
+    how: 'Select your sex and enter your height in centimeters. The calculator applies the Devine formula and also shows a ±10% healthy range around that estimate.',
+    frHow: "Sélectionnez votre sexe et entrez votre taille en centimètres. Le calculateur applique la formule de Devine et affiche aussi une fourchette saine de ±10% autour de cette estimation.",
+    formula: { expr: 'Men: 50kg + 2.3kg per inch over 5ft', note: 'Women: 45.5kg + 2.3kg per inch over 5ft' },
+    frFormula: { expr: 'Hommes : 50kg + 2,3kg par pouce au-delà de 5 pieds', note: 'Femmes : 45,5kg + 2,3kg par pouce au-delà de 5 pieds' },
+    examples: [{ label: 'Male, 175cm', input: '175cm, male', result: '~68.5 kg (61.7–75.4 kg)' }],
+    frExamples: [{ label: 'Homme, 175cm', input: '175cm, homme', result: '~68,5 kg (61,7–75,4 kg)' }],
+    faq: [{ q: 'Is this the "right" weight for me?', a: "It's a general clinical estimate, not a personal target — body frame, muscle mass, and health conditions all affect what's healthy for a given individual." }],
+    frFaq: [{ q: 'Est-ce le "bon" poids pour moi ?', a: "C'est une estimation clinique générale, pas un objectif personnel — la carrure, la masse musculaire et l'état de santé influencent tous ce qui est sain pour chaque individu." }],
+  },
+  waterintake: {
+    title: 'Water Intake Calculator — How Much Water Should You Drink?',
+    frTitle: "Calculateur d'Hydratation — Combien d'Eau Devriez-vous Boire ?",
+    what: 'This calculator estimates how much water you should drink per day based on your body weight, activity level, and climate.',
+    frWhat: "Ce calculateur estime la quantité d'eau que vous devriez boire par jour en fonction de votre poids corporel, de votre niveau d'activité et du climat.",
+    how: 'Enter your weight, select your activity level, and toggle on hot/humid climate if it applies. The calculator multiplies your weight by a base rate, then adjusts for activity and climate.',
+    frHow: "Entrez votre poids, sélectionnez votre niveau d'activité, et activez le climat chaud/humide si applicable. Le calculateur multiplie votre poids par un taux de base, puis ajuste selon l'activité et le climat.",
+    formula: { expr: 'Water (ml) = weight (kg) × 33 × activity factor × climate factor', note: 'Climate factor is +15% in hot/humid conditions' },
+    frFormula: { expr: "Eau (ml) = poids (kg) × 33 × facteur d'activité × facteur climat", note: 'Le facteur climat est de +15% en conditions chaudes/humides' },
+    examples: [
+      { label: 'Sedentary, 70kg', input: '70kg, sedentary', result: '~2.3 L/day' },
+      { label: 'Athlete, hot climate', input: '70kg, athlete, hot', result: '~4.3 L/day' },
+    ],
+    frExamples: [
+      { label: 'Sédentaire, 70kg', input: '70kg, sédentaire', result: '~2,3 L/jour' },
+      { label: 'Athlète, climat chaud', input: '70kg, athlète, chaud', result: '~4,3 L/jour' },
+    ],
+    faq: [{ q: 'Does coffee or tea count toward water intake?', a: 'Most fluids contribute to hydration, though very caffeinated or alcoholic drinks have a mild diuretic effect — plain water remains the most reliable choice.' }],
+    frFaq: [{ q: "Le café ou le thé comptent-ils dans l'apport en eau ?", a: "La plupart des liquides contribuent à l'hydratation, bien que les boissons très caféinées ou alcoolisées aient un léger effet diurétique — l'eau plate reste le choix le plus fiable." }],
+  },
+};
+
+const calcInputStyle = (T: any): React.CSSProperties => ({
+  width: '100%', padding: '12px 16px', borderRadius: 10, fontSize: 16,
+  border: `1px solid ${T.border}`, background: T.bg2, color: T.txt, outline: 'none',
+  boxSizing: 'border-box', fontFamily: 'Inter,sans-serif',
+});
+const calcLabelStyle = (T: any): React.CSSProperties => ({
+  display: 'block', fontSize: 12, fontWeight: 600, color: T.txt3, marginBottom: 6,
+  textTransform: 'uppercase', letterSpacing: '0.05em',
+});
 
 // CALC_TOOLS — the subset of the SITE-WIDE `TOOLS` registry that actually
 // belongs to THIS hub (i.e. has a real PANEL_MAP entry, short key or long
@@ -1245,10 +1330,177 @@ function SmartCalcHub({ darkProp, favsProp, onFavsChange, onBack, initialTool }:
   );
 }
 
+// ── NEWLY INTEGRATED CALCULATORS — panels ───────────────────────
+// Same calculation logic as the old standalone pages, restyled with
+// useTheme()/T tokens so dark mode works, and reporting through
+// useOnResult() so history/share/related-tools all work too.
+
+function IdealWeightCalcPanel() {
+  const { T } = useTheme();
+  const { lang } = useLang();
+  const onResult = useOnResult();
+  const [height, setHeight] = useState('');
+  const [sex, setSex] = useState<'m' | 'f'>('m');
+  const [result, setResult] = useState<{ kg: number; low: number; high: number; lbs: number } | null>(null);
+
+  useEffect(() => {
+    const h = parseFloat(height);
+    if (!h || h < 100 || h > 250) { setResult(null); return }
+    const hIn = h / 2.54;
+    const base = sex === 'm' ? 50 + 2.3 * (hIn - 60) : 45.5 + 2.3 * (hIn - 60);
+    const kg = Math.round(Math.max(base, 0) * 10) / 10;
+    const r = { kg, low: Math.round(kg * 0.9 * 10) / 10, high: Math.round(kg * 1.1 * 10) / 10, lbs: Math.round(kg * 2.20462 * 10) / 10 };
+    setResult(r);
+    onResult({ rows: [{ k: lang === 'fr' ? 'Poids idéal' : 'Ideal weight', v: `${r.kg} kg` }, { k: lang === 'fr' ? 'Fourchette' : 'Range', v: `${r.low}–${r.high} kg` }] });
+  }, [height, sex, lang]);
+
+  const green = T.emerald;
+  const inp = calcInputStyle(T), lbl = calcLabelStyle(T);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div>
+        <label style={lbl}>{lang === 'fr' ? 'Sexe' : 'Sex'}</label>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {(['m', 'f'] as const).map(v => (
+            <button key={v} onClick={() => setSex(v)} style={{
+              flex: 1, padding: 10, borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer',
+              border: `2px solid ${sex === v ? green : T.border}`, background: sex === v ? `${green}15` : T.bg2,
+              color: sex === v ? green : T.txt2,
+            }}>
+              {v === 'm' ? '♂ ' : '♀ '}{v === 'm' ? (lang === 'fr' ? 'Homme' : 'Male') : (lang === 'fr' ? 'Femme' : 'Female')}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label style={lbl}>{lang === 'fr' ? 'Taille' : 'Height'} (cm)</label>
+        <input type="number" value={height} onChange={e => setHeight(e.target.value)} placeholder="175" style={inp} />
+      </div>
+
+      {result ? (
+        <div style={{ background: `${green}12`, border: `2px solid ${green}`, borderRadius: 14, padding: 24, textAlign: 'center' }}>
+          <div style={{ fontSize: 56, fontWeight: 800, color: green, lineHeight: 1, marginBottom: 8, fontFamily: "'Space Grotesk',sans-serif" }}>{result.kg} kg</div>
+          <div style={{ fontSize: 14, color: T.txt3, marginBottom: 16 }}>{lang === 'fr' ? 'Poids idéal estimé' : 'Estimated ideal weight'}</div>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
+            <div style={{ background: T.bg1, borderRadius: 10, padding: '10px 20px', fontSize: 14, color: T.txt, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Icon name="chart-bar" size={14} /> {lang === 'fr' ? 'Fourchette' : 'Range'}: {result.low}–{result.high} kg
+            </div>
+            <div style={{ background: T.bg1, borderRadius: 10, padding: '10px 20px', fontSize: 14, color: T.txt, fontWeight: 600 }}>
+              {result.lbs} lbs
+            </div>
+          </div>
+          <div style={{ fontSize: 11, color: T.txt4, marginBottom: 12 }}>
+            {lang === 'fr' ? 'Basé sur la formule Devine (1974) — estimation clinique' : 'Based on Devine formula (1974) — clinical estimate'}
+          </div>
+          <button onClick={() => navigator.clipboard?.writeText(`${lang === 'fr' ? 'Poids idéal' : 'Ideal weight'}: ${result.kg} kg (${result.low}–${result.high} kg)`)}
+            style={{ padding: '8px 20px', background: green, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <Icon name="clipboard" size={13} />{lang === 'fr' ? 'Copier' : 'Copy'}
+          </button>
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center', color: T.txt3, fontSize: 14, padding: 32, border: `1px dashed ${T.border}`, borderRadius: 14 }}>
+          {lang === 'fr' ? 'Entrez votre taille pour calculer' : 'Enter your height to calculate'}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WaterIntakeCalcPanel() {
+  const { T } = useTheme();
+  const { lang } = useLang();
+  const onResult = useOnResult();
+  const [weight, setWeight] = useState('');
+  const [activity, setActivity] = useState('sedentary');
+  const [hot, setHot] = useState(false);
+  const [result, setResult] = useState<{ liters: number; ml: number; cups: number } | null>(null);
+  const ACTIVITY_LEVELS = [
+    { key: 'sedentary', mult: 1.0, en: 'Sedentary', fr: 'Sédentaire' },
+    { key: 'light', mult: 1.2, en: 'Light Exercise', fr: 'Exercice léger' },
+    { key: 'active', mult: 1.4, en: 'Active', fr: 'Actif' },
+    { key: 'athlete', mult: 1.6, en: 'Athlete', fr: 'Athlète' },
+  ];
+
+  useEffect(() => {
+    const w = parseFloat(weight);
+    if (!w || w <= 0) { setResult(null); return }
+    const act = ACTIVITY_LEVELS.find(a => a.key === activity)?.mult ?? 1;
+    const climate = hot ? 1.15 : 1;
+    const ml = Math.round(w * 33 * act * climate);
+    const r = { liters: Math.round(ml / 100) / 10, ml, cups: Math.round(ml / 240) };
+    setResult(r);
+    onResult({ rows: [{ k: lang === 'fr' ? 'Eau/jour' : 'Water/day', v: `${r.liters} L` }, { k: lang === 'fr' ? 'Tasses' : 'Cups', v: String(r.cups) }] });
+  }, [weight, activity, hot, lang]);
+
+  const blue = T.blue;
+  const inp = calcInputStyle(T), lbl = calcLabelStyle(T);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div>
+        <label style={lbl}>{lang === 'fr' ? 'Poids' : 'Weight'} (kg)</label>
+        <input type="number" value={weight} onChange={e => setWeight(e.target.value)} placeholder="70" style={inp} />
+      </div>
+
+      <div>
+        <label style={lbl}>{lang === 'fr' ? "Niveau d'activité" : 'Activity Level'}</label>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {ACTIVITY_LEVELS.map(a => (
+            <button key={a.key} onClick={() => setActivity(a.key)} style={{
+              padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: 'pointer',
+              border: `2px solid ${activity === a.key ? blue : T.border}`, background: activity === a.key ? `${blue}15` : T.bg2,
+              color: activity === a.key ? blue : T.txt2,
+            }}>
+              {lang === 'fr' ? a.fr : a.en}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <button onClick={() => setHot(h => !h)} style={{
+          width: 44, height: 24, borderRadius: 99, border: 'none', cursor: 'pointer',
+          background: hot ? blue : T.border, position: 'relative', transition: 'background 0.2s',
+        }}>
+          <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: hot ? 23 : 3, transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
+        </button>
+        <span style={{ fontSize: 14, color: T.txt2 }}>
+          {lang === 'fr' ? 'Climat chaud / humide' : 'Hot / humid climate'}
+        </span>
+      </div>
+
+      {result ? (
+        <div style={{ background: `${blue}12`, border: `2px solid ${blue}`, borderRadius: 14, padding: 24, textAlign: 'center' }}>
+          <div style={{ fontSize: 56, fontWeight: 800, color: blue, lineHeight: 1, marginBottom: 8, fontFamily: "'Space Grotesk',sans-serif" }}>{result.liters} L</div>
+          <div style={{ fontSize: 16, color: T.txt3, marginBottom: 16 }}>{lang === 'fr' ? 'par jour' : 'per day'}</div>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div style={{ background: T.bg1, borderRadius: 10, padding: '10px 20px', fontSize: 14, color: T.txt, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Icon name="droplet" size={14} /> {result.ml.toLocaleString()} ml
+            </div>
+            <div style={{ background: T.bg1, borderRadius: 10, padding: '10px 20px', fontSize: 14, color: T.txt, fontWeight: 600 }}>
+              {result.cups} {lang === 'fr' ? 'tasses' : 'cups'}
+            </div>
+          </div>
+          <button onClick={() => navigator.clipboard?.writeText(`${lang === 'fr' ? "Apport en eau" : 'Water intake'}: ${result.liters} L / ${result.cups} cups`)}
+            style={{ marginTop: 16, padding: '8px 20px', background: blue, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <Icon name="clipboard" size={13} />{lang === 'fr' ? 'Copier' : 'Copy'}
+          </button>
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center', color: T.txt3, fontSize: 14, padding: 32, border: `1px dashed ${T.border}`, borderRadius: 14 }}>
+          {lang === 'fr' ? 'Entrez votre poids pour calculer' : 'Enter your weight to calculate'}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ToolSeoPage({ toolId }) {
   const { T } = useTheme();
   const { t, lang } = useLang();
-  const content = SEO_CONTENT[toShortToolId(toolId)];
+  const content = SEO_CONTENT[toShortToolId(toolId)] || LOCAL_SEO_CONTENT[toShortToolId(toolId)];
   if (!content) return null;
 
   const H2 = ({ children }: { children: React.ReactNode }) => (

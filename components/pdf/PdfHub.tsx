@@ -162,13 +162,6 @@ const GROUPS = [
   { key: "other",    en: "Other",    fr: "Autres"     },
 ];
 
-// PDF_TABS never changes at runtime, so these derived lists are computed
-// once at module load instead of with `.filter()` on every PdfHub render.
-const POPULAR_TABS  = PDF_TABS.filter(t => t.group === "popular");
-const CONVERT_TABS  = PDF_TABS.filter(t => t.group === "convert");
-const SECURITY_TABS = PDF_TABS.filter(t => t.group === "security");
-const OTHER_TABS    = PDF_TABS.filter(t => t.group === "other");
-
 // ── Shared style helpers ──
 
 // Style helpers — atao FONCTION mandray ny C ankehitriny (dark/light)
@@ -1750,6 +1743,7 @@ function SideGroup({ label, tabs, activeTab, lang, onSelect, collapsed }: {
   label: string, tabs: typeof PDF_TABS, activeTab: string, lang: string, onSelect: (id: string) => void, collapsed?: boolean,
 }) {
   const { C } = React.useContext(PdfThemeCtx)
+  if (tabs.length === 0) return null;
   return (
     <div style={{ marginTop: 24 }}>
       {!collapsed && (
@@ -1779,8 +1773,41 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
   const [sidebarPinned, setSidebarPinned] = React.useState(false);
   const [sidebarHovered, setSidebarHovered] = React.useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false);
+  const [toolSearch, setToolSearch] = React.useState("");
+  const [toolSearchFocused, setToolSearchFocused] = React.useState(false);
   const sidebarExpanded = sidebarPinned || sidebarHovered;
   const cur = PDF_TABS.find(t => t.id === tab)!;
+
+  // "/" mamoha ny search input (toy ny @ SmartCalc Hub) — tsy miasa raha
+  // efa eo anaty input/textarea/contentEditable hafa ny fokus.
+  const toolSearchRef = React.useRef<HTMLInputElement>(null);
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "/") return;
+      const el = e.target as HTMLElement;
+      if (el?.tagName === "INPUT" || el?.tagName === "TEXTAREA" || el?.isContentEditable) return;
+      e.preventDefault();
+      toolSearchRef.current?.focus();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  // Mi-filtrer ireo PDF tools araka ny toolSearch (anarana sy description,
+  // amin'ny lang eo am-pihodinana). Foana ny search → tabs rehetra.
+  const filteredPdfTabs = React.useMemo(() => {
+    const q = toolSearch.trim().toLowerCase();
+    if (!q) return PDF_TABS;
+    return PDF_TABS.filter(t => {
+      const label = (lang === "fr" ? t.fr : t.en).toLowerCase();
+      const desc = (lang === "fr" ? t.frDesc : t.enDesc).toLowerCase();
+      return label.includes(q) || desc.includes(q);
+    });
+  }, [toolSearch, lang]);
+  const filteredPopularTabs  = React.useMemo(() => filteredPdfTabs.filter(t => t.group === "popular"),  [filteredPdfTabs]);
+  const filteredConvertTabs  = React.useMemo(() => filteredPdfTabs.filter(t => t.group === "convert"),  [filteredPdfTabs]);
+  const filteredSecurityTabs = React.useMemo(() => filteredPdfTabs.filter(t => t.group === "security"), [filteredPdfTabs]);
+  const filteredOtherTabs    = React.useMemo(() => filteredPdfTabs.filter(t => t.group === "other"),    [filteredPdfTabs]);
 
   return (
     <PdfThemeCtx.Provider value={{ C, s }}>
@@ -1826,11 +1853,11 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
               padding: "12px 16px 20px", boxShadow: "0 12px 32px rgba(0,0,0,0.4)",
             }}>
             {[
-              { label: lang === "fr" ? "Populaires" : "Popular", tabs: POPULAR_TABS },
-              { label: lang === "fr" ? "Convertir" : "Convert", tabs: CONVERT_TABS },
-              { label: lang === "fr" ? "Sécurité" : "Security", tabs: SECURITY_TABS },
-              { label: lang === "fr" ? "Autres" : "Other", tabs: OTHER_TABS },
-            ].map(group => (
+              { label: lang === "fr" ? "Populaires" : "Popular", tabs: filteredPopularTabs },
+              { label: lang === "fr" ? "Convertir" : "Convert", tabs: filteredConvertTabs },
+              { label: lang === "fr" ? "Sécurité" : "Security", tabs: filteredSecurityTabs },
+              { label: lang === "fr" ? "Autres" : "Other", tabs: filteredOtherTabs },
+            ].filter(group => group.tabs.length > 0).map(group => (
               <div key={group.label} style={{ marginBottom: 16 }}>
                 <div style={{ fontSize: 10.5, color: C.muted2, textTransform: "uppercase", fontWeight: 800, letterSpacing: ".06em", padding: "0 4px 8px" }}>
                   {group.label}
@@ -1918,10 +1945,15 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
           </div>
 
           <div className="chronos-sidebar-groups">
-            <SideGroup label={lang === "fr" ? "Populaires" : "Popular"} tabs={POPULAR_TABS}  activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
-            <SideGroup label={lang === "fr" ? "Convertir"  : "Convert"}  tabs={CONVERT_TABS}  activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
-            <SideGroup label={lang === "fr" ? "Sécurité"   : "Security"} tabs={SECURITY_TABS} activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
-            <SideGroup label={lang === "fr" ? "Autres"     : "Other"}    tabs={OTHER_TABS}    activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
+            {sidebarExpanded && filteredPdfTabs.length === 0 && (
+              <div style={{ marginTop: 24, padding: "0 12px", fontSize: 11.5, color: C.muted2, lineHeight: 1.5 }}>
+                {lang === "fr" ? "Aucun outil trouvé." : "No tools found."}
+              </div>
+            )}
+            <SideGroup label={lang === "fr" ? "Populaires" : "Popular"} tabs={filteredPopularTabs}  activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
+            <SideGroup label={lang === "fr" ? "Convertir"  : "Convert"}  tabs={filteredConvertTabs}  activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
+            <SideGroup label={lang === "fr" ? "Sécurité"   : "Security"} tabs={filteredSecurityTabs} activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
+            <SideGroup label={lang === "fr" ? "Autres"     : "Other"}    tabs={filteredOtherTabs}    activeTab={tab} lang={lang} onSelect={setTab} collapsed={!sidebarExpanded} />
           </div>
 
           {/* Privacy badge */}
@@ -1945,6 +1977,79 @@ function PdfHub({ onBack, initialTab }: { onBack?: () => void; initialTab?: stri
 
         {/* Main content */}
         <main className="chronos-main" style={{ width: "100%", padding: "20px 40px 65px", height: "100%", overflowY: "auto" }}>
+
+          {/* Search tools — mi-filtrer ireo tool ao amin'ny sidebar sy ny
+              mobile drawer (label + description), amin'ny lang eo
+              am-pihodinana. "/" mamoha ny input avy hatrany. Miseho
+              avy hatrany ny valiny (dropdown) eo ambanin'ny input,
+              na dia litera iray monja aza no voasoratra. */}
+          <div style={{ position: "relative", marginBottom: 16 }}>
+            <span style={{
+              position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+              color: C.muted2, fontSize: 13, pointerEvents: "none",
+            }}>⌕</span>
+            <input
+              ref={toolSearchRef}
+              id="pdf-tools-search"
+              name="pdf-tools-search"
+              type="text"
+              autoComplete="off"
+              value={toolSearch}
+              onChange={e => setToolSearch(e.target.value)}
+              onFocus={e => { e.currentTarget.style.borderColor = C.accent; setToolSearchFocused(true); }}
+              onBlur={e => { e.currentTarget.style.borderColor = C.border; setToolSearchFocused(false); }}
+              onKeyDown={e => { if (e.key === "Escape") { setToolSearch(""); toolSearchRef.current?.blur(); } }}
+              placeholder={lang === "fr" ? "Rechercher un outil... (appuyez sur « / » pour chercher)" : "Search tools... (press \"/\" to focus)"}
+              style={{
+                width: "100%", height: 35,
+                border: `1px solid ${C.border}`, borderRadius: 9,
+                background: C.surfaceAlt, color: C.text,
+                padding: "0 12px 0 32px", fontSize: 12.5,
+                fontFamily: "'DM Sans', sans-serif",
+                outline: "none", boxSizing: "border-box",
+                transition: "border-color .15s",
+              }}
+            />
+
+            {toolSearchFocused && toolSearch.trim() !== "" && (
+              <div style={{
+                position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 60,
+                border: `1px solid ${C.border}`, borderRadius: 10,
+                background: C.panel, boxShadow: "0 12px 28px rgba(0,0,0,0.3)",
+                maxHeight: 280, overflowY: "auto", padding: 6,
+              }}>
+                {filteredPdfTabs.length === 0 ? (
+                  <div style={{ padding: "10px 8px", fontSize: 12.5, color: C.muted2 }}>
+                    {lang === "fr" ? "Aucun outil trouvé." : "No tools found."}
+                  </div>
+                ) : filteredPdfTabs.map(t => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onMouseDown={e => e.preventDefault()}
+                    onClick={() => { setTab(t.id); setToolSearch(""); toolSearchRef.current?.blur(); }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10, width: "100%",
+                      padding: "8px 10px", borderRadius: 8, border: "none",
+                      background: tab === t.id ? `${C.accent}18` : "transparent",
+                      color: tab === t.id ? C.accent : C.text,
+                      cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans', sans-serif",
+                    }}
+                    onMouseEnter={e => { if (tab !== t.id) e.currentTarget.style.background = C.surfaceAlt; }}
+                    onMouseLeave={e => { if (tab !== t.id) e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <span style={{ width: 16, flexShrink: 0, fontSize: 14 }}>{t.icon}</span>
+                    <span style={{ minWidth: 0 }}>
+                      <span style={{ display: "block", fontSize: 12.5, fontWeight: 600 }}>{lang === "fr" ? t.fr : t.en}</span>
+                      <span style={{ display: "block", fontSize: 10.5, color: C.muted2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {lang === "fr" ? t.frDesc : t.enDesc}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Breadcrumb */}
           <div style={{ fontSize: 11, color: C.muted2, marginBottom: 18 }}>

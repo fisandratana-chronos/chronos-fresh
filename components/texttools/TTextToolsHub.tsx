@@ -1551,9 +1551,50 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
   const [sidebarPinned, setSidebarPinned] = React.useState(false)
   const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false)
   const [sidebarHovered, setSidebarHovered] = React.useState(false)
+  const [toolSearch, setToolSearch] = React.useState('')
   const sidebarExpanded = sidebarPinned || sidebarHovered
   const cur = TEXT_TABS.find(t => t.id === tab)
   const isFr = lang === 'fr'
+
+  // "/" mamoha ny search input avy hatrany (toy ny @ PDF Tools / Network /
+  // Image / Converters Hub) — tsy miasa raha efa eo anaty input/textarea/
+  // contentEditable hafa ny fokus.
+  const toolSearchRef = React.useRef<HTMLInputElement>(null)
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== '/') return
+      const el = e.target as HTMLElement
+      if (el?.tagName === 'INPUT' || el?.tagName === 'TEXTAREA' || el?.isContentEditable) return
+      e.preventDefault()
+      toolSearchRef.current?.focus()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
+  // Mi-filtrer ireo TEXT_CATEGORIES/tools araka ny toolSearch (anarana sy
+  // description, amin'ny lang eo am-pihodinana). Foana ny search → daholo.
+  const filteredCategories = React.useMemo(() => {
+    const q = toolSearch.trim().toLowerCase()
+    if (!q) return TEXT_CATEGORIES
+    return TEXT_CATEGORIES
+      .map(cat => ({
+        ...cat,
+        tools: cat.tools.filter(toolId => {
+          const t = TEXT_TABS.find(x => x.id === toolId)
+          if (!t) return false
+          const label = (isFr ? t.fr : t.en).toLowerCase()
+          const desc = (isFr ? t.frDesc : t.enDesc).toLowerCase()
+          return label.includes(q) || desc.includes(q)
+        }),
+      }))
+      .filter(cat => cat.tools.length > 0)
+  }, [toolSearch, isFr])
+  const [toolSearchFocused, setToolSearchFocused] = React.useState(false)
+  const filteredToolsFlat = React.useMemo(
+    () => filteredCategories.flatMap(cat => cat.tools.map(id => TEXT_TABS.find(t => t.id === id)).filter(Boolean) as typeof TEXT_TABS),
+    [filteredCategories]
+  )
 
   const panels: Record<string, React.ReactNode> = {
     'word-counter':      <WordCounterTab lang={lang} />,
@@ -1639,7 +1680,7 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
               borderBottomLeftRadius: 16, borderBottomRightRadius: 16,
               padding: '12px 16px 20px', boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
             }}>
-            {TEXT_CATEGORIES.map(cat => (
+            {filteredCategories.map(cat => (
               <div key={cat.en} style={{ marginBottom: 16 }}>
                 <div style={{ fontSize: 10.5, color: C_T.muted, textTransform: 'uppercase', fontWeight: 800, letterSpacing: '.06em', padding: '0 4px 8px' }}>
                   {isFr ? cat.fr : cat.en}
@@ -1740,7 +1781,12 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
               </button>
             )}
           </div>
-          {TEXT_CATEGORIES.map(cat => (
+          {sidebarExpanded && filteredCategories.length === 0 && (
+            <div style={{ padding: '0 10px', fontSize: 11.5, color: C_T.muted, lineHeight: 1.5 }}>
+              {isFr ? 'Aucun outil trouvé.' : 'No tools found.'}
+            </div>
+          )}
+          {filteredCategories.map(cat => (
             <React.Fragment key={cat.en}>
               {sidebarExpanded && (
                 <div className="side-title" style={{ fontSize: 10.5, color: C_T.muted, textTransform: 'uppercase',
@@ -1779,6 +1825,79 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
 
         <main className="texttools-main tt-scroll" style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '32px 32px 64px' }}>
         <div style={{ width: '100%' }}>
+          {/* Search tools — mi-filtrer ireo tool ao amin'ny sidebar sy ny
+              mobile drawer (label + description), amin'ny lang eo
+              am-pihodinana. "/" mamoha ny input avy hatrany. Miseho
+              avy hatrany ny valiny (dropdown) eo ambanin'ny input,
+              na dia litera iray monja aza no voasoratra. */}
+          <div style={{ position: 'relative', marginBottom: 16 }}>
+            <span style={{
+              position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+              color: C_T.muted, fontSize: 13, pointerEvents: 'none',
+            }}>⌕</span>
+            <input
+              ref={toolSearchRef}
+              id="text-tools-search"
+              name="text-tools-search"
+              type="text"
+              autoComplete="off"
+              value={toolSearch}
+              onChange={e => setToolSearch(e.target.value)}
+              onFocus={e => { e.currentTarget.style.borderColor = C_T.accent; setToolSearchFocused(true) }}
+              onBlur={e => { e.currentTarget.style.borderColor = C_T.border; setToolSearchFocused(false) }}
+              onKeyDown={e => { if (e.key === 'Escape') { setToolSearch(''); toolSearchRef.current?.blur() } }}
+              placeholder={isFr ? 'Rechercher un outil... (appuyez sur « / » pour chercher)' : 'Search tools... (press "/" to focus)'}
+              style={{
+                width: '100%', height: 35,
+                border: `1px solid ${C_T.border}`, borderRadius: 9,
+                background: C_T.card, color: C_T.text,
+                padding: '0 12px 0 32px', fontSize: 12.5,
+                fontFamily: "'Inter','Segoe UI',sans-serif",
+                outline: 'none', boxSizing: 'border-box',
+                transition: 'border-color .15s',
+              }}
+            />
+
+            {toolSearchFocused && toolSearch.trim() !== '' && (
+              <div style={{
+                position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 60,
+                border: `1px solid ${C_T.border}`, borderRadius: 10,
+                background: C_T.card, boxShadow: '0 12px 28px rgba(0,0,0,0.3)',
+                maxHeight: 280, overflowY: 'auto', padding: 6,
+              }}>
+                {filteredToolsFlat.length === 0 ? (
+                  <div style={{ padding: '10px 8px', fontSize: 12.5, color: C_T.muted }}>
+                    {isFr ? 'Aucun outil trouvé.' : 'No tools found.'}
+                  </div>
+                ) : filteredToolsFlat.map(t => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onMouseDown={e => e.preventDefault()}
+                    onClick={() => { setTab(t.id); setToolSearch(''); toolSearchRef.current?.blur() }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                      padding: '8px 10px', borderRadius: 8, border: 'none',
+                      background: tab === t.id ? `${C_T.accent}18` : 'transparent',
+                      color: tab === t.id ? C_T.accent : C_T.text,
+                      cursor: 'pointer', textAlign: 'left', fontFamily: "'Inter','Segoe UI',sans-serif",
+                    }}
+                    onMouseEnter={e => { if (tab !== t.id) e.currentTarget.style.background = `${C_T.border}40` }}
+                    onMouseLeave={e => { if (tab !== t.id) e.currentTarget.style.background = 'transparent' }}
+                  >
+                    <Icon name={t.icon} size={14} />
+                    <span style={{ minWidth: 0 }}>
+                      <span style={{ display: 'block', fontSize: 12.5, fontWeight: 600 }}>{isFr ? t.fr : t.en}</span>
+                      <span style={{ display: 'block', fontSize: 10.5, color: C_T.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {isFr ? t.frDesc : t.enDesc}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div style={{ fontSize: 12, color: C_T.muted, marginBottom: 12 }}>
             CHRONOS / {isFr ? 'Outils Texte' : 'Text Tools'} / <span style={{ color: C_T.text, fontWeight: 600 }}>{isFr ? cur?.fr : cur?.en}</span>
           </div>

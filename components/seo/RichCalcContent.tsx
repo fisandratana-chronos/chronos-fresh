@@ -20,9 +20,11 @@
 import type { CSSProperties } from 'react'
 import { SEO_CONTENT } from '../../lib/seoContent'
 import { useLang } from '../../lib/hooks/useLang'
+import { useDark } from '../../lib/hooks/useDark'
 
 export default function RichCalcContent({ contentKey }: { contentKey: string }) {
   const { lang } = useLang()
+  const { dark } = useDark()
   const entry = SEO_CONTENT[contentKey]
   if (!entry) return null
 
@@ -41,9 +43,20 @@ export default function RichCalcContent({ contentKey }: { contentKey: string }) 
     faq: isFr ? 'Questions fréquentes' : 'Frequently Asked Questions',
   }
 
+  // ── Theme tokens ──────────────────────────────────────────
+  const T = {
+    text: dark ? '#F1F5F9' : '#0F172A',
+    muted: dark ? '#94A3B8' : '#475569',
+    muted2: dark ? '#94A3B8' : '#64748B',
+    border: dark ? '#1E293B' : '#E2E8F0',
+    card: dark ? '#111827' : '#fff',
+    formulaBg: dark ? '#0B1120' : '#0F172A',
+    formulaText: '#F1F5F9',
+  }
+
   const sectionStyle: CSSProperties = { marginBottom: 28 }
-  const h2Style: CSSProperties = { fontSize: 17, fontWeight: 800, margin: '0 0 10px', color: '#0F172A' }
-  const pStyle: CSSProperties = { fontSize: 14, lineHeight: 1.7, color: '#475569', margin: 0 }
+  const h2Style: CSSProperties = { fontSize: 17, fontWeight: 800, margin: '0 0 10px', color: T.text }
+  const pStyle: CSSProperties = { fontSize: 14, lineHeight: 1.7, color: T.muted, margin: 0 }
 
   return (
     <section style={{ maxWidth: 680, margin: '0 auto', padding: '8px 24px 48px' }}>
@@ -65,8 +78,9 @@ export default function RichCalcContent({ contentKey }: { contentKey: string }) 
         <div style={sectionStyle}>
           <h2 style={h2Style}>{L.formula}</h2>
           <div style={{
-            background: '#0F172A', color: '#F1F5F9', borderRadius: 10,
+            background: T.formulaBg, color: T.formulaText, borderRadius: 10,
             padding: '14px 18px', fontFamily: 'monospace', fontSize: 15,
+            border: dark ? `1px solid ${T.border}` : 'none',
           }}>
             {formula.expr}
           </div>
@@ -80,12 +94,13 @@ export default function RichCalcContent({ contentKey }: { contentKey: string }) 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {examples.map((ex, i) => (
               <div key={i} style={{
-                border: '1px solid #E2E8F0', borderRadius: 10, padding: '10px 14px',
+                border: `1px solid ${T.border}`, borderRadius: 10, padding: '10px 14px',
+                background: T.card,
                 display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
               }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>{ex.label}</span>
-                <span style={{ fontSize: 13, color: '#64748B' }}>{ex.input}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>{ex.result}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{ex.label}</span>
+                <span style={{ fontSize: 13, color: T.muted2 }}>{ex.input}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{ex.result}</span>
               </div>
             ))}
           </div>
@@ -98,12 +113,12 @@ export default function RichCalcContent({ contentKey }: { contentKey: string }) 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {faq.map((item, i) => (
               <details key={i} style={{
-                border: '1px solid #E2E8F0', borderRadius: 10, padding: '12px 16px', background: '#fff',
+                border: `1px solid ${T.border}`, borderRadius: 10, padding: '12px 16px', background: T.card,
               }}>
-                <summary style={{ fontSize: 14, fontWeight: 700, cursor: 'pointer', color: '#0F172A' }}>
+                <summary style={{ fontSize: 14, fontWeight: 700, cursor: 'pointer', color: T.text }}>
                   {item.q}
                 </summary>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: '#475569', margin: '10px 0 0' }}>
+                <p style={{ fontSize: 14, lineHeight: 1.6, color: T.muted, margin: '10px 0 0' }}>
                   {item.a}
                 </p>
               </details>
