@@ -553,7 +553,7 @@ export default function ImageHub({ initialTab, initialFormat }: { initialTab?: T
 
         <main className="ih-main ih-scroll" style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
           <div className="ih-main-inner" style={{ padding: '32px 32px 80px' }}>
-            <div style={{ maxWidth: 900 }}>
+            <div style={{ width: '100%' }}>
 
               <div style={{ fontSize: 12, color: T.muted, marginBottom: 12 }}>
                 CHRONOS / {lang === 'fr' ? 'Outils Image' : 'Image Tools'} / <span style={{ color: T.text, fontWeight: 600 }}>{lang === 'fr' ? cur.frLabel : cur.label}</span>

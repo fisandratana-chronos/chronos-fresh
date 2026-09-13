@@ -76,6 +76,395 @@ const TEXT_CATEGORIES = [
   { en: 'Convert',   fr: 'Convertir', tools: ['markdown-to-html', 'html-to-markdown'] },
 ]
 
+// ── RELATED_TEXT_TOOLS — static map: tool id → related tool ids
+// (mitovy filaharana amin'ny RELATED_CONVERTERS ao amin'ny
+// TConvertersHub.tsx, mba hanampy ny mpampiasa hitady tool mifandray) ──
+const RELATED_TEXT_TOOLS: Record<string, string[]> = {
+  'word-counter':      ['text-statistics', 'text-cleaner', 'case-converter'],
+  'case-converter':    ['text-cleaner', 'slug-generator', 'word-counter'],
+  'text-cleaner':      ['remove-spaces', 'remove-empty-lines', 'word-counter'],
+  'find-replace':      ['text-diff', 'case-converter', 'remove-duplicates'],
+  'remove-duplicates': ['sort-lines', 'remove-empty-lines', 'find-replace'],
+  'sort-lines':        ['remove-duplicates', 'text-to-list', 'list-to-text'],
+  'text-diff':         ['find-replace', 'word-counter', 'text-statistics'],
+  'slug-generator':    ['case-converter', 'text-cleaner', 'remove-spaces'],
+  'text-statistics':   ['word-counter', 'text-diff', 'case-converter'],
+  'lorem-ipsum':       ['word-counter', 'text-statistics', 'case-converter'],
+  'markdown-to-html':  ['html-to-markdown', 'text-cleaner', 'find-replace'],
+  'html-to-markdown':  ['markdown-to-html', 'text-cleaner', 'find-replace'],
+  'remove-empty-lines':['remove-spaces', 'text-cleaner', 'remove-duplicates'],
+  'remove-spaces':     ['text-cleaner', 'remove-empty-lines', 'remove-duplicates'],
+  'text-reverser':     ['case-converter', 'text-diff', 'sort-lines'],
+  'text-to-list':      ['list-to-text', 'sort-lines', 'remove-duplicates'],
+  'list-to-text':      ['text-to-list', 'remove-empty-lines', 'text-cleaner'],
+}
+
+// ── Text tool SEO content — content lalindalina isaky ny tab (what/how/
+// examples/faq), mitovy endrika amin'ny CONVERTER_SEO_CONTENT ao amin'ny
+// TConvertersHub.tsx, fa self-contained ato anatin'ity fichier ity ihany. ──
+
+type TxtSeoExample = { label: string; input: string; result: string }
+type TxtSeoFaqItem = { q: string; a: string }
+type TextSeoEntry = {
+  title: string; frTitle: string
+  what: string; frWhat: string
+  how: string; frHow: string
+  examples: TxtSeoExample[]
+  faq: TxtSeoFaqItem[]; frFaq: TxtSeoFaqItem[]
+}
+
+const TEXT_SEO_CONTENT: Record<string, TextSeoEntry> = {
+  'word-counter': {
+    title: 'Word Counter — Count Words, Characters & Reading Time',
+    frTitle: 'Compteur de Mots — Mots, Caractères et Temps de Lecture',
+    what: 'A word counter analyzes a piece of text and reports metrics like word count, character count, sentence count, and estimated reading time — useful for meeting length requirements on essays, articles, or social posts.',
+    frWhat: "Un compteur de mots analyse un texte et indique des métriques comme le nombre de mots, de caractères, de phrases, et le temps de lecture estimé — utile pour respecter une limite de longueur sur un essai, un article ou un post.",
+    how: 'Type or paste your text into the box; the tool scans it live and updates the counts (words, characters, spaces, sentences, paragraphs) and reading time as you type, with no need to click a button.',
+    frHow: "Tapez ou collez votre texte dans la zone ; l'outil l'analyse en direct et met à jour les compteurs (mots, caractères, espaces, phrases, paragraphes) ainsi que le temps de lecture au fur et à mesure, sans bouton à cliquer.",
+    examples: [
+      { label: 'Short paragraph', input: '"The quick brown fox jumps over the lazy dog."', result: '9 words · 45 characters' },
+      { label: 'Long-form draft', input: '~1,500-word article', result: '~6 min reading time' },
+    ],
+    faq: [{ q: 'How is reading time calculated?', a: "It's estimated from an average adult reading speed of roughly 200-250 words per minute." }],
+    frFaq: [{ q: 'Comment le temps de lecture est-il calculé ?', a: "Il est estimé à partir d'une vitesse de lecture moyenne d'environ 200-250 mots par minute." }],
+  },
+  'case-converter': {
+    title: 'Case Converter — UPPERCASE, lowercase, Title Case & More',
+    frTitle: 'Convertisseur de Casse — MAJUSCULE, minuscule, Titre et Plus',
+    what: 'A case converter rewrites text into a different letter-casing style — such as all uppercase, all lowercase, Title Case, or Sentence case — without changing the words themselves.',
+    frWhat: "Un convertisseur de casse réécrit un texte selon un style de casse différent — MAJUSCULES, minuscules, Casse de Titre, ou casse de phrase — sans changer les mots eux-mêmes.",
+    how: "Paste your text, pick the case style you want (UPPERCASE, lowercase, Title Case, Sentence case, or camelCase), and the tool instantly rewrites every letter according to that rule.",
+    frHow: "Collez votre texte, choisissez le style voulu (MAJUSCULES, minuscules, Casse de Titre, casse de Phrase, ou camelCase), et l'outil réécrit instantanément chaque lettre selon cette règle.",
+    examples: [
+      { label: 'To Title Case', input: '"hello world"', result: '"Hello World"' },
+      { label: 'To camelCase', input: '"hello world"', result: '"helloWorld"' },
+    ],
+    faq: [{ q: 'Does it work on accented letters?', a: 'Yes — casing rules use standard Unicode case mapping, so accented characters like é or ü convert correctly too.' }],
+    frFaq: [{ q: 'Fonctionne-t-il sur les lettres accentuées ?', a: "Oui — les règles de casse utilisent la correspondance Unicode standard, donc les caractères accentués comme é ou ü sont convertis correctement aussi." }],
+  },
+  'text-cleaner': {
+    title: 'Text Cleaner — Remove Extra Spaces, Tabs & Empty Lines',
+    frTitle: 'Nettoyeur de Texte — Supprimer Espaces, Tabulations et Lignes Vides',
+    what: 'A text cleaner strips out formatting clutter from pasted text — extra spaces, tab characters, and blank lines — so the result is tidy plain text ready to paste elsewhere.',
+    frWhat: "Un nettoyeur de texte retire le désordre de mise en forme d'un texte collé — espaces en trop, tabulations, et lignes vides — pour obtenir un texte brut propre, prêt à coller ailleurs.",
+    how: 'Paste your text and choose which cleanup rules to apply (collapse multiple spaces, remove tabs, drop empty lines); the tool applies them immediately and shows the cleaned result.',
+    frHow: "Collez votre texte et choisissez les règles de nettoyage à appliquer (réduire les espaces multiples, retirer les tabulations, supprimer les lignes vides) ; l'outil les applique immédiatement.",
+    examples: [
+      { label: 'Collapse spaces', input: '"Hello    world"', result: '"Hello world"' },
+      { label: 'Remove empty lines', input: '3 lines, 1 blank', result: '2 lines' },
+    ],
+    faq: [{ q: 'Will it change my actual words?', a: 'No — it only touches whitespace and blank lines; letters, numbers and punctuation are left untouched.' }],
+    frFaq: [{ q: 'Cela change-t-il mes mots ?', a: 'Non — seuls les espaces et les lignes vides sont touchés ; lettres, chiffres et ponctuation restent intacts.' }],
+  },
+  'find-replace': {
+    title: 'Find & Replace — Search and Replace Text (with Regex)',
+    frTitle: 'Rechercher et Remplacer — avec Support Regex',
+    what: 'A find-and-replace tool locates every occurrence of a word, phrase, or pattern inside a text and swaps it for something else, in one pass instead of doing it manually.',
+    frWhat: "Un outil de recherche et remplacement localise chaque occurrence d'un mot, d'une phrase ou d'un motif dans un texte et le remplace par autre chose, en une seule fois plutôt que manuellement.",
+    how: 'Enter the text to search for and what to replace it with, optionally turn on regex for pattern matching (like digits or wildcards), then run it — every match in your text is replaced at once.',
+    frHow: "Entrez le texte à rechercher et son remplacement, activez éventuellement le mode regex pour les motifs (comme des chiffres ou des jokers), puis lancez — chaque correspondance est remplacée d'un coup.",
+    examples: [
+      { label: 'Simple replace', input: '"cat" → "dog"', result: '"the cat sat" → "the dog sat"' },
+      { label: 'Regex replace', input: '\\d+ → "#"', result: '"Item 42" → "Item #"' },
+    ],
+    faq: [{ q: 'What is regex used for here?', a: 'Regex (regular expressions) lets you match patterns — like any number, any word, or text between quotes — instead of one exact phrase.' }],
+    frFaq: [{ q: 'À quoi sert le regex ici ?', a: "Le regex (expression régulière) permet de repérer des motifs — comme un nombre, un mot, ou un texte entre guillemets — au lieu d'une seule phrase exacte." }],
+  },
+  'remove-duplicates': {
+    title: 'Remove Duplicate Lines — Deduplicate a List Instantly',
+    frTitle: 'Supprimer les Doublons — Dédupliquer une Liste Instantanément',
+    what: 'This tool scans a list of lines and removes any line that appears more than once, keeping only the first occurrence of each — handy for cleaning up email lists, keyword lists, or data exports.',
+    frWhat: "Cet outil parcourt une liste de lignes et supprime toute ligne qui apparaît plus d'une fois, en ne gardant que la première occurrence — pratique pour nettoyer des listes d'emails, de mots-clés, ou des exports de données.",
+    how: 'Paste your list (one item per line), and the tool compares every line against the ones before it, removing exact repeats and leaving a clean, duplicate-free list.',
+    frHow: "Collez votre liste (un élément par ligne), et l'outil compare chaque ligne à celles précédentes, retirant les répétitions exactes pour ne laisser qu'une liste propre, sans doublon.",
+    examples: [
+      { label: 'Duplicate emails', input: '5 lines, 2 repeated', result: '3 unique lines' },
+      { label: 'Keyword list', input: '"apple, apple, banana"', result: '"apple, banana"' },
+    ],
+    faq: [{ q: 'Is the comparison case-sensitive?', a: 'By default yes — "Apple" and "apple" are treated as different lines unless you enable case-insensitive matching.' }],
+    frFaq: [{ q: 'La comparaison est-elle sensible à la casse ?', a: 'Par défaut oui — "Pomme" et "pomme" sont traités comme différents, sauf si vous activez la comparaison insensible à la casse.' }],
+  },
+  'sort-lines': {
+    title: 'Sort Lines — Alphabetical, Numeric & Length Sorting',
+    frTitle: 'Trier les Lignes — Alphabétique, Numérique et par Longueur',
+    what: 'A line sorter reorders the lines of a text block — alphabetically (A-Z or Z-A), numerically, or by line length — without changing the content of each line.',
+    frWhat: "Un trieur de lignes réorganise les lignes d'un bloc de texte — par ordre alphabétique (A-Z ou Z-A), numérique, ou par longueur — sans modifier le contenu de chaque ligne.",
+    how: 'Paste your list, pick a sort order (alphabetical, reverse alphabetical, numeric, or by length), and the tool rearranges every line to match, instantly.',
+    frHow: "Collez votre liste, choisissez un ordre de tri (alphabétique, alphabétique inverse, numérique, ou par longueur), et l'outil réorganise instantanément chaque ligne en conséquence.",
+    examples: [
+      { label: 'Alphabetical', input: '"banana, apple, cherry"', result: '"apple, banana, cherry"' },
+      { label: 'By length', input: '"cat, elephant, dog"', result: '"cat, dog, elephant"' },
+    ],
+    faq: [{ q: 'Can it sort numbers correctly (not as text)?', a: 'Yes — numeric sort mode compares the actual numeric value, so "10" correctly comes after "9" instead of before it.' }],
+    frFaq: [{ q: 'Peut-il trier les nombres correctement (pas comme du texte) ?', a: 'Oui — le tri numérique compare la valeur numérique réelle, donc "10" vient bien après "9" au lieu d\'avant.' }],
+  },
+  'text-diff': {
+    title: 'Text Diff — Compare Two Texts and See What Changed',
+    frTitle: 'Comparateur de Textes — Voir les Différences entre Deux Textes',
+    what: 'A text diff tool compares two versions of a text side by side and highlights exactly what was added, removed, or changed between them — useful for reviewing edits or comparing drafts.',
+    frWhat: "Un comparateur de textes met côte à côte deux versions d'un texte et met en évidence exactement ce qui a été ajouté, supprimé ou modifié entre les deux — utile pour relire des modifications ou comparer des brouillons.",
+    how: 'Paste the original text on one side and the revised text on the other; the tool lines them up and highlights the differences line by line (or word by word).',
+    frHow: "Collez le texte original d'un côté et la version modifiée de l'autre ; l'outil les aligne et met en évidence les différences ligne par ligne (ou mot par mot).",
+    examples: [
+      { label: 'One word changed', input: '"I like cats" vs "I like dogs"', result: '"cats" → "dogs" highlighted' },
+      { label: 'Line added', input: '2 lines vs 3 lines', result: '1 new line highlighted' },
+    ],
+    faq: [{ q: 'Does it compare whole documents or just single lines?', a: 'It compares full blocks of text, line by line, so you can paste entire paragraphs or documents.' }],
+    frFaq: [{ q: 'Compare-t-il des documents entiers ou juste des lignes seules ?', a: 'Il compare des blocs de texte complets, ligne par ligne, donc vous pouvez coller des paragraphes ou documents entiers.' }],
+  },
+  'slug-generator': {
+    title: 'Slug Generator — Turn Text into a URL-Friendly Slug',
+    frTitle: 'Générateur de Slug — Transformer un Texte en Slug pour URL',
+    what: 'A slug generator converts a title or phrase into a clean, lowercase, hyphen-separated string safe to use in a web address (URL) — removing spaces, accents, and special characters.',
+    frWhat: "Un générateur de slug convertit un titre ou une phrase en une chaîne propre, en minuscules et séparée par des tirets, utilisable sans risque dans une adresse web (URL) — en retirant espaces, accents et caractères spéciaux.",
+    how: 'Type your title, and the tool lowercases it, replaces spaces with hyphens, strips punctuation and accented characters, and gives you a ready-to-use slug.',
+    frHow: "Tapez votre titre, et l'outil le met en minuscules, remplace les espaces par des tirets, retire la ponctuation et les accents, pour vous donner un slug prêt à l'emploi.",
+    examples: [
+      { label: 'Blog title', input: '"10 Tips for Better Sleep!"', result: '"10-tips-for-better-sleep"' },
+      { label: 'Accented title', input: '"Café à Paris"', result: '"cafe-a-paris"' },
+    ],
+    faq: [{ q: 'Why do slugs matter for a website?', a: 'Clean slugs make URLs more readable for people and easier for search engines to understand.' }],
+    frFaq: [{ q: 'Pourquoi les slugs sont-ils importants pour un site web ?', a: "Des slugs propres rendent les URL plus lisibles pour les humains et plus faciles à comprendre pour les moteurs de recherche." }],
+  },
+  'text-statistics': {
+    title: 'Text Statistics — Word Frequency, Averages & More',
+    frTitle: 'Statistiques de Texte — Fréquence des Mots, Moyennes et Plus',
+    what: 'This tool goes beyond a simple word count to show deeper statistics about a text — like how often each word appears, average word and sentence length, and vocabulary variety.',
+    frWhat: "Cet outil va au-delà d'un simple comptage de mots pour montrer des statistiques plus fines sur un texte — comme la fréquence de chaque mot, la longueur moyenne des mots et des phrases, et la variété du vocabulaire.",
+    how: 'Paste your text and the tool tallies word frequency, computes averages (word length, sentence length), and displays the most common words at a glance.',
+    frHow: "Collez votre texte et l'outil comptabilise la fréquence des mots, calcule des moyennes (longueur des mots, des phrases), et affiche les mots les plus utilisés en un coup d'œil.",
+    examples: [
+      { label: 'Word frequency', input: '200-word article', result: 'top 10 most-used words' },
+      { label: 'Averages', input: 'a 5-paragraph essay', result: 'avg. 14 words/sentence' },
+    ],
+    faq: [{ q: 'Does it count common words like "the" or "and"?', a: 'Yes by default, though many people scan the frequency list mentally to skip common filler words.' }],
+    frFaq: [{ q: 'Compte-t-il les mots courants comme "le" ou "et" ?', a: "Oui par défaut, bien que beaucoup ignorent mentalement les mots de liaison courants dans la liste de fréquence." }],
+  },
+  'lorem-ipsum': {
+    title: 'Lorem Ipsum Generator — Placeholder Text for Mockups',
+    frTitle: 'Générateur Lorem Ipsum — Texte de Remplissage pour Maquettes',
+    what: 'A Lorem Ipsum generator produces meaningless filler text in the traditional Latin-like style, used by designers and developers to preview layouts before real content is ready.',
+    frWhat: "Un générateur Lorem Ipsum produit un texte de remplissage sans signification dans le style latin traditionnel, utilisé par les designers et développeurs pour prévisualiser une mise en page avant que le vrai contenu soit prêt.",
+    how: 'Choose how much text you need (by word, sentence, or paragraph count) and the tool generates that amount of placeholder Lorem Ipsum text instantly.',
+    frHow: "Choisissez la quantité de texte voulue (en mots, phrases, ou paragraphes) et l'outil génère instantanément ce texte de remplissage Lorem Ipsum.",
+    examples: [
+      { label: 'One paragraph', input: '1 paragraph', result: '"Lorem ipsum dolor sit amet..."' },
+      { label: '50 words', input: '50 words', result: 'a 50-word placeholder block' },
+    ],
+    faq: [{ q: 'Why is it called "Lorem Ipsum"?', a: "It comes from a scrambled passage of a 1st-century BC Latin text, chosen historically because its even letter distribution doesn't distract from a layout." }],
+    frFaq: [{ q: 'Pourquoi ça s\'appelle "Lorem Ipsum" ?', a: "Ça vient d'un passage remanié d'un texte latin du 1er siècle av. J.-C., choisi historiquement car sa répartition régulière des lettres ne distrait pas d'une mise en page." }],
+  },
+  'markdown-to-html': {
+    title: 'Markdown → HTML — Convert Markdown to HTML Instantly',
+    frTitle: 'Markdown → HTML — Convertir du Markdown en HTML',
+    what: 'This tool converts Markdown syntax (like **bold**, # headings, and - lists) into standard HTML markup, so it can be pasted directly into a web page or CMS.',
+    frWhat: "Cet outil convertit la syntaxe Markdown (comme **gras**, # titres, et - listes) en balisage HTML standard, prêt à être collé directement dans une page web ou un CMS.",
+    how: 'Paste your Markdown text and the tool parses the syntax and outputs the equivalent HTML tags — headings become <h1>/<h2>, bullet lists become <ul><li>, and so on.',
+    frHow: "Collez votre texte Markdown et l'outil analyse la syntaxe pour produire les balises HTML équivalentes — les titres deviennent <h1>/<h2>, les listes à puces deviennent <ul><li>, etc.",
+    examples: [
+      { label: 'Heading', input: '"# Hello"', result: '"<h1>Hello</h1>"' },
+      { label: 'Bold text', input: '"**important**"', result: '"<strong>important</strong>"' },
+    ],
+    faq: [{ q: 'Does it support tables and code blocks?', a: 'Yes — common Markdown extensions like tables, code fences, and links are converted along with the basics.' }],
+    frFaq: [{ q: 'Gère-t-il les tableaux et blocs de code ?', a: "Oui — les extensions Markdown courantes comme les tableaux, blocs de code, et liens sont converties en plus des bases." }],
+  },
+  'html-to-markdown': {
+    title: 'HTML → Markdown — Convert HTML to Clean Markdown',
+    frTitle: 'HTML → Markdown — Convertir du HTML en Markdown Propre',
+    what: 'This tool does the reverse of Markdown-to-HTML — it takes HTML markup and converts it back into clean, readable Markdown syntax.',
+    frWhat: "Cet outil fait l'inverse de Markdown vers HTML — il prend du balisage HTML et le reconvertit en syntaxe Markdown propre et lisible.",
+    how: 'Paste your HTML and the tool reads the tags (headings, bold, lists, links) and rewrites them using Markdown syntax, stripping out the HTML tags themselves.',
+    frHow: "Collez votre HTML et l'outil lit les balises (titres, gras, listes, liens) et les réécrit en syntaxe Markdown, en retirant les balises HTML elles-mêmes.",
+    examples: [
+      { label: 'Heading tag', input: '"<h2>Title</h2>"', result: '"## Title"' },
+      { label: 'Link tag', input: '\'<a href="x">go</a>\'', result: '"[go](x)"' },
+    ],
+    faq: [{ q: 'Is this useful when migrating content?', a: "Yes — it's handy for pulling HTML content out of a CMS or webpage and turning it into Markdown for a static site or docs." }],
+    frFaq: [{ q: 'Est-ce utile pour migrer du contenu ?', a: "Oui — pratique pour extraire du contenu HTML d'un CMS ou d'une page web et le transformer en Markdown pour un site statique ou une documentation." }],
+  },
+  'remove-empty-lines': {
+    title: 'Remove Empty Lines — Clean Up Blank Lines in a Text',
+    frTitle: 'Supprimer les Lignes Vides — Nettoyer les Espacements',
+    what: "This tool removes every blank (empty) line from a block of text, tightening up the spacing without touching the actual content lines.",
+    frWhat: "Cet outil supprime chaque ligne vide d'un bloc de texte, resserrant l'espacement sans toucher aux lignes de contenu réelles.",
+    how: "Paste your text and the tool scans line by line, dropping any line that's empty or contains only whitespace, then returns the compacted result.",
+    frHow: "Collez votre texte et l'outil parcourt ligne par ligne, retirant toute ligne vide ou ne contenant que des espaces, puis renvoie le résultat compacté.",
+    examples: [
+      { label: 'Double-spaced text', input: '6 lines, 3 blank', result: '3 lines' },
+      { label: 'Pasted document', input: 'text with stray blank lines', result: 'single-spaced text' },
+    ],
+    faq: [{ q: 'Does it remove lines with just spaces too?', a: 'Yes — a line containing only spaces or tabs is treated the same as a truly empty line.' }],
+    frFaq: [{ q: 'Supprime-t-il aussi les lignes avec juste des espaces ?', a: "Oui — une ligne ne contenant que des espaces ou tabulations est traitée comme une ligne réellement vide." }],
+  },
+  'remove-spaces': {
+    title: 'Remove Spaces — Strip, Trim & Collapse Whitespace',
+    frTitle: 'Supprimer les Espaces — Retirer, Ajuster ou Fusionner',
+    what: 'This tool cleans up whitespace issues in text — removing all spaces entirely, trimming leading/trailing spaces, or collapsing multiple spaces down to one.',
+    frWhat: "Cet outil corrige les problèmes d'espacement dans un texte — en retirant tous les espaces, en ajustant les espaces en début/fin, ou en fusionnant les espaces multiples en un seul.",
+    how: 'Paste your text and choose a mode (remove all spaces, trim ends only, or collapse repeated spaces); the tool applies it and shows the result immediately.',
+    frHow: "Collez votre texte et choisissez un mode (retirer tous les espaces, ajuster les extrémités seulement, ou fusionner les répétitions) ; l'outil l'applique et affiche le résultat immédiatement.",
+    examples: [
+      { label: 'Remove all', input: '"h e l l o"', result: '"hello"' },
+      { label: 'Collapse repeats', input: '"a   b     c"', result: '"a b c"' },
+    ],
+    faq: [{ q: 'What\'s the difference between "trim" and "collapse"?', a: 'Trim only removes spaces at the very start and end of the text; collapse also fixes multiple spaces in the middle down to a single space.' }],
+    frFaq: [{ q: 'Quelle est la différence entre "ajuster" et "fusionner" ?', a: "Ajuster ne retire que les espaces au tout début et à la toute fin du texte ; fusionner corrige aussi les espaces multiples au milieu en un seul espace." }],
+  },
+  'text-reverser': {
+    title: 'Text Reverser — Reverse Characters, Words, or Lines',
+    frTitle: 'Inverseur de Texte — Inverser Caractères, Mots ou Lignes',
+    what: 'A text reverser flips the order of a text — either character by character, word by word, or line by line — depending on the mode you pick.',
+    frWhat: "Un inverseur de texte retourne l'ordre d'un texte — caractère par caractère, mot par mot, ou ligne par ligne — selon le mode choisi.",
+    how: 'Paste your text, choose whether to reverse by character, word, or line, and the tool instantly outputs the reversed version.',
+    frHow: "Collez votre texte, choisissez d'inverser par caractère, par mot, ou par ligne, et l'outil affiche instantanément la version inversée.",
+    examples: [
+      { label: 'Reverse characters', input: '"hello"', result: '"olleh"' },
+      { label: 'Reverse words', input: '"I like cats"', result: '"cats like I"' },
+    ],
+    faq: [{ q: 'What is character reversal used for?', a: "It's often used for quick text tricks, puzzles, or checking palindromes." }],
+    frFaq: [{ q: "À quoi sert l'inversion de caractères ?", a: 'Elle est souvent utilisée pour des jeux de texte, des énigmes, ou pour vérifier des palindromes.' }],
+  },
+  'text-to-list': {
+    title: 'Text → List — Turn Lines into a Numbered or Bulleted List',
+    frTitle: 'Texte → Liste — Transformer des Lignes en Liste Numérotée ou à Puces',
+    what: 'This tool takes plain lines of text and formats them into a numbered list (1. 2. 3.) or a bulleted list (• • •), ready to paste into a document or webpage.',
+    frWhat: "Cet outil prend des lignes de texte brut et les met en forme en liste numérotée (1. 2. 3.) ou à puces (• • •), prêtes à être collées dans un document ou une page web.",
+    how: 'Paste your lines (one item per line), pick numbered or bulleted style, and the tool prefixes each line accordingly.',
+    frHow: "Collez vos lignes (un élément par ligne), choisissez le style numéroté ou à puces, et l'outil ajoute le préfixe correspondant à chaque ligne.",
+    examples: [
+      { label: 'Numbered list', input: '"apple\\nbanana"', result: '"1. apple\\n2. banana"' },
+      { label: 'Bulleted list', input: '"apple\\nbanana"', result: '"• apple\\n• banana"' },
+    ],
+    faq: [{ q: 'Can I start numbering from something other than 1?', a: 'Yes, some tools let you set a custom starting number — otherwise it defaults to starting at 1.' }],
+    frFaq: [{ q: 'Puis-je commencer la numérotation à un autre chiffre que 1 ?', a: "Oui, certains outils permettent de définir un numéro de départ personnalisé — sinon ça commence à 1 par défaut." }],
+  },
+  'list-to-text': {
+    title: 'List → Text — Strip List Markers Back to Plain Lines',
+    frTitle: 'Liste → Texte — Retirer les Puces/Numéros pour du Texte Simple',
+    what: 'This tool does the reverse of Text → List — it takes a numbered or bulleted list and strips the markers (1., -, •) back off, leaving plain lines of text.',
+    frWhat: "Cet outil fait l'inverse de Texte → Liste — il prend une liste numérotée ou à puces et retire les marqueurs (1., -, •) pour ne laisser que des lignes de texte brut.",
+    how: 'Paste your list and the tool detects and removes the leading numbers, bullets, or dashes from each line, returning clean plain text.',
+    frHow: "Collez votre liste et l'outil détecte et retire les numéros, puces ou tirets en début de chaque ligne, pour renvoyer un texte brut propre.",
+    examples: [
+      { label: 'Remove numbers', input: '"1. apple\\n2. banana"', result: '"apple\\nbanana"' },
+      { label: 'Remove bullets', input: '"• apple\\n• banana"', result: '"apple\\nbanana"' },
+    ],
+    faq: [{ q: 'Does it work with different bullet styles?', a: 'Yes — common markers like -, *, •, and numbered/lettered lists (1., a)) are all recognized and stripped.' }],
+    frFaq: [{ q: 'Fonctionne-t-il avec différents styles de puces ?', a: "Oui — les marqueurs courants comme -, *, •, et les listes numérotées/lettrées (1., a)) sont tous reconnus et retirés." }],
+  },
+}
+
+function TxtFaqItem({ q, a, last }: { q: string; a: string; last?: boolean }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const [open, setOpen] = React.useState(false)
+  return (
+    <div style={{ borderBottom: last ? 'none' : `1px solid ${C_T.border}` }}>
+      <button onClick={() => setOpen(o => !o)}
+        style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          gap: 12, padding: '14px 0', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+        <span style={{ fontFamily: "'Inter','Segoe UI',sans-serif", fontWeight: 700, fontSize: 13, color: C_T.text }}>{q}</span>
+        <span style={{ color: C_T.muted, fontSize: 14, flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}>▾</span>
+      </button>
+      {open && (
+        <p style={{ fontFamily: "'Inter','Segoe UI',sans-serif", fontSize: 13, color: C_T.muted, lineHeight: 1.7, margin: '0 0 16px' }}>{a}</p>
+      )}
+    </div>
+  )
+}
+
+function TextSeoContent({ toolId, lang }: { toolId: string; lang: string }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const content = TEXT_SEO_CONTENT[toolId]
+  if (!content) return null
+  const isFr = lang === 'fr'
+
+  return (
+    <article style={{ marginTop: 24, padding: '24px 20px', background: C_T.card, border: `1px solid ${C_T.border}`, borderRadius: 14 }}>
+      <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 17, color: C_T.text, marginBottom: 10, marginTop: 4, lineHeight: 1.3 }}>
+        {isFr ? "Qu'est-ce que c'est ?" : 'What is it?'}
+      </h2>
+      <p style={{ fontFamily: "'Inter','Segoe UI',sans-serif", fontSize: 13.5, color: C_T.muted, lineHeight: 1.75, margin: 0 }}>
+        {isFr ? content.frWhat : content.what}
+      </p>
+
+      <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 17, color: C_T.text, marginBottom: 10, marginTop: 26, lineHeight: 1.3 }}>
+        {isFr ? 'Comment ça marche' : 'How it works'}
+      </h2>
+      <p style={{ fontFamily: "'Inter','Segoe UI',sans-serif", fontSize: 13.5, color: C_T.muted, lineHeight: 1.75, margin: 0 }}>
+        {isFr ? content.frHow : content.how}
+      </p>
+
+      {content.examples.length > 0 && (
+        <>
+          <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 17, color: C_T.text, marginBottom: 10, marginTop: 26, lineHeight: 1.3 }}>
+            {isFr ? 'Exemples' : 'Examples'}
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {content.examples.map((ex, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 14px', background: C_T.bg, borderRadius: 9, border: `1px solid ${C_T.border}` }}>
+                <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, color: C_T.accent, fontWeight: 700, flexShrink: 0, paddingTop: 2 }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 12, color: C_T.text, display: 'block', marginBottom: 2 }}>
+                    {ex.label}
+                  </span>
+                  <span style={{ fontFamily: "'Inter','Segoe UI',sans-serif", fontSize: 12, color: C_T.muted }}>
+                    <code style={{ fontFamily: "'JetBrains Mono',monospace", color: C_T.muted, fontSize: 11 }}>{ex.input}</code>
+                    <span style={{ margin: '0 6px', color: C_T.muted }}>→</span>
+                    <span style={{ color: C_T.accent, fontWeight: 500 }}>{ex.result}</span>
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {(isFr ? content.frFaq : content.faq).length > 0 && (
+        <>
+          <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 17, color: C_T.text, marginBottom: 10, marginTop: 26, lineHeight: 1.3 }}>
+            {isFr ? 'Questions fréquentes' : 'Frequently asked questions'}
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {(isFr ? content.frFaq : content.faq).map((item, i, arr) => (
+              <TxtFaqItem key={i} q={item.q} a={item.a} last={i === arr.length - 1} />
+            ))}
+          </div>
+        </>
+      )}
+    </article>
+  )
+}
+
+function RelatedTextTools({ currentId, lang, onSelect }: { currentId: string; lang: string; onSelect: (id: string) => void }) {
+  const C_T = React.useContext(TextThemeCtx)
+  const relatedIds = RELATED_TEXT_TOOLS[currentId] || []
+  const related = relatedIds.map(id => TEXT_TABS.find(t => t.id === id)).filter(Boolean) as typeof TEXT_TABS
+  if (related.length === 0) return null
+
+  return (
+    <div style={{ marginTop: 24, padding: '20px', background: C_T.card, border: `1px solid ${C_T.border}`, borderRadius: 14 }}>
+      <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 15, color: C_T.text, marginBottom: 14 }}>
+        {lang === 'fr' ? 'Voir aussi' : 'You might also like'}
+      </h2>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        {related.map(t => (
+          <button key={t.id} onClick={() => onSelect(t.id)}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px',
+              background: C_T.bg, border: `1px solid ${C_T.border}`, borderRadius: 10,
+              color: C_T.text, fontFamily: "'Inter','Segoe UI',sans-serif", fontSize: 13, fontWeight: 600,
+              cursor: 'pointer', transition: 'border-color .15s' }}>
+            <Icon name={t.icon} size={16} />
+            <span>{lang === 'fr' ? t.fr : t.en}</span>
+            <span style={{ color: C_T.accent }}>→</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── Shared helpers (same shape as TConvertersHub) ──
 
 const inp = (C_T: ReturnType<typeof buildPalette>, extra: React.CSSProperties = {}): React.CSSProperties => ({
@@ -1201,6 +1590,8 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
         .tt-scroll::-webkit-scrollbar-thumb:hover { background: ${C_T.muted}; }
         .tool-link.rail-collapsed .tool-link-label { display: none; }
         .texttools-sidebar-pin { opacity: 0; transition: opacity .15s; }
+        .tt-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:flex-start;}
+        .tt-tool{position:sticky;top:0;}
         .texttools-sidebar:hover .texttools-sidebar-pin, .texttools-sidebar-pin.pinned { opacity: 1; }
         .tt-mobile-trigger { display: none; }
         @media(max-width:${BP.tablet}px){
@@ -1210,6 +1601,8 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
           .texttools-sidebar { display: none !important; }
           .tt-mobile-trigger { display: flex !important; }
           .texttools-main { overflow: visible !important; }
+          .tt-layout{grid-template-columns:1fr;}
+          .tt-tool{position:static;order:-1;}
         }
       `}</style>
 
@@ -1385,7 +1778,7 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
         </aside>
 
         <main className="texttools-main tt-scroll" style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '32px 32px 64px' }}>
-        <div style={{ maxWidth: 900 }}>
+        <div style={{ width: '100%' }}>
           <div style={{ fontSize: 12, color: C_T.muted, marginBottom: 12 }}>
             CHRONOS / {isFr ? 'Outils Texte' : 'Text Tools'} / <span style={{ color: C_T.text, fontWeight: 600 }}>{isFr ? cur?.fr : cur?.en}</span>
           </div>
@@ -1460,8 +1853,16 @@ function TTextToolsHub({ onBack }: { onBack?: () => void }) {
               )
             })}
           </div>
-          <div style={{ background: C_T.card, border: `1px solid ${C_T.border}`, borderRadius: 16, padding: 24 }}>
-            {panels[tab]}
+          <div className="tt-layout">
+            <div>
+              <TextSeoContent toolId={tab} lang={lang} />
+              <RelatedTextTools currentId={tab} lang={lang} onSelect={setTab} />
+            </div>
+            <div className="tt-tool">
+              <div style={{ background: C_T.card, border: `1px solid ${C_T.border}`, borderRadius: 16, padding: 24 }}>
+                {panels[tab]}
+              </div>
+            </div>
           </div>
         </div>
         </main>
