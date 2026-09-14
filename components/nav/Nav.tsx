@@ -150,7 +150,7 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
         </div>
 
         {/* Right actions */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto" }}>
           <button
             onClick={() => setPaletteOpen(true)}
             title={t("nav.commandPalette")}
@@ -179,17 +179,32 @@ export default function Nav({ dark, setDark, setCurrentPage, setPaletteOpen }: N
             aria-label={t("nav.language")}
             title={t("nav.language")}
             style={{
-              background: dark ? "#1E293B" : "#F1F5F9", border: "none", cursor: "pointer",
+              background: dark ? "#1E293B" : "#F1F5F9",
+              border: `1px solid ${dark ? "#334155" : "#E2E8F0"}`,
+              cursor: "pointer",
               width: 38, height: 38, borderRadius: 10, fontSize: 16,
               display: "flex", alignItems: "center", justifyContent: "center",
-              transition: "background 0.15s",
-            }}>{LANGS.find(l => l.code === lang)?.flag}</button>
-          <button onClick={() => setDark(!dark)} aria-label={dark ? t("nav.switchToLight") : t("nav.switchToDark")} style={{
-            background: dark ? "#1E293B" : "#F1F5F9", border: "none", cursor: "pointer",
-            width: 38, height: 38, borderRadius: 10, fontSize: 16,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "background 0.15s",
-          }}>{dark ? <IconSun size={16} /> : <IconMoon size={16} />}</button>
+              color: dark ? "#94A3B8" : "#64748B",
+              transition: "all 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "#2563EB"; e.currentTarget.style.color = "#2563EB"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = dark ? "#334155" : "#E2E8F0"; e.currentTarget.style.color = dark ? "#94A3B8" : "#64748B"; }}
+          >{LANGS.find(l => l.code === lang)?.flag}</button>
+          <button
+            onClick={() => setDark(!dark)}
+            aria-label={dark ? t("nav.switchToLight") : t("nav.switchToDark")}
+            style={{
+              background: dark ? "#1E293B" : "#F1F5F9",
+              border: `1px solid ${dark ? "#334155" : "#E2E8F0"}`,
+              cursor: "pointer",
+              width: 38, height: 38, borderRadius: 10, fontSize: 16,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: dark ? "#94A3B8" : "#64748B",
+              transition: "all 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "#2563EB"; e.currentTarget.style.color = "#2563EB"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = dark ? "#334155" : "#E2E8F0"; e.currentTarget.style.color = dark ? "#94A3B8" : "#64748B"; }}
+          >{dark ? <IconSun size={16} /> : <IconMoon size={16} />}</button>
           <button className="ch-nav-cta"
             onClick={() => router.push('/')}
             style={{
